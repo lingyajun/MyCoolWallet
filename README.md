@@ -1,0 +1,2 @@
+# MyCoolWallet
+ bitcoin wallet
