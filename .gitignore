@@ -81,3 +81,13 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+
+# osx
+.DS_Store
+
+# my file
+*.properties
+release/
+.idea/
+._LICENSE
+gradle/
