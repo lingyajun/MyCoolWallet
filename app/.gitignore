@@ -1,1 +1,7 @@
 /build
+res/.*
+.DS_Store
+app/src/main/res/.*
+app/src/main/res/values-zh.*
+app/src/main/res/values-zh-rTW/.*
+app/src/main/res/values/.*
