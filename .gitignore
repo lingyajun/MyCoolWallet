@@ -84,6 +84,8 @@ lint/tmp/
 
 # osx
 .DS_Store
+**/.DS_Store
+.DS_Store?
 
 # my file
 *.properties
