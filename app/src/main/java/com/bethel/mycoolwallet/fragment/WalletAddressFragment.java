@@ -1,10 +1,8 @@
 package com.bethel.mycoolwallet.fragment;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -34,6 +32,7 @@ public class WalletAddressFragment extends BaseFragment {
 
     @OnClick(R.id.bitcoin_address_qr_card)
     public void onCardClick() {
+        WalletAddressDialogFragment.show(getFragmentManager());
         XToast.info(getActivity(), "view my address detail").show();
     }
 
