@@ -71,6 +71,17 @@ public class WalletBalanceFragment extends BaseFragment {
         // test data
         Coin coin = Coin.parseCoin("0.0019");
         Coin c2 = Coin.COIN;
+        /**
+         * shift()
+         * 设置位数，以使小数点分隔符向右移动，该位数来自2014年前的标准BTC表示法。
+         *
+         * minDecimals()
+         * 设置用于格式化的最小小数位数。
+         *
+         * repeatOptionalDecimals(int decimals, int repetitions)
+         * 设置重复的附加小数点组以在最小小数点后使用（如果它们对表示精度有用）。
+         * 例如，如果您传递{@code 1,8}，则在需要时，格式字符串最多可以包含八个小数。
+         */
         MonetaryFormat format =  new MonetaryFormat().shift(0).minDecimals(2)
                 .repeatOptionalDecimals(2, 1);
 //        MonetaryFormat format2 = new MonetaryFormat(true);
