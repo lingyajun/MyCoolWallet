@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
+import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.utils.MonetaryFormat;
@@ -90,16 +91,29 @@ public class WalletBalanceFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.wallet_balance_fragment_options, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        super.onPrepareOptionsMenu(menu);
+        // todo 
+        boolean hasSomeBalance = true;
+        menu.findItem(R.id.wallet_balance_options_donate)
+                .setVisible(Constants.DONATION_ADDRESS != null && hasSomeBalance);
+                super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.wallet_balance_options_donate) {
+            donateBtc();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void donateBtc() {
+        XToast.info(getContext(), "donate some bitcoin");
     }
 }
