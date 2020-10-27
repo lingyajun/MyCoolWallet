@@ -5,6 +5,7 @@ import android.content.Context;
 
 import androidx.multidex.MultiDex;
 
+import com.bethel.mycoolwallet.utils.Logging;
 import com.xuexiang.xui.XUI;
 
 public class CoolApplication extends Application {
@@ -20,5 +21,6 @@ public class CoolApplication extends Application {
         super.onCreate();
         XUI.init(this);
         XUI.debug(true);
+        Logging.init(getFilesDir());
     }
 }
