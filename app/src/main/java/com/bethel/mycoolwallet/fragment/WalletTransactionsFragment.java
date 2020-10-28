@@ -14,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -45,6 +48,7 @@ public class WalletTransactionsFragment extends BaseFragment {
     RecyclerView recyclerView;
 
     private ListAdapter mAdapter;
+    private MenuItem filterMenuItem;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -104,6 +108,25 @@ public class WalletTransactionsFragment extends BaseFragment {
 
     private ListAdapter generateTestAdapter() {
         return new TestTransactionsAdapter(getActivity());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.wallet_transactions_fragment_options, menu);
+        filterMenuItem = menu.findItem(R.id.wallet_transactions_options_filter);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        // todo
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // todo
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

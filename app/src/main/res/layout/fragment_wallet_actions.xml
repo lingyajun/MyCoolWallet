@@ -1,0 +1,67 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:measureWithLargestChild="true"
+    android:orientation="horizontal">
+<!--    android:theme="@android:style/ThemeOverlay.Material.Dark.ActionBar"
+    style="?android:attr/actionBarSplitStyle"
+    -->
+
+    <com.xuexiang.xui.widget.button.RippleView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        app:rv_type="simpleRipple">
+<!--        android:layout_marginTop="?attr/xui_config_content_spacing_horizontal"-->
+
+        <Button
+            android:id="@+id/wallet_actions_request"
+            style="@style/My.Widget.ActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_send_flipped_white_24dp"
+            android:text="@string/button_request_coins" />
+    </com.xuexiang.xui.widget.button.RippleView>
+
+
+    <Space
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:layout_weight="1" />
+
+    <com.xuexiang.xui.widget.button.RippleView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        app:rv_type="simpleRipple">
+
+        <Button
+            android:id="@+id/wallet_actions_send"
+            style="@style/My.Widget.ActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableRight="@drawable/ic_send_white_24dp"
+            android:text="@string/button_send_coins" />
+    </com.xuexiang.xui.widget.button.RippleView>
+
+    <com.xuexiang.xui.widget.button.RippleView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/list_entry_padding_horizontal_cram"
+        android:layout_marginRight="@dimen/list_entry_padding_horizontal_cram"
+        app:rv_type="doubleRipple">
+
+        <ImageButton
+            android:id="@+id/wallet_actions_send_qr"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:contentDescription="@string/button_scan"
+            android:tint="@android:color/black"
+            android:background="@drawable/floating_action_button_background"
+            android:backgroundTint="@color/fg_on_dark_bg_network_significant"
+            android:src="@drawable/ic_photo_camera_white_24dp" />
+    </com.xuexiang.xui.widget.button.RippleView>
+
+</LinearLayout>

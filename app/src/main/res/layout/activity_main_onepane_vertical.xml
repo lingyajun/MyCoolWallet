@@ -61,7 +61,7 @@
 <!--        </FrameLayout>-->
 <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
     </LinearLayout>
-    <com.xuexiang.xui.widget.textview.supertextview.SuperButton
-        style="@style/SuperButton.Green"
-        android:layout_margin="20dp" />
+
+    <include layout="@layout/wallet_activity_bottom_include" />
+
 </LinearLayout>
