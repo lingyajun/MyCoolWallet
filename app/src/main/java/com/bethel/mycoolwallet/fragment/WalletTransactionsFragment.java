@@ -26,6 +26,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.TestTransactionsAdapter;
 import com.bethel.mycoolwallet.adapter.TransactionsAdapter;
 import com.bethel.mycoolwallet.view.StickToTopLinearLayoutManager;
+import com.xuexiang.xui.widget.toast.XToast;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,12 @@ public class WalletTransactionsFragment extends BaseFragment {
 
     private ListAdapter mAdapter;
     private MenuItem filterMenuItem;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -126,7 +133,19 @@ public class WalletTransactionsFragment extends BaseFragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         // todo
-        return super.onOptionsItemSelected(item);
+        final int id = item.getItemId();
+        switch (id) {
+            case R.id.wallet_transactions_options_filter_all:
+                break;
+            case R.id.wallet_transactions_options_filter_received:
+                XToast.info(getContext(), "received tx");
+                break;
+            case R.id.wallet_transactions_options_filter_sent:
+                XToast.info(getContext(), "sent tx");
+                break;
+                default: return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 
     @Override

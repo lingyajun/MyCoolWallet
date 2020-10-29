@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="app_name">麥酷錢包</string>
+
   <string name="toast_wallet_reset">錢包重置了！\n恢復需要花一點時間。</string>
   <string name="wallet_disclaimer_fragment_remind_safety">使用注意安全風險，請詳讀&lt;u&gt;安全提示&lt;/u&gt;。</string>
   <string name="wallet_disclaimer_fragment_remind_backup">你必須要&lt;u&gt;備份你的錢包&lt;/u&gt;！</string>
