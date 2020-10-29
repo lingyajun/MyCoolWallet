@@ -17,16 +17,28 @@
 
 package com.bethel.mycoolwallet.activity;
 
+import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AccelerateInterpolator;
 
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.utils.OnFirstPreDraw;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xqrcode.ui.CaptureActivity;
 import com.xuexiang.xui.widget.toast.XToast;
@@ -38,6 +50,9 @@ import com.xuexiang.xui.widget.toast.XToast;
  * @since 2019/5/30 10:43
  */
 public class CustomCaptureActivity extends CaptureActivity implements View.OnClickListener {
+    private static final String INTENT_EXTRA_SCENE_TRANSITION_X = "scene_transition_x";
+    private static final String INTENT_EXTRA_SCENE_TRANSITION_Y = "scene_transition_y";
+
     /**
      * 开始二维码扫描
      *
@@ -59,8 +74,37 @@ public class CustomCaptureActivity extends CaptureActivity implements View.OnCli
      * @param theme       主题
      */
     public static void start(Activity activity, int requestCode, int theme) {
+        start(activity, null, requestCode, theme);
+//        Intent intent = new Intent(activity, CustomCaptureActivity.class);
+//        intent.putExtra(KEY_CAPTURE_THEME, theme);
+//        activity.startActivityForResult(intent, requestCode);
+    }
+
+    /**
+     * 开始二维码扫描
+     *
+     * @param activity
+     * @param requestCode 请求码
+     * @param theme       主题
+     */
+    public static void start(Activity activity, View v, int requestCode, int theme) {
         Intent intent = new Intent(activity, CustomCaptureActivity.class);
         intent.putExtra(KEY_CAPTURE_THEME, theme);
+        if (null != v) {
+            final int[] clickViewLocation = new int[2];
+            v.getLocationOnScreen(clickViewLocation);
+            intent.putExtra(INTENT_EXTRA_SCENE_TRANSITION_X,
+                    (int) (clickViewLocation[0] + v.getWidth() / 2));
+            intent.putExtra(INTENT_EXTRA_SCENE_TRANSITION_Y,
+                    (int) (clickViewLocation[1] + v.getHeight() / 2));
+
+            if (Build.VERSION.SDK_INT >= 21) {
+                final ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity, v,
+                        "transition");
+                activity.startActivityForResult(intent, requestCode, options.toBundle());
+                return;
+            }
+        }
         activity.startActivityForResult(intent, requestCode);
     }
 
@@ -89,6 +133,58 @@ public class CustomCaptureActivity extends CaptureActivity implements View.OnCli
     private AppCompatImageView mIvFlashLight;
     private AppCompatImageView mIvFlashLight1;
     private boolean mIsOpen;
+
+
+    private View contentView;
+    private Animator sceneTransition = null;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        contentView = findViewById(android.R.id.content);
+        if (savedInstanceState == null && Build.VERSION.SDK_INT >= 21 && checkCameraPermission()) {
+            Intent data = getIntent();
+            int x = data.getIntExtra(INTENT_EXTRA_SCENE_TRANSITION_X, -1);
+            int y = data.getIntExtra(INTENT_EXTRA_SCENE_TRANSITION_Y, -1);
+            if (x != -1 && y != -1) {
+                contentView.setAlpha(0);
+                getWindow().setBackgroundDrawable(
+                        new ColorDrawable(ContextCompat.getColor(this, android.R.color.transparent)));
+                OnFirstPreDraw.listen(contentView, () -> {
+                        float finalRadius = (float) (Math.max(contentView.getWidth(), contentView.getHeight()));
+                        final int duration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+                        sceneTransition = ViewAnimationUtils.createCircularReveal(contentView, x, y, 0, finalRadius);
+                        sceneTransition.setDuration(duration);
+                        sceneTransition.setInterpolator(new AccelerateInterpolator());
+                        // TODO Here, the transition should start in a paused state, showing the first frame
+                        // of the animation. Sadly, RevealAnimator doesn't seem to support this, unlike
+                        // (subclasses of) ValueAnimator.
+                        return false;
+                });
+            }
+//            XToast.info(this, x+" : "+y).show();
+        }
+
+        contentView.postDelayed(() -> {
+            if (sceneTransition != null) {
+                contentView.setAlpha(1);
+                sceneTransition.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        getWindow().setBackgroundDrawable(new ColorDrawable(
+                                ContextCompat.getColor(CustomCaptureActivity.this, android.R.color.black)));
+                    }
+                });
+                sceneTransition.start();
+                sceneTransition = null;
+            }
+        }, 200);
+    }
+
+    protected boolean checkCameraPermission() {
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
 
     //===============================重写UI===================================//
 

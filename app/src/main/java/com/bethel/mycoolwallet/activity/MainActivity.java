@@ -154,25 +154,26 @@ public class MainActivity extends BaseActivity implements IQrScan {
 
     @Override
     public void startScan(View o) {
-        requestCameraPermissionsIfNotGranted();
-//        if (!maybeOpenCamera()) {
-//            requestCameraPermissions();
-//       }
+//        maybeOpenCamera();
+//        requestCameraPermissionsIfNotGranted();
+        if (!maybeOpenCamera(o)) {
+            requestCameraPermissions();
+       }
     }
 
     @Override
     protected void onCameraPermissionsResult(boolean grant) {
         if (grant) {
-            maybeOpenCamera();
+            maybeOpenCamera(null);
         } else {
             XToast.warning(this, R.string.open_camera_permissions).show();
         }
     }
 
-    private boolean maybeOpenCamera() {
+    private boolean maybeOpenCamera(View o) {
         boolean can = checkCameraPermission();
         if (can)
-            CustomCaptureActivity.start(this, REQUEST_QR_SCAN_CODE, R.style.XQRCodeTheme_Custom);
+            CustomCaptureActivity.start(this, o, REQUEST_QR_SCAN_CODE, R.style.XQRCodeTheme_Custom);
         return can;
     }
 
