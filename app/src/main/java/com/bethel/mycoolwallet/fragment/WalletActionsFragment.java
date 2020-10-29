@@ -1,6 +1,7 @@
 package com.bethel.mycoolwallet.fragment;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import butterknife.BindView;
@@ -44,7 +46,11 @@ public class WalletActionsFragment extends BaseFragment {
 
     @OnClick(R.id.wallet_actions_send_qr)
     protected void startQr() {
-        XToast.info(getContext(), "startQr").show();
+        Activity activity = getActivity();
+        if (activity instanceof IQrScan) {
+            ((IQrScan) activity).startScan(qrBtn);
+        }
+//        XToast.info(getContext(), "startQr").show();
     }
 
     @Override

@@ -1,23 +1,36 @@
 package com.bethel.mycoolwallet.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity implements IQrScan {
+    /**
+     * 扫描跳转Activity RequestCode
+     */
+    public static final int REQUEST_QR_SCAN_CODE = 111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
         initTitleBar();
     }
 
-    private void initTitleBar() {       //隐藏默认actionbar
+    private void initTitleBar() {
+        //隐藏默认actionbar
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.hide();
@@ -135,6 +149,61 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleScan(View o) {
-        XToast.info(this, "handleScan").show();
+        startScan(o);
     }
+
+    @Override
+    public void startScan(View o) {
+        requestCameraPermissionsIfNotGranted();
+//        if (!maybeOpenCamera()) {
+//            requestCameraPermissions();
+//       }
+    }
+
+    @Override
+    protected void onCameraPermissionsResult(boolean grant) {
+        if (grant) {
+            maybeOpenCamera();
+        } else {
+            XToast.warning(this, R.string.open_camera_permissions).show();
+        }
+    }
+
+    private boolean maybeOpenCamera() {
+        boolean can = checkCameraPermission();
+        if (can)
+            CustomCaptureActivity.start(this, REQUEST_QR_SCAN_CODE, R.style.XQRCodeTheme_Custom);
+        return can;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //处理二维码扫描结果
+        if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == RESULT_OK) {
+            handleScanResult(data);
+        }
+    }
+
+
+    /**
+     * 处理二维码扫描结果
+     *
+     * @param data
+     */
+    private void handleScanResult(Intent data) {
+        if (data != null) {
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
+                    String result = bundle.getString(XQRCode.RESULT_DATA);
+                    // todo handle bitcoin pay
+                    XToast.success(this, "解析结果: " + result, Toast.LENGTH_LONG).show();
+                } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
+                    XToast.error(this,R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
+
 }
