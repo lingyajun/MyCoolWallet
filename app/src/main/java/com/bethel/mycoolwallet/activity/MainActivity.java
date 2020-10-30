@@ -22,11 +22,12 @@ import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
+import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
-public class MainActivity extends BaseActivity implements IQrScan {
+public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins {
     /**
      * 扫描跳转Activity RequestCode
      */
@@ -37,22 +38,7 @@ public class MainActivity extends BaseActivity implements IQrScan {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.wallet_content);
 
-        initTitleBar();
-    }
-
-    private void initTitleBar() {
-        //隐藏默认actionbar
-        ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
-            actionBar.hide();
-        }
-
-        //获取toolbar
-       Toolbar toolBar = findViewById(R.id.toolbar);
-        //主标题，必须在setSupportActionBar之前设置，否则无效，如果放在其他位置，则直接setTitle即可
-        toolBar.setTitle(getString(R.string.app_name));
-        //用toolbar替换actionbar
-        setSupportActionBar(toolBar);
+        initTitleBar(R.string.app_name);
     }
 
     @Override
@@ -141,7 +127,8 @@ public class MainActivity extends BaseActivity implements IQrScan {
     }
 
     private void   handleRequestCoins() {
-        XToast.info(this, "handleRequestCoins").show();
+        requestCoins();
+       // XToast.info(this, "handleRequestCoins").show();
     }
 
     private void handleSendCoins() {
@@ -207,4 +194,12 @@ public class MainActivity extends BaseActivity implements IQrScan {
         }
     }
 
+    /**
+     * 打开收钱页面
+     * */
+    @Override
+    public void requestCoins() {
+//         XToast.info(this, "requestCoins").show();
+        RequestCoinsActivity.start(this);
+    }
 }

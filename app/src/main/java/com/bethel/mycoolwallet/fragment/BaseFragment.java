@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +23,10 @@ public abstract class BaseFragment extends Fragment {
     /**
      * 根布局
      */
-    protected View mRootView;
-    protected Unbinder mUnbinder;
+    protected View mRootView = null;
+    protected Unbinder mUnbinder = null;
 
+    protected Handler mainHandler = null;
 
 
     @Override
@@ -59,5 +62,16 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract int getLayoutId();
+
+    protected  void runOnUIthread(Runnable task) {
+        prepareMainHandler();
+        mainHandler.post(task);
+    }
+
+    private synchronized void prepareMainHandler() {
+        if (null == mainHandler) {
+            mainHandler = new Handler(Looper.getMainLooper());
+        }
+    }
 
 }

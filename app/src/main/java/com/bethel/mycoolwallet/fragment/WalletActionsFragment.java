@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
+import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import butterknife.BindView;
@@ -36,7 +37,11 @@ public class WalletActionsFragment extends BaseFragment {
 
     @OnClick(R.id.wallet_actions_request)
     protected void requestCoin() {
-        XToast.info(getContext(), "requestCoin").show();
+        Activity activity = getActivity();
+        if (activity instanceof IRequestCoins) {
+            ((IRequestCoins) activity).requestCoins();
+        }
+//        XToast.info(getContext(), "requestCoin").show();
     }
 
     @OnClick(R.id.wallet_actions_send)

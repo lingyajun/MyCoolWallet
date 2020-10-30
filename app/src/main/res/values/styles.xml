@@ -100,4 +100,32 @@
         <item name="inner_scan_animation_interval">25</item>
     </style>
 
+<!--    <style name="My.Theme.ChildActivity" parent="@style/My.Theme">-->
+<!--        <item name="android:actionBarStyle">@style/My.Widget.ActionBar.ChildActivity</item>-->
+<!--    </style>-->
+
+<!--    <style name="My.Theme" parent="@android:style/Theme.Material.Light.DarkActionBar">-->
+<!--        <item name="android:actionBarTheme">@style/My.ThemeOverlay.ActionBar</item>-->
+<!--        <item name="android:actionBarStyle">@style/My.Widget.ActionBar</item>-->
+<!--        <item name="android:actionModeStyle">@style/My.Widget.ActionMode</item>-->
+<!--        <item name="android:actionMenuTextColor">@color/fg_on_dark_bg_network</item>-->
+<!--        <item name="android:actionButtonStyle">@style/My.Widget.ActionButton</item>-->
+<!--        <item name="android:actionOverflowButtonStyle">@style/My.Widget.ActionButton.Overflow</item>-->
+<!--        <item name="android:actionOverflowMenuStyle">@style/My.Widget.PopupMenu.Overflow</item>-->
+<!--        <item name="android:textViewStyle">@style/My.Widget.TextView</item>-->
+<!--        <item name="android:editTextStyle">@style/My.Widget.EditText</item>-->
+<!--        <item name="android:autoCompleteTextViewStyle">@style/My.Widget.AutoCompleteTextView</item>-->
+<!--        <item name="android:checkboxStyle">@style/My.Widget.CompoundButton.CheckBox</item>-->
+<!--        <item name="android:spinnerStyle">@style/My.Widget.Spinner</item>-->
+<!--        <item name="android:popupMenuStyle">@style/My.Widget.PopupMenu</item>-->
+<!--        <item name="android:windowBackground">@color/bg_level1</item>-->
+<!--    </style>-->
+    <style name="MyEditText" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/xui_btn_gray_normal_color</item>
+        <item name="colorControlActivated">@color/xui_btn_blue_select_color</item>
+    </style>
+    <style name="MyCheckBox"  parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/xui_btn_gray_normal_color</item>
+        <item name="colorControlActivated">@color/xui_btn_blue_select_color</item>
+    </style>
 </resources>
