@@ -23,11 +23,12 @@ import android.widget.Toast;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
+import com.bethel.mycoolwallet.interfaces.ISendCoins;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
-public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins {
+public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins, ISendCoins {
     /**
      * 扫描跳转Activity RequestCode
      */
@@ -132,13 +133,17 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
     }
 
     private void handleSendCoins() {
-        XToast.info(this, "handleSendCoins").show();
+        sendCoins();
+//        XToast.info(this, "handleSendCoins").show();
     }
 
     private void handleScan(View o) {
         startScan(o);
     }
 
+    /**
+     * 打开扫码页面
+     * */
     @Override
     public void startScan(View o) {
 //        maybeOpenCamera();
@@ -201,5 +206,13 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
     public void requestCoins() {
 //         XToast.info(this, "requestCoins").show();
         RequestCoinsActivity.start(this);
+    }
+
+    /**
+     * 打开支付页面
+     * */
+    @Override
+    public void sendCoins() {
+        SendCoinsActivity.start(this);
     }
 }

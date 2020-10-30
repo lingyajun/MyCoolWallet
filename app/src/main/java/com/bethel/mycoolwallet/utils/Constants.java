@@ -140,7 +140,7 @@ public final class Constants {
     /** Default currency to use if all default mechanisms fail. */
     public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
 
-    /** Donation address for tip/donate action. */
+    /** todo: change address for me. Donation address for tip/donate action. */
     public static final String DONATION_ADDRESS = NETWORK_PARAMETERS.getId().equals(NetworkParameters.ID_MAINNET)
             ? "bc1qzug4shzgksqfqxuphgxluhnayqq3rmmh5v0dql" : null;
 
