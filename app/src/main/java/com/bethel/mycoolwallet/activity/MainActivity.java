@@ -154,7 +154,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
     }
 
     @Override
-    protected void onCameraPermissionsResult(boolean grant) {
+    public void onCameraPermissionsResult(boolean grant) {
         if (grant) {
             maybeOpenCamera(null);
         } else {

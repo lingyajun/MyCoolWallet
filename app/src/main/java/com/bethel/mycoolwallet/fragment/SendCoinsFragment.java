@@ -1,6 +1,8 @@
 package com.bethel.mycoolwallet.fragment;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -19,12 +21,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
 import com.bethel.mycoolwallet.data.FeeCategory;
+import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
+import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.utils.MonetaryFormat;
@@ -35,7 +41,12 @@ import butterknife.OnClick;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SendCoinsFragment extends BaseFragment {
+public class SendCoinsFragment extends BaseFragment implements IQrScan {
+    /**
+     * 扫描跳转Activity RequestCode
+     */
+    public static final int REQUEST_QR_SCAN_CODE = 111;
+
     @BindView(R.id.send_coins_payee_group)
      View payeeGroup;
     @BindView(R.id.send_coins_payee_name)
@@ -142,6 +153,60 @@ public class SendCoinsFragment extends BaseFragment {
 //            menu.findItem(R.id.send_coins_options_fee_category_priority).setChecked(true);
 
         super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case R.id.send_coins_options_scan:
+                    startScan(null);
+                break;
+            case R.id.send_coins_options_fee_category_economic:
+                break;
+            case R.id.send_coins_options_fee_category_normal:
+                break;
+            case R.id.send_coins_options_fee_category_priority:
+                break;
+            case R.id.send_coins_options_empty:
+                break;
+                default:    return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void startScan(View v) {
+        CustomCaptureActivity.start(this, REQUEST_QR_SCAN_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //处理二维码扫描结果
+        if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == Activity.RESULT_OK) {
+            handleScanResult(data);
+        }
+    }
+
+    /**
+     * 处理二维码扫描结果
+     *
+     * @param data
+     */
+    private void handleScanResult(Intent data) {
+        if (data != null) {
+            Bundle bundle = data.getExtras();
+            if (bundle != null) {
+                if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
+                    String result = bundle.getString(XQRCode.RESULT_DATA);
+                    // todo handle bitcoin pay
+                    XToast.success(getContext(), "解析结果: " + result, Toast.LENGTH_LONG).show();
+                } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
+                    XToast.error(getContext(), R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     @Override
