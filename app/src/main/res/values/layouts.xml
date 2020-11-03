@@ -3,4 +3,5 @@
     <item name="wallet_content" type="layout">@layout/activity_main_onepane_vertical</item>
     <item name="wallet_actions_top" type="bool">false</item>
     <item name="show_exchange_rates_option" type="bool">true</item>
+    <bool name="show_wallet_address_dialog_hint">false</bool>
 </resources>

@@ -69,7 +69,7 @@ public class RequestCoinsFragment extends BaseFragment {
 
     @OnClick(R.id.request_coins_qr_card)
     public void onCardClick() {
-        WalletAddressDialogFragment.show(getFragmentManager());
+//    todo    WalletAddressDialogFragment.show(getFragmentManager());
         XToast.info(getActivity(), " my request uri").show();
     }
 

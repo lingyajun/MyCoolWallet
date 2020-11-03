@@ -21,7 +21,7 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
     /**
      * 相机权限
      */
-    public static final int REQUEST_CAMERA_PERMISSION_CODE = 1777;
+//    public static final int REQUEST_CAMERA_PERMISSION_CODE = 1777;
 
     RequestPermissionsManager permissionsManager = null;
 

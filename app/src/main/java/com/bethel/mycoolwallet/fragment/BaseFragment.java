@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -74,4 +76,7 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
+    protected  <T extends ViewModel> T getViewModel(@NonNull Class<T> modelClass) {
+        return ViewModelProviders.of(this).get(modelClass);
+    }
 }

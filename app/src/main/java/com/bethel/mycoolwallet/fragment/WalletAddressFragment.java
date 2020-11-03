@@ -3,6 +3,8 @@ package com.bethel.mycoolwallet.fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -12,8 +14,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.mvvm.view_model.WalletAddressViewModel;
 import com.bethel.mycoolwallet.utils.Qr;
 import com.xuexiang.xui.widget.toast.XToast;
+
+import org.bitcoinj.core.Address;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -22,7 +28,8 @@ import butterknife.OnClick;
  * 当前btc地址.
  */
 public class WalletAddressFragment extends BaseFragment {
-    private Handler mHandler;
+    private WalletAddressViewModel viewModel;
+//    private Handler mHandler;
 
     @BindView(R.id.bitcoin_address_qr_card)
     CardView cardView;
@@ -32,15 +39,14 @@ public class WalletAddressFragment extends BaseFragment {
 
     @OnClick(R.id.bitcoin_address_qr_card)
     public void onCardClick() {
-        WalletAddressDialogFragment.show(getFragmentManager());
-        XToast.info(getActivity(), "view my address detail").show();
+        viewModel.showWalletAddressDialog.setValue(Event.simple());
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         XToast.Config.get().setAlpha(200).allowQueue(false).setGravity(Gravity.CENTER);
-        mHandler = new Handler();
+        viewModel = getViewModel(WalletAddressViewModel.class);
     }
 
     @Override
@@ -50,20 +56,18 @@ public class WalletAddressFragment extends BaseFragment {
         cardView.setUseCompatPadding(false);
         cardView.setMaxCardElevation(0);
 
-        showQrBmp("bit,eth,defi,,,,9977");
-
+        viewModel.qrCode.observe(this, ( bitmap)-> showQrBmp(bitmap));
+        viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
+        viewModel.showWalletAddressDialog.observe(this, (event)->{
+            final Address address = viewModel.currentAddress.getValue();
+            WalletAddressDialogFragment.show(getFragmentManager(), address, null);
+        });
     }
 
-    private void showQrBmp(final String content) {
-        new Thread(() -> {
-            final  Bitmap bitmap = Qr.bitmap(content);
-            mHandler.post( () -> {
-                        if (isAdded()) {
-                            qrImg.setImageBitmap(bitmap);
-                        }
-                    }
-            );
-        }).start();
+    private void showQrBmp(Bitmap bitmap) {
+        if (isAdded()) {
+            qrImg.setImageBitmap(bitmap);
+        }
     }
 
     @Override
