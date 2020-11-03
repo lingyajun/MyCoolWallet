@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -57,7 +58,7 @@ public class WalletAddressFragment extends BaseFragment {
         cardView.setMaxCardElevation(0);
 
         viewModel.qrCode.observe(this, ( bitmap)-> showQrBmp(bitmap));
-        viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
+//        viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
         viewModel.showWalletAddressDialog.observe(this, (event)->{
             final Address address = viewModel.currentAddress.getValue();
             WalletAddressDialogFragment.show(getFragmentManager(), address, null);
@@ -66,7 +67,10 @@ public class WalletAddressFragment extends BaseFragment {
 
     private void showQrBmp(Bitmap bitmap) {
         if (isAdded()) {
-            qrImg.setImageBitmap(bitmap);
+            final BitmapDrawable qrDrawable = new BitmapDrawable(getResources(), bitmap);
+            qrDrawable.setFilterBitmap(false);
+            qrImg.setImageDrawable(qrDrawable);
+//            qrImg.setImageBitmap(bitmap);
         }
     }
 

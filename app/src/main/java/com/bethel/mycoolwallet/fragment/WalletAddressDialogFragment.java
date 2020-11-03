@@ -75,7 +75,6 @@ public  class WalletAddressDialogFragment extends DialogFragment {
         mHandler = new Handler();
     }
 
-    // todo btc address.
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

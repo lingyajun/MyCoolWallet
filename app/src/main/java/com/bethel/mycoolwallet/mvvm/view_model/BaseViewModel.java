@@ -9,10 +9,10 @@ import androidx.lifecycle.AndroidViewModel;
 import com.bethel.mycoolwallet.CoolApplication;
 
 public class BaseViewModel extends AndroidViewModel {
-    protected final CoolApplication app;
-    public BaseViewModel(@NonNull Application application) {
-        super( application);
-        this.app = (CoolApplication) application;
+    protected final CoolApplication application;
+    public BaseViewModel(@NonNull Application app) {
+        super(app);
+        this.application = (CoolApplication) app;
     }
 
     /**

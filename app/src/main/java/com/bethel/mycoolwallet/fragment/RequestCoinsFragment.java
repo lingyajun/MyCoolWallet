@@ -4,8 +4,10 @@ package com.bethel.mycoolwallet.fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -28,13 +30,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.activity.RequestCoinsActivity;
+import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.mvvm.view_model.RequestCoinsViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.utils.Qr;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
+import com.bethel.mycoolwallet.view.CurrencyCalculatorLink;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.script.Script;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -44,6 +54,11 @@ import butterknife.OnClick;
  */
 public class RequestCoinsFragment extends BaseFragment {
     private ClipboardManager clipboardManager;
+
+    private RequestCoinsViewModel viewModel;
+
+    private static final String KEY_RECEIVE_ADDRESS = "receive_address";
+    private static final Logger log = LoggerFactory.getLogger(RequestCoinsFragment.class);
 
     @BindView(R.id.request_coins_amount_btc)
     CurrencyAmountView coinAmountView;
@@ -66,11 +81,15 @@ public class RequestCoinsFragment extends BaseFragment {
     @BindView(R.id.request_coins_fragment_initiate_request)
     TextView initNfcTv;
 
+    private CurrencyCalculatorLink amountCalculatorLink;
 
     @OnClick(R.id.request_coins_qr_card)
     public void onCardClick() {
-//    todo    WalletAddressDialogFragment.show(getFragmentManager());
-        XToast.info(getActivity(), " my request uri").show();
+//        WalletAddressDialogFragment.show(getFragmentManager());
+//        XToast.info(getActivity(), " my request uri").show();
+        Bitmap bitmap = viewModel.qrCode.getValue();
+        if (null!=bitmap)
+            viewModel.showBitmapDialog.setValue(new Event<>(bitmap));
     }
 
     @Override
@@ -78,17 +97,32 @@ public class RequestCoinsFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         this.clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         setHasOptionsMenu(true);
+        viewModel = getViewModel(RequestCoinsViewModel.class);
+
+        final Intent intent = getActivity().getIntent();
+        String scriptName = RequestCoinsActivity.INTENT_EXTRA_OUTPUT_SCRIPT_TYPE;
+        if (intent.hasExtra(scriptName)) {
+            Script.ScriptType outputScriptType =(Script.ScriptType) intent.getSerializableExtra(scriptName);
+            viewModel.freshReceiveAddress.overrideOutputScriptType(outputScriptType);
+        }
+
+        if (savedInstanceState != null) {
+            restoreInstanceState(savedInstanceState);
+        }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        viewModelObserves();
+
         qrCard.setCardBackgroundColor(Color.WHITE);
         qrCard.setPreventCornerOverlap(false);
         qrCard.setUseCompatPadding(false);
         qrCard.setMaxCardElevation(0); // we're using Lollipop elevation
 
-        // test ui
+        //  test ui; todo SharedPreferences 存储
         coinAmountView.setCurrencySymbol(MonetaryFormat.CODE_MBTC);
         coinAmountView.setInputFormat(CurrencyTools.getMaxPrecisionFormat(3));
         coinAmountView.setHintFormat(CurrencyTools.getFormat(3, 2));
@@ -97,26 +131,81 @@ public class RequestCoinsFragment extends BaseFragment {
         localAmountView.setHintFormat(Constants.LOCAL_FORMAT);
         localAmountView.setCurrencySymbol("usd"); // exchangeRate.fiat.currencyCode
 
-        // test qr
-        showQrBmp("test-1hbvsffgukllllllkjjhvsk-8743799");
+        amountCalculatorLink = new CurrencyCalculatorLink(coinAmountView, localAmountView);
 
-        // test nfc
-        SpannableStringBuilder initiateText = new SpannableStringBuilder(
-                getString(R.string.request_coins_fragment_initiate_request_qr));
-        initiateText.append(' ').append(getString(R.string.request_coins_fragment_initiate_request_nfc));
-        initNfcTv.setText(initiateText);
+        // todo amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
+        amountCalculatorLink.setExchangeDirection(true);
+        amountCalculatorLink.requestFocus();
     }
 
-    private void showQrBmp(final String content) {
-        new Thread(() -> {
-            final Bitmap bitmap = Qr.bitmap(content);
-            runOnUIthread( () -> {
-                        if (isAdded()) {
-                            qrImg.setImageBitmap(bitmap);
-                        }
-                    }
-            );
-        }).start();
+    @Override
+    public void onResume() {
+        super.onResume();
+        amountCalculatorLink.setListener(new CurrencyAmountView.Listener() {
+            @Override
+            public void changed() {
+                viewModel.amount.setValue(amountCalculatorLink.getAmount());
+            }
+
+            @Override
+            public void focusChanged(final boolean hasFocus) {
+                // focus linking
+                final int activeAmountViewId = amountCalculatorLink.activeTextView().getId();
+                bleCheckBox.setNextFocusUpId(activeAmountViewId);
+            }
+        });
+
+        // todo  Start Bluetooth Listening
+    }
+
+    @Override
+    public void onPause() {
+        amountCalculatorLink.setListener(null);
+        super.onPause();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        final Address receiveAddress = viewModel.freshReceiveAddress.getValue();
+        if (null != receiveAddress) {
+            outState.putString(KEY_RECEIVE_ADDRESS, receiveAddress.toString());
+        }
+    }
+
+    private void restoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState.containsKey(KEY_RECEIVE_ADDRESS)) {
+            Address address = Address.fromString(Constants.NETWORK_PARAMETERS,
+                    savedInstanceState.getString(KEY_RECEIVE_ADDRESS));
+            viewModel.freshReceiveAddress.setValue(address);
+        }
+    }
+
+    private void viewModelObserves() {
+        viewModel.freshReceiveAddress.observe(this, address -> log.info("request coins address: {}", address));
+        viewModel.qrCode.observe(this, bitmap -> showQrBmp(bitmap));
+        viewModel.paymentRequest.observe(this, bytes -> {
+            // todo test nfc
+            SpannableStringBuilder initiateText = new SpannableStringBuilder(
+                    getString(R.string.request_coins_fragment_initiate_request_qr));
+            initiateText.append(' ').append(getString(R.string.request_coins_fragment_initiate_request_nfc));
+            initNfcTv.setText(initiateText);
+        });
+
+        viewModel.bitcoinUri.observe(this, uri -> getActivity().invalidateOptionsMenu());
+        viewModel.showBitmapDialog.observe(this, bitmapEvent ->
+                        BitmapFragment.show(getFragmentManager(), bitmapEvent.getContentIfNotHandled()));
+
+
+        // todo exchangeRate
+    }
+
+    private void showQrBmp(Bitmap bitmap) {
+        if (isAdded()) {
+            final BitmapDrawable qrDrawable = new BitmapDrawable(getResources(), bitmap);
+            qrDrawable.setFilterBitmap(false);
+            qrImg.setImageDrawable(qrDrawable);
+        }
     }
 
     @Override
@@ -127,8 +216,7 @@ public class RequestCoinsFragment extends BaseFragment {
 
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
-        // todo
-        final boolean hasBitcoinUri = true;
+        final boolean hasBitcoinUri = viewModel.bitcoinUri.getValue() != null;
         menu.findItem(R.id.request_coins_options_copy).setEnabled(hasBitcoinUri);
         menu.findItem(R.id.request_coins_options_share).setEnabled(hasBitcoinUri);
         menu.findItem(R.id.request_coins_options_local_app).setEnabled(hasBitcoinUri);

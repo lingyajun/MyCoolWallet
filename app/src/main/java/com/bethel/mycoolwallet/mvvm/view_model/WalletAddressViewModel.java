@@ -21,9 +21,9 @@ public class WalletAddressViewModel extends BaseViewModel {
     public final MediatorLiveData<Uri> bitcoinUri = new MediatorLiveData<>();
     public final MutableLiveData<Event<Void>> showWalletAddressDialog = new MutableLiveData<>();
 
-    public WalletAddressViewModel(@NonNull Application application) {
-        super(application);
-        currentAddress = new CurrentAddressLiveData(app);
+    public WalletAddressViewModel(@NonNull Application app) {
+        super(app);
+        currentAddress = new CurrentAddressLiveData(application);
         qrCode.addSource(currentAddress, (address)-> maybeGenerateQrCode());
         bitcoinUri.addSource(currentAddress, (address)-> maybeGenerateBitcoinUri());
     }
