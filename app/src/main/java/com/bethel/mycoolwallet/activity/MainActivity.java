@@ -28,6 +28,8 @@ import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.script.Script;
+
 public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins, ISendCoins {
     /**
      * 扫描跳转Activity RequestCode
@@ -87,6 +89,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 break;
 
             case R.id.wallet_options_request_legacy:
+                // 用旧式地址索取比特币 (pay to pubkey hash)
+                RequestCoinsActivity.start(this, Script.ScriptType.P2PKH);
                 break;
             case R.id.wallet_options_send :
                 handleSendCoins();
