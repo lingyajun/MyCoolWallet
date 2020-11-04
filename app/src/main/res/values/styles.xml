@@ -128,4 +128,15 @@
         <item name="colorControlNormal">@color/xui_btn_gray_normal_color</item>
         <item name="colorControlActivated">@color/xui_btn_blue_select_color</item>
     </style>
+
+
+<!--    <style name="MyBaseAlert">-->
+<!--        <item name="windowMinWidthMajor">@dimen/dialog_min_width_major</item>-->
+<!--        <item name="windowMinWidthMinor">@dimen/dialog_min_width_minor</item>-->
+<!--    </style>-->
+
+    <style name="My.Theme.Dialog" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:background">@color/bg_level3</item>
+    </style>
+
 </resources>

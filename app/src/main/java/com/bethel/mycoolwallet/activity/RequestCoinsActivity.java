@@ -11,8 +11,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
+import com.bethel.mycoolwallet.mvvm.view_model.RequestCoinsActivityViewModel;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.script.Script;
@@ -31,6 +35,8 @@ public class RequestCoinsActivity extends BaseActivity {
         context.startActivity(intent);
     }
 
+    private RequestCoinsActivityViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +44,15 @@ public class RequestCoinsActivity extends BaseActivity {
         Toolbar toolbar= initTitleBar(R.string.request_coins_activity_title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);//显示toolbar的左侧返回按钮
         toolbar.setNavigationOnClickListener((v)-> finish());
+
+        viewModel = getViewModel(RequestCoinsActivityViewModel.class);
+        viewModel.showHelpDialog.observe(this, new Event.Observer<Integer>() {
+            @Override
+            public void onEvent(final Integer messageResId) {
+                HelpDialogFragment.show(getSupportFragmentManager(), messageResId);
+//                XToast.info(getApplication(), messageResId).show();
+            }
+        });
     }
 
     @Override
@@ -49,8 +64,7 @@ public class RequestCoinsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.request_coins_options_help) {
-            // todo
-            XToast.info(this, Html.fromHtml(getString(R.string.help_request_coins))).show();
+            viewModel.showHelpDialog.setValue(new Event<>(R.string.help_request_coins));
             return true;
         }
         return super.onOptionsItemSelected(item);

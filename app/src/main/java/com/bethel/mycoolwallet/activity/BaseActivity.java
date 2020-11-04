@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.interfaces.IRequestPermissions;
@@ -97,4 +99,7 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
         return toolBar;
     }
 
+    protected  <T extends ViewModel> T getViewModel(@NonNull Class<T> modelClass) {
+        return ViewModelProviders.of(this).get(modelClass);
+    }
 }
