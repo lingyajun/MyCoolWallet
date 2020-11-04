@@ -1,10 +1,14 @@
 package com.bethel.mycoolwallet.fragment;
 
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -31,6 +35,7 @@ import android.widget.TextView;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.RequestCoinsActivity;
+import com.bethel.mycoolwallet.activity.SendCoinsActivity;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.mvvm.view_model.RequestCoinsViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -242,18 +247,18 @@ public class RequestCoinsFragment extends BaseFragment {
     }
 
     private void handleCopy() {
-        // todo btc uri
-        final Uri request = Uri.parse("bitcoin:1aasffdvdjsvnjksdnvkjnvkj");
-        clipboardManager.setPrimaryClip(ClipData.newPlainText("btc address", "btc123456uuss"));
-//        final Uri request = viewModel.bitcoinUri.getValue();
-//        clipboardManager.setPrimaryClip(ClipData.newRawUri("Bitcoin payment request", request));
+        //  btc uri
+//        final Uri request = Uri.parse("bitcoin:1aasffdvdjsvnjksdnvkjnvkj");
+//        clipboardManager.setPrimaryClip(ClipData.newPlainText("btc address", "btc123456uuss"));
+        final Uri request = viewModel.bitcoinUri.getValue();
+        clipboardManager.setPrimaryClip(ClipData.newRawUri("Bitcoin payment request", request));
         XToast.success(getContext(), R.string.request_coins_clipboard_msg).show();
     }
 
     private void handleShare() {
-        // todo btc uri
-        final Uri request = Uri.parse("bitcoin:1aasffdvdjsvnjksdnvkjnvkj");
-//        final Uri request = viewModel.bitcoinUri.getValue();
+        //  btc uri
+//        final Uri request = Uri.parse("bitcoin:1aasffdvdjsvnjksdnvkjnvkj");
+        final Uri request = viewModel.bitcoinUri.getValue();
         final ShareCompat.IntentBuilder builder = ShareCompat.IntentBuilder.from(getActivity());
         builder.setType("text/plain");
         builder.setText(request.toString());
@@ -262,7 +267,22 @@ public class RequestCoinsFragment extends BaseFragment {
     }
 
     private void handleLocalApp() {
-        XToast.warning(getContext(), "handleLocalApp-ComponentName-SendCoinsActivity").show();
+        Context context = getContext();
+        ComponentName componentName = new ComponentName(context, SendCoinsActivity.class);
+        PackageManager manager = context.getPackageManager();
+        Uri btcUri = viewModel.bitcoinUri.getValue();
+        Intent intent = new Intent(Intent.ACTION_VIEW, btcUri);
+
+        try {
+            manager.setComponentEnabledSetting(componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            XToast.error(context, R.string.request_coins_no_local_app_msg).show();
+        } finally {
+            manager.setComponentEnabledSetting(componentName,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+        }
     }
 
     @Override
