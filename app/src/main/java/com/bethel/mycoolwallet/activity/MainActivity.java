@@ -21,10 +21,12 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.fragment.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
+import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
@@ -36,6 +38,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
      * 扫描跳转Activity RequestCode
      */
     public static final int REQUEST_QR_SCAN_CODE = 111;
+    private  MainActivityViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,11 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         setContentView(R.layout.wallet_content);
 
         initTitleBar(R.string.app_name);
+
+        viewModel = getViewModel(MainActivityViewModel.class);
+        viewModel.walletEncrypted.observe(this, result -> invalidateOptionsMenu());
+        viewModel.showEncryptKeysDialog.observe(this,
+                (v) -> EncryptKeysDialogFragment.show(getSupportFragmentManager()));
     }
 
     @Override
@@ -65,13 +73,15 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         final boolean enableRestoreWalletOption = Environment.MEDIA_MOUNTED.equals(externalStorageState)
                 || Environment.MEDIA_MOUNTED_READ_ONLY.equals(externalStorageState);
         menu.findItem(R.id.wallet_options_restore_wallet).setEnabled(enableRestoreWalletOption);
-//  todo      final Boolean isEncrypted = viewModel.walletEncrypted.getValue();
-//        if (isEncrypted != null) {
+
+        final Boolean isEncrypted = viewModel.walletEncrypted.getValue();
+        if (isEncrypted != null) {
             final MenuItem encryptKeysOption = menu.findItem(R.id.wallet_options_encrypt_keys);
-//            encryptKeysOption.setTitle(isEncrypted ? R.string.wallet_options_encrypt_keys_change
-//                    : R.string.wallet_options_encrypt_keys_set);
+            encryptKeysOption.setTitle(isEncrypted ? R.string.wallet_options_encrypt_keys_change
+                    : R.string.wallet_options_encrypt_keys_set);
             encryptKeysOption.setVisible(true);
-//        }
+        }
+
 //   todo     final Boolean isLegacyFallback = viewModel.walletLegacyFallback.getValue();
 //        if (isLegacyFallback != null) {
 //            final MenuItem requestLegacyOption = menu.findItem(R.id.wallet_options_request_legacy);
@@ -112,8 +122,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             case R.id.wallet_options_backup_wallet :
                 break;
             case R.id.wallet_options_encrypt_keys :
-                // todo
-                EncryptKeysDialogFragment.show(getSupportFragmentManager());
+                viewModel.showEncryptKeysDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_preferences :
                 break;

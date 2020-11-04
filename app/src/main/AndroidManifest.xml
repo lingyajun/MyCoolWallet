@@ -62,6 +62,7 @@
 
         <activity android:name=".activity.MainActivity"
             android:configChanges="keyboard|keyboardHidden"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true"
             android:launchMode="singleTask">
 <!--            android:theme="@style/My.Theme.WithSplash">-->

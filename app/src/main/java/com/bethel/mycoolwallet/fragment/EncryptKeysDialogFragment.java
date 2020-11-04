@@ -20,9 +20,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.google.common.base.Strings;
@@ -73,11 +75,13 @@ public class EncryptKeysDialogFragment extends BaseDialogFragment {
     private State state = State.INPUT;
 
     private Wallet wallet;
+    private MainActivityViewModel mainActivityViewModel;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         wallet = CoolApplication.getApplication().getWallet();
+        mainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
     }
 
     @Override
@@ -211,10 +215,11 @@ public class EncryptKeysDialogFragment extends BaseDialogFragment {
                 if (state == State.DONE) {
                     // 备份钱包文件
                     WalletUtils.autoBackupWallet(getContext(), wallet);
-                    // todo 加密操作完成，通知外部～
+                    // 加密操作完成，通知外部～
+                    mainActivityViewModel.walletEncrypted.load();
                     // dialog 消失
                     runOnUIthread(()-> dismiss() , 2000);
-                    XToast.success(getContext(),"wallet successfully encrypted !").show();
+//                    XToast.success(getContext(),"wallet successfully encrypted !").show();
                 }
             });
         });
