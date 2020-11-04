@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.fragment.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
@@ -66,12 +67,12 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         menu.findItem(R.id.wallet_options_restore_wallet).setEnabled(enableRestoreWalletOption);
 //  todo      final Boolean isEncrypted = viewModel.walletEncrypted.getValue();
 //        if (isEncrypted != null) {
-//            final MenuItem encryptKeysOption = menu.findItem(R.id.wallet_options_encrypt_keys);
+            final MenuItem encryptKeysOption = menu.findItem(R.id.wallet_options_encrypt_keys);
 //            encryptKeysOption.setTitle(isEncrypted ? R.string.wallet_options_encrypt_keys_change
 //                    : R.string.wallet_options_encrypt_keys_set);
-//            encryptKeysOption.setVisible(true);
+            encryptKeysOption.setVisible(true);
 //        }
-//        final Boolean isLegacyFallback = viewModel.walletLegacyFallback.getValue();
+//   todo     final Boolean isLegacyFallback = viewModel.walletLegacyFallback.getValue();
 //        if (isLegacyFallback != null) {
 //            final MenuItem requestLegacyOption = menu.findItem(R.id.wallet_options_request_legacy);
 //            requestLegacyOption.setVisible(isLegacyFallback);
@@ -111,6 +112,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             case R.id.wallet_options_backup_wallet :
                 break;
             case R.id.wallet_options_encrypt_keys :
+                // todo
+                EncryptKeysDialogFragment.show(getSupportFragmentManager());
                 break;
             case R.id.wallet_options_preferences :
                 break;

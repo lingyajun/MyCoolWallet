@@ -59,13 +59,20 @@
             android:configChanges="keyboard|keyboardHidden"
             android:label="@string/request_coins_activity_title"
             android:windowSoftInputMode="adjustResize" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
-        <activity android:name=".activity.MainActivity">
+
+        <activity android:name=".activity.MainActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true"
+            android:launchMode="singleTask">
+<!--            android:theme="@style/My.Theme.WithSplash">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- open camera scan qr -->
+        </activity>
+
+        <!-- open camera scan qr -->
         <activity
             android:name=".activity.CustomCaptureActivity"
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"

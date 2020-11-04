@@ -328,6 +328,7 @@
   <string name="button_request_coins">請款</string>
   <string name="button_send_coins">付款</string>
   <string name="button_scan">掃描</string>
+  <string name="button_options">更多</string>
   <string name="button_settings">設定</string>
   <string name="action_show_qr">顯示 QR 二維條碼</string>
   <string name="action_browse">瀏覽</string>

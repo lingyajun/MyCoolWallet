@@ -27,4 +27,15 @@
     <color name="fg_network_significant">#ff000000</color>
     <color name="fg_shortcut">#ffa0a0a0</color>
 
+    <!-- app icon -->
+    <color name="appicon_gradient_start">#bbbbbb</color>
+    <color name="appicon_gradient_end">#999999</color>
+    <item name="splash_icon_alpha" format="float" type="dimen">1</item>
+
+    <!-- password strength -->
+    <color name="fg_password_strength_weak">#ff0000</color>
+    <color name="fg_password_strength_fair">#c06000</color>
+    <color name="fg_password_strength_good">#666666</color>
+    <color name="fg_password_strength_strong">#00a000</color>
+
 </resources>

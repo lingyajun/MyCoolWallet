@@ -1,9 +1,11 @@
 package com.bethel.mycoolwallet;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.StrictMode;
 
 import androidx.multidex.MultiDex;
@@ -27,6 +29,7 @@ public class CoolApplication extends Application {
 
     private static CoolApplication application = null;
     private  MyWalletManager myWalletManager = null;
+    private ActivityManager activityManager;
 
     private static final Logger log = LoggerFactory.getLogger(CoolApplication.class);
     @Override
@@ -61,6 +64,8 @@ public class CoolApplication extends Application {
         myWalletManager = new MyWalletManager();
         myWalletManager.init(this);
 
+        activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+
         XUI.init(this);
         XUI.debug(true);
     }
@@ -88,6 +93,13 @@ public class CoolApplication extends Application {
             }
         }
         return packageInfo;
+    }
+
+    // 加密 -- 迭代次数
+    public int scryptIterationsTarget() {
+        return activityManager.getMemoryClass() <= 128 ||
+                (Build.VERSION.SDK_INT >=21 && Build.SUPPORTED_64_BIT_ABIS.length == 0)
+                ? Constants.SCRYPT_ITERATIONS_TARGET_LOWRAM : Constants.SCRYPT_ITERATIONS_TARGET;
     }
 
 }

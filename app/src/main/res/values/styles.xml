@@ -139,4 +139,25 @@
         <item name="android:background">@color/bg_level3</item>
     </style>
 
+    <style name="My.Theme.WithSplash" parent="@style/My.Theme">
+<!--        <item name="android:windowBackground">@drawable/background_splash</item>-->
+    </style>
+
+    <style name="My.Theme" parent="Theme.AppCompat.Light.NoActionBar">
+<!--        <item name="android:actionBarTheme">@style/My.ThemeOverlay.ActionBar</item>-->
+<!--        <item name="android:actionBarStyle">@style/My.Widget.ActionBar</item>-->
+<!--        <item name="android:actionModeStyle">@style/My.Widget.ActionMode</item>-->
+        <item name="android:actionMenuTextColor">@color/fg_on_dark_bg_network</item>
+        <item name="android:actionButtonStyle">@style/My.Widget.ActionButton</item>
+<!--        <item name="android:actionOverflowButtonStyle">@style/My.Widget.ActionButton.Overflow</item>-->
+<!--        <item name="android:actionOverflowMenuStyle">@style/My.Widget.PopupMenu.Overflow</item>-->
+<!--        <item name="android:textViewStyle">@style/My.Widget.TextView</item>-->
+        <item name="android:editTextStyle">@style/MyEditText</item>
+<!--        <item name="android:autoCompleteTextViewStyle">@style/My.Widget.AutoCompleteTextView</item>-->
+        <item name="android:checkboxStyle">@style/MyCheckBox</item>
+<!--        <item name="android:spinnerStyle">@style/My.Widget.Spinner</item>-->
+<!--        <item name="android:popupMenuStyle">@style/My.Widget.PopupMenu</item>-->
+        <item name="android:windowBackground">@color/bg_level1</item>
+    </style>
+
 </resources>
