@@ -80,6 +80,8 @@
             android:screenOrientation="portrait"
             android:theme="@style/XQRCodeTheme"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
+        <activity android:name=".activity.SettingsActivity"/>
     </application>
 
 </manifest>

@@ -125,6 +125,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 viewModel.showEncryptKeysDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_preferences :
+                SettingsActivity.start(this);
                 break;
             case R.id.wallet_options_safety :
                 XToast.info(this, "safety").show();
