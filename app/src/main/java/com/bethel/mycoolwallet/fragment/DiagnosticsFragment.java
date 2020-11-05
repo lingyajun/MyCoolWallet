@@ -4,14 +4,19 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xui.widget.toast.XToast;
+
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.wallet.DeterministicKeyChain;
+
+import java.util.Locale;
 
 public class DiagnosticsFragment extends PreferenceFragment {
     private static final String PREFS_KEY_INITIATE_RESET = "initiate_reset";
@@ -25,26 +30,37 @@ public class DiagnosticsFragment extends PreferenceFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.preference_layout, container, false);
-//        return view;
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         String key = preference.getKey();
         if (PREFS_KEY_EXTENDED_PUBLIC_KEY.equals(key)) {
             handleExtendedPubkey();
-//            XToast.info(getActivity(), PREFS_KEY_EXTENDED_PUBLIC_KEY).show();
             return true;
         } else if (PREFS_KEY_INITIATE_RESET.equals(key)) {
+            // todo
             XToast.info(getActivity(), PREFS_KEY_INITIATE_RESET).show();
             return true;
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
+
+    /**
+     * DeterministicKeyChain :
+     * 确定性钥匙链是{@link KeyChain}，它使用  BIP 32标准 ，
+     * 由{@link DeterministicHierarchy}，用于从主种子派生钥匙串中的所有钥匙。
+     *
+     * DeterministicKey:
+     * 确定性键是{@link DeterministicHierarchy}中的一个节点。
+     */
     private void handleExtendedPubkey() {
+        DeterministicKeyChain keyChain = CoolApplication.getApplication().getWallet().getActiveKeyChain();
+        DeterministicKey myKey = keyChain.getWatchingKey();
+
+        Script.ScriptType outputScriptType = keyChain.getOutputScriptType();
+        long creation = myKey.getCreationTimeSeconds();
+
+        String pubBase58 = myKey.serializePubB58(Constants.NETWORK_PARAMETERS, outputScriptType);
+        String data = String.format(Locale.US, "%s?c=%d&h=bip32", pubBase58, creation);
+        ExtendedPublicKeyFragment.show(getFragmentManager(),  (CharSequence) data);
     }
 }

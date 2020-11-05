@@ -40,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     /**
      * PreferenceActivity+ToolBar(限Android 5.0以上)
+     * https://www.chenlongfei.cn/2015/08/07/preference-activity-toolbar-usage/
      */
     private void initTitleBar() {
         // 找到Activity根布局
@@ -54,7 +55,6 @@ public class SettingsActivity extends PreferenceActivity {
         toolbarLayout.addView(content);
         //将包含Toolbar的自定义布局添加到根布局中
         rootView.addView(toolbarLayout);
-//        setContentView(R.layout.preference_layout);
         //获取toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.preferences_activity_title);
