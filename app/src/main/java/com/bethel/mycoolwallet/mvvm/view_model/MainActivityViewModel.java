@@ -12,6 +12,8 @@ public class MainActivityViewModel extends BaseViewModel {
     public final WalletEncryptedLiveData walletEncrypted;
 
     public final MutableLiveData<Event<Void>> showEncryptKeysDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<Void>> showBackupWalletDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<Void>> showRestoreWalletDialog = new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application app) {
         super(app);

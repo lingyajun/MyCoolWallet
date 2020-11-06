@@ -51,6 +51,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel.walletEncrypted.observe(this, result -> invalidateOptionsMenu());
         viewModel.showEncryptKeysDialog.observe(this,
                 (v) -> EncryptKeysDialogFragment.show(getSupportFragmentManager()));
+        viewModel.showRestoreWalletDialog.observe(this, e -> {});
+        viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
     }
 
     @Override
@@ -118,8 +120,10 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             case R.id.wallet_options_network_monitor :
                 break;
             case R.id.wallet_options_restore_wallet :
+                viewModel.showRestoreWalletDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_backup_wallet :
+                viewModel.showBackupWalletDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_encrypt_keys :
                 viewModel.showEncryptKeysDialog.setValue(Event.simple());

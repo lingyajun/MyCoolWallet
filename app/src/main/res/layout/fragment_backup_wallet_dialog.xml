@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.WalletBackupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/list_entry_padding_vertical"
+            android:layout_marginTop="@dimen/list_entry_padding_vertical"
+            android:text="@string/backup_wallet_dialog_message" />
+        <!-- password layout -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_entry_padding_vertical"
+            android:divider="@drawable/divider_field"
+            android:orientation="horizontal"
+            android:showDividers="middle" >
+
+            <com.xuexiang.xui.widget.edittext.PasswordEditText
+                android:id="@+id/backup_wallet_dialog_password"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:imeOptions="flagNoExtractUi"
+                android:hint="@string/import_export_keys_dialog_password"
+                android:inputType="textPassword"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/backup_wallet_dialog_password_strength"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <!-- confirm password layout -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/list_entry_padding_vertical"
+            android:divider="@drawable/divider_field"
+            android:orientation="horizontal"
+            android:showDividers="middle" >
+
+            <com.xuexiang.xui.widget.edittext.PasswordEditText
+                android:id="@+id/backup_wallet_dialog_password_again"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/backup_wallet_dialog_password_again"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="textPassword"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/backup_wallet_dialog_password_mismatch"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/backup_wallet_dialog_password_mismatch"
+                android:textColor="@color/fg_error"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/backup_wallet_dialog_warning_encrypted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/list_entry_padding_vertical_lax"
+            android:layout_marginTop="@dimen/list_entry_padding_vertical_lax"
+            android:text="@string/backup_wallet_dialog_warning_encrypted"
+            android:textColor="@color/fg_less_significant"
+            android:textSize="@dimen/font_size_small" />
+    </LinearLayout>
+</ScrollView>

@@ -24,8 +24,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.data.PasswordStrength;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.google.common.base.Strings;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
@@ -238,19 +240,10 @@ public class EncryptKeysDialogFragment extends BaseDialogFragment {
         Context activity = getContext();
         final int passwordLength = newPasswordView.getText().length();
         passwordStrengthView.setVisibility(state == State.INPUT && passwordLength > 0 ? View.VISIBLE : View.INVISIBLE);
-        if (passwordLength < 4) {
-            passwordStrengthView.setText(R.string.encrypt_keys_dialog_password_strength_weak);
-            passwordStrengthView.setTextColor(ContextCompat.getColor(activity, R.color.fg_password_strength_weak));
-        } else if (passwordLength < 6) {
-            passwordStrengthView.setText(R.string.encrypt_keys_dialog_password_strength_fair);
-            passwordStrengthView.setTextColor(ContextCompat.getColor(activity, R.color.fg_password_strength_fair));
-        } else if (passwordLength < 8) {
-            passwordStrengthView.setText(R.string.encrypt_keys_dialog_password_strength_good);
-            passwordStrengthView.setTextColor(ContextCompat.getColor(activity, R.color.fg_password_strength_good));
-        } else {
-            passwordStrengthView.setText(R.string.encrypt_keys_dialog_password_strength_strong);
-            passwordStrengthView.setTextColor(ContextCompat.getColor(activity, R.color.fg_password_strength_strong));
-        }
+
+        PasswordStrength strength = Utils.getPinPasswordStrength(newPasswordView.getText());
+        passwordStrengthView.setText(strength.getTextId());
+        passwordStrengthView.setTextColor(ContextCompat.getColor(activity, strength.getColorId()));
 
         if (state == State.INPUT) {
             if (wallet.isEncrypted()) {

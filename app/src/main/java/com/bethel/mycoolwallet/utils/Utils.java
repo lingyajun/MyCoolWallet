@@ -7,6 +7,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import com.bethel.mycoolwallet.data.PasswordStrength;
+
+import org.jetbrains.annotations.NotNull;
+
 public final class Utils {
     public static boolean startsWithIgnoreCase(final String string, final String prefix) {
         return string.regionMatches(true, 0, prefix, 0, prefix.length());
@@ -43,4 +47,29 @@ public final class Utils {
         return (int) (pxValue / scale + 0.5f);
     }
 
+    public static PasswordStrength getPinPasswordStrength(@NotNull CharSequence password) {
+        int length = password.length();
+        if (length < 4) {
+            return PasswordStrength.WEAK;
+        } else if (length < 6) {
+            return PasswordStrength.FAIR;
+        } else if (length < 8) {
+            return PasswordStrength.GOOD;
+        } else {
+            return PasswordStrength.STRONG;
+        }
+    }
+
+    public static PasswordStrength getBackupWalletPasswordStrength(@NotNull CharSequence password) {
+        int length = password.length();
+        if (length < 6) {
+            return PasswordStrength.WEAK;
+        } else if (length < 8) {
+            return PasswordStrength.FAIR;
+        } else if (length < 10) {
+            return PasswordStrength.GOOD;
+        } else {
+            return PasswordStrength.STRONG;
+        }
+    }
 }
