@@ -28,18 +28,29 @@ import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.WalletUtils;
+import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins, ISendCoins {
     /**
      * 扫描跳转Activity RequestCode
      */
     public static final int REQUEST_QR_SCAN_CODE = 111;
+    /**
+     * 选择钱包文件 RequestCode
+     */
+    public static final int WALLET_FILE_PICKER_REQUEST_CODE = 100;
     private  MainActivityViewModel viewModel;
 
+    private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,8 +62,42 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel.walletEncrypted.observe(this, result -> invalidateOptionsMenu());
         viewModel.showEncryptKeysDialog.observe(this,
                 (v) -> EncryptKeysDialogFragment.show(getSupportFragmentManager()));
-        viewModel.showRestoreWalletDialog.observe(this, e -> {});
+        viewModel.showRestoreWalletDialog.observe(this, e -> {
+            // todo
+            // 1. 读取外部存储权限
+            // 2。 文件选择器
+
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                log.info("missing {}, requesting", Manifest.permission.READ_EXTERNAL_STORAGE);
+                ActivityCompat.requestPermissions(this,
+                        new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
+//                ActivityCompat.requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
+            }
+            WalletUtils.testRestoreWallet(this);
+            openWalletFilePicker();
+        });
         viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
+    }
+
+    private void openWalletFilePicker() {
+        File sd = Constants.Files.EXTERNAL_WALLET_BACKUP_DIR;
+       new MaterialFilePicker()
+                // Pass a source of context. Can be:
+                .withActivity(this)
+                // With cross icon on the right side of toolbar for closing picker straight away
+                .withCloseMenu(true)
+                // Entry point path (user will start from it)
+                .withPath(sd.getAbsolutePath())
+                // Root path (user won't be able to come higher than it)
+                .withRootPath(Constants.Files.EXTERNAL_STORAGE_DIR.getAbsolutePath())
+                // Showing hidden files
+                .withHiddenFiles(false)
+                .withFilterDirectories(false)
+                .withCustomActivity(WalletFilePickerActivity.class)
+                .withTitle(getString(R.string.import_keys_dialog_title))
+                .withRequestCode(WALLET_FILE_PICKER_REQUEST_CODE)
+                .start();
     }
 
     @Override
@@ -196,6 +241,16 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         //处理二维码扫描结果
         if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == RESULT_OK) {
             handleScanResult(data);
+        }
+
+        if (requestCode == WALLET_FILE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
+            // todo
+            String path = data.getStringExtra(WalletFilePickerActivity.RESULT_FILE_PATH);
+
+            if (path != null) {
+                log.info("Path: {}", path);
+                XToast.success(this, "Picked file: "+ path).show();
+            }
         }
     }
 

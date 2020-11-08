@@ -11,6 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <activity android:name=".activity.WalletFilePickerActivity"
+            android:theme="@style/MFP_BaseTheme">
+        </activity>
+
         <activity android:name=".activity.WalletBackupActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
             android:theme="@style/DialogTheme"/>

@@ -3,6 +3,7 @@ package com.bethel.mycoolwallet.utils;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -22,8 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -112,6 +117,28 @@ public class WalletUtils {
         }
     }
 
+    public static void testRestoreWallet(Context context) {
+        final String backupPath = Constants.Files.EXTERNAL_WALLET_BACKUP_DIR.getAbsolutePath();
+        final String storagePath = Constants.Files.EXTERNAL_STORAGE_DIR.getAbsolutePath();
+        // backupPath: /storage/emulated/0/Download  ; storagePath: /storage/emulated/0
+        log.info("testRestoreWallet, backupPath: {}  ; storagePath: {}", backupPath, storagePath);
+
+        // external storage
+        log.info("testRestoreWallet, looking for backup files in '{}'", Constants.Files.EXTERNAL_WALLET_BACKUP_DIR);
+        final File[] externalFiles = Constants.Files.EXTERNAL_WALLET_BACKUP_DIR.listFiles();
+        if (null!= externalFiles) {
+            for (File file: externalFiles ) {
+                log.info("testRestoreWallet, external storage file: {}", file.getName());
+            }
+        }
+
+        //  app-private storage
+        for (final String filename : context.fileList()) {
+            log.info("testRestoreWallet, app-private storage file: {}", filename );
+        }
+
+    }
+
     public static String getFileStorageName(Uri fileUri) {
         if (!fileUri.getScheme().equals("content"))
             return null;
@@ -124,6 +151,17 @@ public class WalletUtils {
             return "internal storage";
         return null;
     }
+
+    public static final FileFilter BACKUP_FILE_FILTER = new FileFilter() {
+        @Override
+        public boolean accept(final File file) {
+            try (final InputStream is = new FileInputStream(file)) {
+                return WalletProtobufSerializer.isWallet(is);
+            } catch (final IOException x) {
+                return false;
+            }
+        }
+    };
 
     public static Spanned formatHash(final String hash, final int groupSize, final int lineSize) {
         return formatHash(null, hash, groupSize, lineSize, Constants.CHAR_THIN_SPACE);

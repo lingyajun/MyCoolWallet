@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':file_picker_library'
 rootProject.name='MyCoolWallet'
