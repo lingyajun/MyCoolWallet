@@ -4,6 +4,7 @@
     <string name="open_camera_permissions">Please open camera permissions !</string>
     <string name="parse_qr_code_failed">Failed to parse QR code</string>
     <string name="wrong_wallet_file_alarm">This is not a wallet file, please select the correct wallet file</string>
+    <string name="pls_select_wallet_file">please select your wallet file</string>
 
     <!--    Andreas Schildbach -->
     <string name="toast_wallet_reset">Your wallet was reset!\nIt will take some time to recover.</string>

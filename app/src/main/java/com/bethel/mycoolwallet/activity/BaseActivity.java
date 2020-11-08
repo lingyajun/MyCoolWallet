@@ -1,25 +1,20 @@
 package com.bethel.mycoolwallet.activity;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.interfaces.IRequestPermissions;
+import com.bethel.mycoolwallet.interfaces.IRequestCameraPermissions;
 import com.bethel.mycoolwallet.manager.RequestPermissionsManager;
 
 /**
  * 基类
  * */
-public class BaseActivity extends AppCompatActivity implements IRequestPermissions {
+public class BaseActivity extends AppCompatActivity implements IRequestCameraPermissions {
     /**
      * 相机权限
      */
@@ -36,6 +31,7 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
 
     public void requestCameraPermissions() {
         checkRequestPermissionsManager();
+        permissionsManager.setPermissionsResult(grant -> onCameraPermissionsResult(grant));
         permissionsManager.requestCameraPermissions();
 //        ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA },
 //        REQUEST_CAMERA_PERMISSION_CODE);
@@ -46,7 +42,8 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
         if (permissionsManager.checkCameraPermission()) {
             onCameraPermissionsResult(true);
         } else {
-            permissionsManager.requestCameraPermissions();
+            requestCameraPermissions();
+//            permissionsManager.requestCameraPermissions();
         }
     }
 
@@ -57,13 +54,6 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
         if (!handle) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-//        switch (requestCode) {
-//            case REQUEST_CAMERA_PERMISSION_CODE:
-//                onCameraPermissionsResult(grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED);
-//                break;
-//                default:  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        }
     }
 
     public void onCameraPermissionsResult(boolean grant) {
@@ -72,8 +62,6 @@ public class BaseActivity extends AppCompatActivity implements IRequestPermissio
     private void checkRequestPermissionsManager() {
         if (null == permissionsManager) {
             permissionsManager = new RequestPermissionsManager(this);
-            if (this instanceof IRequestPermissions)
-            permissionsManager.setiRequest((IRequestPermissions)this);
         }
     }
 

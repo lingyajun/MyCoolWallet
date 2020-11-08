@@ -5,6 +5,7 @@
   <string name="open_camera_permissions">请打开相机权限 !</string>
   <string name="parse_qr_code_failed">解析二维码失败</string>
   <string name="wrong_wallet_file_alarm">这不是钱包文件，请选择正确的钱包文件</string>
+  <string name="pls_select_wallet_file">请选择你的钱包文件</string>
 
   <!--    Andreas Schildbach -->
   <string name="toast_wallet_reset">钱包已重置，\n 需要一些时间才能恢复</string>
