@@ -11,6 +11,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.MainActivity;
 import com.bethel.mycoolwallet.activity.WalletFilePickerActivity;
 import com.bethel.mycoolwallet.interfaces.IPermissionsResult;
+import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.bethel.mycoolwallet.manager.RequestPermissionsManager;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Crypto;
@@ -31,6 +33,7 @@ import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.textview.badge.BadgeView;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,6 +114,8 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
             updateView();
 
             maybeOpenWalletFilePicker();
+
+            // todo WalletBalanceLiveData , replaceWarningView
         });
 
         fileView.setOnClickListener(view1 -> maybeOpenWalletFilePicker());
@@ -124,24 +129,31 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
         final String password = passwordView.getText().toString().trim();
         passwordView.setText(null); // get rid of it asap
 
-        // todo
-        if (WalletUtils.BACKUP_FILE_FILTER.accept(file))
+        if (WalletUtils.BACKUP_FILE_FILTER.accept(file)) {
             restoreWalletFromProtobuf(file);
-        else if (Crypto.OPENSSL_FILE_FILTER.accept(file))
+        } else if (isWalletFileEncrypted(file) && !TextUtils.isEmpty(password)) {
             restoreWalletFromEncrypted(file, password);
+        }
+
     }
 
     private void restoreWalletFromEncrypted(File file, String password) {
+        WalletUtils.restoreWalletFromEncrypted(file, password, mWalletRestoreCallback);
     }
 
     private void restoreWalletFromProtobuf(File file) {
+        WalletUtils.restoreWalletFromProtobuf(file, mWalletRestoreCallback);
     }
 
     private void updateView() {
-        passwordView.setVisibility(null != mSelectedFile ? View.VISIBLE : View.GONE);
+        passwordView.setVisibility(isWalletFileEncrypted(mSelectedFile) ? View.VISIBLE : View.GONE);
         passwordView.setText(null);
         if (null!=mSelectedFile)
             fileView.setText(mSelectedFile.getName());
+    }
+
+    private boolean isWalletFileEncrypted(File file) {
+        return null != file && Crypto.OPENSSL_FILE_FILTER.accept(file);
     }
 
     @Override
@@ -182,13 +194,15 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == WALLET_FILE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
-            // todo
             String path = data.getStringExtra(WalletFilePickerActivity.RESULT_FILE_PATH);
 
-            if (path != null) {
+            if (!TextUtils.isEmpty(path)) {
                 File file = new File(path);
                 mSelectedFile = file;
                 updateView();
+                if (!isWalletFileEncrypted(file)) {
+                    handleGo();
+                }
                 log.info("Path: {}", path);
 //                XToast.success(getContext(), "Picked file: "+ path).show();
             }
@@ -200,4 +214,17 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
         if (!permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults))
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    // todo : 1. alert && 2. store the configs { 3. reset block chain}
+    private IWalletRestoreCallback mWalletRestoreCallback = new IWalletRestoreCallback() {
+        @Override
+        public void onSuccess(Wallet restoredWallet) {
+            XToast.success(getContext(), R.string.restore_wallet_dialog_success).show();
+        }
+
+        @Override
+        public void onFailed(Exception e) {
+            XToast.error(getContext(), getString(R.string.import_keys_dialog_failure, e.getMessage())).show();
+        }
+    };
 }

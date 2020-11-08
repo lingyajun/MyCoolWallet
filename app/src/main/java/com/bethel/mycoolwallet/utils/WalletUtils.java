@@ -13,15 +13,20 @@ import android.text.style.TypefaceSpan;
 import androidx.annotation.Nullable;
 
 import com.bethel.mycoolwallet.interfaces.IWalletBackupCallback;
+import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.wallet.Protos;
+import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 import org.bitcoinj.wallet.WalletProtobufSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -137,6 +142,52 @@ public class WalletUtils {
             log.info("testRestoreWallet, app-private storage file: {}", filename );
         }
 
+    }
+
+    public static  void restoreWalletFromProtobuf(File file, IWalletRestoreCallback callback) {
+        try {
+            FileInputStream is = new FileInputStream(file);
+            Wallet restoredWallet = restoreWalletFromProtobuf(is, Constants.NETWORK_PARAMETERS);
+            if (null!=callback) callback.onSuccess(restoredWallet);
+        } catch (UnreadableWalletException | IOException e) {
+            if (null!=callback) callback.onFailed(e);
+            log.info("problem restoring unencrypted wallet: " + file, e);
+        }
+    }
+    public static Wallet restoreWalletFromProtobuf(final InputStream is,
+                                                   final NetworkParameters expectedNetworkParameters)
+            throws IOException, UnreadableWalletException {
+        Wallet wallet = new WalletProtobufSerializer().readWallet(is, true, null);
+        if (!wallet.getParams().equals(expectedNetworkParameters)) {
+            throw new IOException("bad wallet backup network parameters: " +wallet.getParams().getId());
+        }
+        if (!wallet.isConsistent()) {
+            throw new IOException("inconsistent wallet backup");
+        }
+        return wallet;
+    }
+
+    public static void restoreWalletFromEncrypted(final File file, final String password, IWalletRestoreCallback callback) {
+        try {
+            FileInputStream is = new FileInputStream(file);
+            InputStreamReader inReader = new InputStreamReader(is, Commons.UTF_8);
+            BufferedReader cipherIn = new BufferedReader(inReader);
+
+            StringBuilder cipherText = new StringBuilder();
+            CharStreams.copy(cipherIn, cipherText);
+            cipherIn.close();
+
+            // 将钱包文件解密
+            byte[] plainText = Crypto.decryptBytes(cipherText.toString(), password.toCharArray());
+            InputStream inputStream = new ByteArrayInputStream(plainText);
+            // 将解密后的钱包文件 恢复
+            Wallet restoredWallet = restoreWalletFromProtobuf(inputStream, Constants.NETWORK_PARAMETERS);
+            if (null!=callback) callback.onSuccess(restoredWallet);
+
+        }  catch (IOException | UnreadableWalletException e) {
+            if (null!=callback) callback.onFailed(e);
+            log.info("problem restoring encrypted wallet: " + file, e);
+        }
     }
 
     public static String getFileStorageName(Uri fileUri) {
