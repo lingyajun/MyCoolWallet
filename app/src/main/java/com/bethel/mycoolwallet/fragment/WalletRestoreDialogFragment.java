@@ -3,6 +3,7 @@ package com.bethel.mycoolwallet.fragment;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,19 +11,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.activity.MainActivity;
 import com.bethel.mycoolwallet.activity.WalletFilePickerActivity;
-import com.bethel.mycoolwallet.interfaces.IPermissionsResult;
+import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.bethel.mycoolwallet.manager.RequestPermissionsManager;
+import com.bethel.mycoolwallet.mvvm.view_model.WalletRestoreViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Crypto;
 import com.bethel.mycoolwallet.utils.WalletUtils;
@@ -46,13 +47,13 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class RestoreWalletDialogFragment extends BaseDialogFragment {
+public class WalletRestoreDialogFragment extends BaseDialogFragment {
     /**
      * 选择钱包文件 RequestCode
      */
     public static final int WALLET_FILE_PICKER_REQUEST_CODE = 100;
 
-    private static final String TAG = "RestoreWalletDialogFragment";
+    private static final String TAG = "WalletRestoreDialogFragment";
 
     private TextView positiveButton, negativeButton;
 
@@ -67,11 +68,12 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
 
     private RequestPermissionsManager permissionsManager;
     private File mSelectedFile=null;
+    private WalletRestoreViewModel viewModel;
 
-    private static final Logger log = LoggerFactory.getLogger(RestoreWalletDialogFragment.class);
+    private static final Logger log = LoggerFactory.getLogger(WalletRestoreDialogFragment.class);
 
     public static void show(final FragmentManager fm) {
-        final DialogFragment newFragment = new RestoreWalletDialogFragment();
+        final DialogFragment newFragment = new WalletRestoreDialogFragment();
         newFragment.show(fm, TAG);
     }
 
@@ -84,6 +86,22 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
                 openWalletFilePicker();
             } else if (isAdded()) {
                 XToast.info(getContext(), R.string.restore_wallet_permission_dialog_message).show();
+            }
+        });
+
+        viewModel = ViewModelProviders.of(this).get(WalletRestoreViewModel.class);
+        viewModel.showFailureDialog.observe(this, new Event.Observer<String>(){
+            @Override
+            public void onEvent(String content) {
+                dismiss();
+                WalletRestoreErrorDialogFragment.showDialog(getFragmentManager(), content);
+            }
+        });
+        viewModel.showSuccessDialog.observe(this, new Event.Observer<Boolean>() {
+            @Override
+            public void onEvent(Boolean content) {
+                dismiss();
+                WalletRestoreSuccessDialogFragment.showDialog(getFragmentManager(), content);
             }
         });
     }
@@ -119,7 +137,6 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
         });
 
         fileView.setOnClickListener(view1 -> maybeOpenWalletFilePicker());
-//        fileView.postDelayed(()-> maybeOpenWalletFilePicker(), 100);
         return materialDialog;
     }
 
@@ -138,11 +155,14 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
     }
 
     private void restoreWalletFromEncrypted(File file, String password) {
-        WalletUtils.restoreWalletFromEncrypted(file, password, mWalletRestoreCallback);
+        AsyncTask.execute(()->
+                WalletUtils.restoreWalletFromEncrypted(file, password, mWalletRestoreCallback)
+                );
     }
 
     private void restoreWalletFromProtobuf(File file) {
-        WalletUtils.restoreWalletFromProtobuf(file, mWalletRestoreCallback);
+        AsyncTask.execute(()->
+                WalletUtils.restoreWalletFromProtobuf(file, mWalletRestoreCallback));
     }
 
     private void updateView() {
@@ -166,7 +186,7 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
         if (permissionsManager.checkStoragePermission(getContext())) {
             openWalletFilePicker();
         } else {
-            permissionsManager.requestStoragePermissions(RestoreWalletDialogFragment.this);
+            permissionsManager.requestStoragePermissions(WalletRestoreDialogFragment.this);
         }
     }
 
@@ -219,12 +239,12 @@ public class RestoreWalletDialogFragment extends BaseDialogFragment {
     private IWalletRestoreCallback mWalletRestoreCallback = new IWalletRestoreCallback() {
         @Override
         public void onSuccess(Wallet restoredWallet) {
-            XToast.success(getContext(), R.string.restore_wallet_dialog_success).show();
+            viewModel.showSuccessDialog.postValue(new Event<>(restoredWallet.isEncrypted()));
         }
 
         @Override
         public void onFailed(Exception e) {
-            XToast.error(getContext(), getString(R.string.import_keys_dialog_failure, e.getMessage())).show();
+            viewModel.showFailureDialog.postValue(new Event<>(e.getMessage()));
         }
     };
 }

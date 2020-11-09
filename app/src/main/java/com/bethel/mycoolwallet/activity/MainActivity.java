@@ -2,16 +2,9 @@ package com.bethel.mycoolwallet.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,22 +16,18 @@ import android.widget.Toast;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.fragment.EncryptKeysDialogFragment;
-import com.bethel.mycoolwallet.fragment.RestoreWalletDialogFragment;
+import com.bethel.mycoolwallet.fragment.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
-import com.bethel.mycoolwallet.utils.WalletUtils;
-import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.script.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins, ISendCoins {
     /**
@@ -74,7 +63,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 //            }
 //            WalletUtils.testRestoreWallet(this);
 //            openWalletFilePicker();
-            RestoreWalletDialogFragment.show(getSupportFragmentManager());
+            WalletRestoreDialogFragment.show(getSupportFragmentManager());
         });
         viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
     }
