@@ -1,7 +1,7 @@
 package com.bethel.mycoolwallet.mvvm.live_data;
 
 import com.bethel.mycoolwallet.CoolApplication;
-import com.bethel.mycoolwallet.manager.MyWalletManager;
+import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
@@ -35,7 +35,7 @@ public class CurrentAddressLiveData extends AbstractWalletLiveData<Address> {
     protected void load() {
         Wallet wallet = getWallet();
         executeAsyncTask(() -> {
-            MyWalletManager.propagate();
+            MyCoolWalletManager.propagate();
             postValue(wallet.currentReceiveAddress());
         });
     }

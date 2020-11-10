@@ -11,7 +11,7 @@ import android.os.StrictMode;
 import androidx.multidex.MultiDex;
 
 import com.bethel.mycoolwallet.interfaces.OnWalletLoadedListener;
-import com.bethel.mycoolwallet.manager.MyWalletManager;
+import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.Logging;
@@ -28,7 +28,7 @@ public class CoolApplication extends Application {
             + ".wallet_reference_changed";
 
     private static CoolApplication application = null;
-    private  MyWalletManager myWalletManager = null;
+    private MyCoolWalletManager myWalletManager = null;
     private ActivityManager activityManager;
 
     private static final Logger log = LoggerFactory.getLogger(CoolApplication.class);
@@ -61,7 +61,7 @@ public class CoolApplication extends Application {
             CrashReporter.saveBackgroundTrace(throwable, packageInfo());
         };
 
-        myWalletManager = new MyWalletManager();
+        myWalletManager = new MyCoolWalletManager();
         myWalletManager.init(this);
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -100,6 +100,20 @@ public class CoolApplication extends Application {
         return activityManager.getMemoryClass() <= 128 ||
                 (Build.VERSION.SDK_INT >=21 && Build.SUPPORTED_64_BIT_ABIS.length == 0)
                 ? Constants.SCRYPT_ITERATIONS_TARGET_LOWRAM : Constants.SCRYPT_ITERATIONS_TARGET;
+    }
+
+    public int maxConnectedPeers() {
+        return activityManager.getMemoryClass() <= 128 ? 4 : 6;
+    }
+
+    public final String applicationPackageFlavor() {
+        final String packageName = getPackageName();
+        final int index = packageName.lastIndexOf('_');
+
+        if (index != -1)
+            return packageName.substring(index + 1);
+        else
+            return null;
     }
 
 }

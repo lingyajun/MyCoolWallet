@@ -17,7 +17,12 @@ import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.script.Script;
+import org.bitcoinj.script.ScriptException;
 import org.bitcoinj.wallet.Protos;
 import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
@@ -188,6 +193,21 @@ public class WalletUtils {
             if (null!=callback) callback.onFailed(e);
             log.info("problem restoring encrypted wallet: " + file, e);
         }
+    }
+
+    public static Address getWalletAddressOfReceived(final Transaction tx, final Wallet wallet) {
+        for (TransactionOutput output: tx.getOutputs() ) {
+            try {
+                if (output.isMine(wallet)) {
+                    Script script = output.getScriptPubKey();
+                    return script.getToAddress(Constants.NETWORK_PARAMETERS, true);
+                }
+            } catch (ScriptException e) {
+                log.error("getWalletAddressOfReceived: {}", e.getMessage());
+            }
+
+        }
+        return null;
     }
 
     public static String getFileStorageName(Uri fileUri) {

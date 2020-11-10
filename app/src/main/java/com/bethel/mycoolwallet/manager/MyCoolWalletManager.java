@@ -1,12 +1,9 @@
 package com.bethel.mycoolwallet.manager;
 
-import android.app.Application;
-import android.content.Intent;
 import android.os.Looper;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.WorkerThread;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
@@ -34,8 +31,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class MyWalletManager {
-    private static final Logger log = LoggerFactory.getLogger(MyWalletManager.class);
+public class MyCoolWalletManager {
+    private static final Logger log = LoggerFactory.getLogger(MyCoolWalletManager.class);
     private static final String BIP39_WORDLIST_FILENAME = "bip39-wordlist.txt";
 
     private CoolApplication application;

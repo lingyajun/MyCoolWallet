@@ -1,7 +1,7 @@
 package com.bethel.mycoolwallet.mvvm.live_data;
 
 import com.bethel.mycoolwallet.CoolApplication;
-import com.bethel.mycoolwallet.manager.MyWalletManager;
+import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.script.Script;
@@ -34,7 +34,7 @@ public class FreshReceiveAddressLiveData extends AbstractWalletLiveData<Address>
         final Wallet wallet = getWallet();
         final Script.ScriptType oScriptType = this.outputScriptType;
         executeAsyncTask(()->{
-            MyWalletManager.propagate();
+            MyCoolWalletManager.propagate();
             Address address = null != oScriptType ?
                     wallet.freshReceiveAddress(oScriptType) : wallet.freshReceiveAddress();
             postValue(address);
