@@ -45,7 +45,10 @@ import butterknife.BindView;
 import static android.app.Activity.RESULT_OK;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 恢复钱包.
+ *
+ * 1. 读取外部存储权限
+ * 2。 文件选择器
  */
 public class WalletRestoreDialogFragment extends BaseDialogFragment {
     /**

@@ -1,12 +1,15 @@
 package com.bethel.mycoolwallet.service;
 
 import android.content.ComponentCallbacks2;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -15,6 +18,7 @@ import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.manager.MyCoolBlockChainManager;
 import com.bethel.mycoolwallet.manager.MyCoolNotificationManager;
+import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 import com.bethel.mycoolwallet.utils.Constants;
 
@@ -45,11 +49,21 @@ public class BlockChainService extends LifecycleService {
     private WalletLiveData wallet;
     private long serviceCreatedAt;
     private boolean resetBlockChainOnShutdown = false;
+//    private BlockChainServiceViewModel viewModel;
 
     private final IBinder mBinder = new LocalBinder();
 
     private static final Logger log = LoggerFactory.getLogger(BlockChainService.class);
 
+    public static void start(final Context context, final boolean cancelCoinsReceived) {
+        Intent intent ;
+        if (cancelCoinsReceived) {
+            intent = new Intent(ACTION_CANCEL_COINS_RECEIVED, null, context, BlockChainService.class);
+        } else {
+            intent = new Intent(context, BlockChainService.class);
+        }
+        ContextCompat.startForegroundService(context, intent);
+    }
     @Nullable
     @Override
     public IBinder onBind(@NonNull Intent intent) {
@@ -69,15 +83,21 @@ public class BlockChainService extends LifecycleService {
         serviceCreatedAt = System.currentTimeMillis();
         log.debug(".onCreate()");
         super.onCreate();
+//        viewModel = ViewModelProviders.of()
 
         mNotificationManager.init(this);
 
-        // todo viewModel: WalletBalanceLiveData,SelectedExchangeRateLiveData, WalletLiveData
+        // todo : WalletBalanceLiveData,SelectedExchangeRateLiveData, WalletLiveData
         wallet = new WalletLiveData(CoolApplication.getApplication());
         wallet.observe(this, wallet1 -> {
-            BlockChainService.this.wallet.removeObservers(BlockChainService.this);
-            mBlockChainManager.init(BlockChainService.this.wallet, BlockChainService.this);
+            wallet.removeObservers(BlockChainService.this);
+            mBlockChainManager.init(wallet, BlockChainService.this);
             mBlockChainManager.setBlockChainEventsCallback(mEventsCallback);
+        });
+
+        WalletBalanceLiveData walletBalance = new WalletBalanceLiveData(CoolApplication.getApplication());
+        walletBalance.observe(this, coin -> {
+            // todo: update Widgets
         });
 
         startForeground(0);
@@ -124,10 +144,14 @@ public class BlockChainService extends LifecycleService {
         if (resetBlockChainOnShutdown) {
             mBlockChainManager.removeBlockChainFile();
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            BlockChainJobService.startUp();
+        }
         stopForeground(true);
         super.onDestroy();
         long duration = System.currentTimeMillis() - serviceCreatedAt;
-        log.info("service was up for " + (duration / 1000 / 60) + " minutes");
+        log.info(String.format("service was up for  %s  minutes", duration / 1000 / 60));
     }
 
     @Override

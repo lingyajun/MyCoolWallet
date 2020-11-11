@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
@@ -37,6 +39,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
     private  MainActivityViewModel viewModel;
 
+    private final Handler mHandler = new Handler();
+
     private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,45 +54,22 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel.showEncryptKeysDialog.observe(this,
                 (v) -> EncryptKeysDialogFragment.show(getSupportFragmentManager()));
         viewModel.showRestoreWalletDialog.observe(this, e -> {
-            // todo
-            // 1. 读取外部存储权限
-            // 2。 文件选择器
-
-//            if (ContextCompat.checkSelfPermission(this,
-//                    Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//                log.info("missing {}, requesting", Manifest.permission.READ_EXTERNAL_STORAGE);
-//                ActivityCompat.requestPermissions(this,
-//                        new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
-////                ActivityCompat.requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE }, 0);
-//            }
-//            WalletUtils.testRestoreWallet(this);
-//            openWalletFilePicker();
             WalletRestoreDialogFragment.show(getSupportFragmentManager());
         });
         viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
     }
-/*
 
-    private void openWalletFilePicker() {
-        File sd = Constants.Files.EXTERNAL_WALLET_BACKUP_DIR;
-       new MaterialFilePicker()
-                // Pass a source of context. Can be:
-                .withActivity(this)
-                // With cross icon on the right side of toolbar for closing picker straight away
-                .withCloseMenu(true)
-                // Entry point path (user will start from it)
-                .withPath(sd.getAbsolutePath())
-                // Root path (user won't be able to come higher than it)
-                .withRootPath(Constants.Files.EXTERNAL_STORAGE_DIR.getAbsolutePath())
-                // Showing hidden files
-                .withHiddenFiles(false)
-                .withFilterDirectories(false)
-                .withCustomActivity(WalletFilePickerActivity.class)
-                .withTitle(getString(R.string.import_keys_dialog_title))
-                .withRequestCode(WALLET_FILE_PICKER_REQUEST_CODE)
-                .start();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mHandler.postDelayed(()-> BlockChainService.start(this, true),1000);
     }
-*/
+
+    @Override
+    protected void onPause() {
+        mHandler.removeCallbacksAndMessages(null);
+        super.onPause();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -232,16 +213,6 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == RESULT_OK) {
             handleScanResult(data);
         }
-
-/*        if (requestCode == WALLET_FILE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
-            // todo
-            String path = data.getStringExtra(WalletFilePickerActivity.RESULT_FILE_PATH);
-
-            if (path != null) {
-                log.info("Path: {}", path);
-                XToast.success(this, "Picked file: "+ path).show();
-            }
-        }*/
     }
 
 

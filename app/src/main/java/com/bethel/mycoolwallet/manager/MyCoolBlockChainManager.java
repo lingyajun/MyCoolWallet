@@ -118,7 +118,7 @@ public class MyCoolBlockChainManager {
         this.lifecycleOwner = owner;
         mainHandler = new Handler(Looper.getMainLooper());
         delayHandler = new Handler(Looper.getMainLooper());
-        mConfig = Configuration.instance(application);
+        mConfig = application.getConfiguration();
 
         PowerManager pm = (PowerManager) application.getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, lifecycleOwner.getClass().getName());

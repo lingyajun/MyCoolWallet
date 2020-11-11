@@ -40,7 +40,7 @@ public class MyCoolNotificationManager {
     public void init(Context service) {
         this.service = service;
         application = CoolApplication.getApplication();
-        mConfig = Configuration.instance(application);
+        mConfig = application.getConfiguration();
         manager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
@@ -114,7 +114,7 @@ public class MyCoolNotificationManager {
     }
 
     public void cancelNotification(int notificationId) {
-        manager.cancel(notificationId);
+       if (null!= manager) manager.cancel(notificationId);
     }
     public void cancelCoinsReceivedNotification() {
         notificationAddresses.clear();

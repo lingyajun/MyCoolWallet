@@ -90,4 +90,16 @@ public class PreferenceWraper {
         editor.apply();
         return true;
     }
+
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPref;
+    }
+
+    public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mSharedPref.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unregisterOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mSharedPref.unregisterOnSharedPreferenceChangeListener(listener);
+    }
 }

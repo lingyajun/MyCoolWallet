@@ -10,6 +10,7 @@ import android.os.StrictMode;
 
 import androidx.multidex.MultiDex;
 
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.interfaces.OnWalletLoadedListener;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -30,6 +31,7 @@ public class CoolApplication extends Application {
     private static CoolApplication application = null;
     private MyCoolWalletManager myWalletManager = null;
     private ActivityManager activityManager;
+    private Configuration mConfig;
 
     private static final Logger log = LoggerFactory.getLogger(CoolApplication.class);
     @Override
@@ -76,6 +78,11 @@ public class CoolApplication extends Application {
 
     public void getWalletAsync(OnWalletLoadedListener listener) {
          myWalletManager.getWalletAsync(listener);
+    }
+
+    public Configuration getConfiguration() {
+        if (null== mConfig) mConfig = Configuration.instance(this);
+        return mConfig;
     }
 
     public static CoolApplication getApplication() {

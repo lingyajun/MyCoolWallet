@@ -1,8 +1,13 @@
 package com.bethel.mycoolwallet.helper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.format.DateUtils;
 
 import com.google.common.base.Strings;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Configuration {
     private  static  Configuration config;
@@ -13,9 +18,12 @@ public class Configuration {
     public static final String PREFS_KEY_TRUSTED_PEER = "trusted_peer";
     public static final String PREFS_KEY_TRUSTED_PEER_ONLY = "trusted_peer_only";
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
+    private static final String PREFS_KEY_LAST_USED = "last_used";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
+
+    private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
     private Configuration(Context context) {
         mPreference = PreferenceWraper.getInstance(context);
@@ -62,4 +70,30 @@ public class Configuration {
             return PREFS_DEFAULT_BTC_PRECISION;
     }
 
+    public boolean hasBeenUsed() {
+        return mPreference.getSharedPreferences().contains(PREFS_KEY_LAST_USED);
+    }
+
+    public long getLastUsedAgo() {
+        final long now = System.currentTimeMillis();
+
+        return now - mPreference.getLong(PREFS_KEY_LAST_USED, 0);
+    }
+
+    public void touchLastUsed() {
+        final long prefsLastUsed = mPreference.getLong(PREFS_KEY_LAST_USED, 0);
+        final long now = System.currentTimeMillis();
+        mPreference.putLong(PREFS_KEY_LAST_USED, now);
+
+        log.info("just being used - last used {} minutes ago", (now - prefsLastUsed) / DateUtils.MINUTE_IN_MILLIS);
+    }
+
+
+    public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreference.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unregisterOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreference.unregisterOnSharedPreferenceChangeListener(listener);
+    }
 }
