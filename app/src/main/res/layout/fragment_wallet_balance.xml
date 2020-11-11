@@ -15,16 +15,14 @@
             android:id="@+id/wallet_balance_btc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size_huge"
-            android:text="mBTC 15.00" />
+            android:textSize="@dimen/font_size_huge" />
         <TextView
             android:id="@+id/wallet_balance_local"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:paddingRight="8dp"
-            android:textSize="@dimen/font_size_small"
-            android:text="≈ CNY 120.00"/>
+            android:textSize="@dimen/font_size_small"/>
 
         <TextView
             android:id="@+id/wallet_balance_warning"
@@ -38,15 +36,29 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/wallet_balance_progress"
+    <LinearLayout
+        android:id="@+id/wallet_balance_progress_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="@dimen/list_entry_padding_horizontal_lax"
-        android:layout_marginRight="@dimen/list_entry_padding_horizontal_lax"
-        android:textColor="@color/fg_less_significant"
-        android:textSize="@dimen/font_size_small"
-        android:visibility="gone" />
+        android:layout_gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <ProgressBar
+            android:id="@+id/wallet_balance_progress_bar"
+            style="?android:progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+        <TextView
+            android:id="@+id/wallet_balance_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/list_entry_padding_horizontal_lax"
+            android:layout_marginRight="@dimen/list_entry_padding_horizontal_lax"
+            android:textColor="@color/fg_less_significant"
+            android:textSize="@dimen/font_size_small" />
 
+    </LinearLayout>
 </FrameLayout>

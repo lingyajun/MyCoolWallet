@@ -456,7 +456,7 @@ public class MyCoolBlockChainManager {
             } else {
                 delayHandler.postDelayed(task, BLOCKCHAIN_STATE_BROADCAST_THROTTLE_MS);
             }
-            log.info("onBlocksDownloaded  {} , peer {}", block.getTime(), peer.getAddress());
+//            log.info("onBlocksDownloaded  {} , peer {}", block.getTime(), peer.getAddress());
         }
 
         Runnable task = () ->{

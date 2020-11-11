@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bethel.mycoolwallet.CoolApplication;
@@ -55,6 +56,12 @@ public class WalletBalanceFragment extends BaseFragment {
     @BindView(R.id.wallet_balance_layout)
     ViewGroup balanceLayout;
 
+    @BindView(R.id.wallet_balance_progress_layout)
+    ViewGroup progressLayout;
+
+    @BindView(R.id.wallet_balance_progress_bar)
+    ProgressBar progressBar;
+
     private WalletBalanceViewModel viewModel;
     private Configuration mConfig;
 
@@ -89,19 +96,6 @@ public class WalletBalanceFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-//                Build.VERSION.SECURITY_PATCH.compareToIgnoreCase(Constants.SECURITY_PATCH_INSECURE_BELOW) < 0) {
-//            warningTv.setVisibility(View.VISIBLE);
-//            warningTv.setText(R.string.wallet_balance_fragment_insecure_device);
-//        } else {
-//            warningTv.setVisibility(View.GONE);
-//        }
-//
-//        progressTv.setVisibility(View.GONE);
-
-        // test data
-//        Coin coin = Coin.parseCoin("0.0019");
-//        Coin c2 = Coin.COIN;
         /**
          * shift()
          * 设置位数，以使小数点分隔符向右移动，该位数来自2014年前的标准BTC表示法。
@@ -133,7 +127,8 @@ public class WalletBalanceFragment extends BaseFragment {
 
 //            log.info("updateView : currentTimeMillis {},  bestChainDate {}",
 //                    System.currentTimeMillis(), chainState.bestChainDate.getTime());
-            showProgress = (!noNeedUptodate|| chainState.replaying);
+            showProgress = (!noNeedUptodate|| chainState.replaying); // 时间间隔长，或者重放
+//            showProgress = !(noNeedUptodate || !chainState.replaying); // 时间间隔长，并且重放
             log.info("updateView : chainDuration {}, UPTODATE__MS {}, noNeedUptodate {},  replaying {}",
                     chainDuration, BLOCKCHAIN_UPTODATE_THRESHOLD_MS, noNeedUptodate, chainState.replaying);
 //            log.info("updateView (chainDuration - UPTODATE__MS) = {}",
@@ -155,11 +150,14 @@ public class WalletBalanceFragment extends BaseFragment {
                     final long months = chainDuration / (30 * DateUtils.DAY_IN_MILLIS);
                     progressTv.setText(getString(R.string.blockchain_state_progress_months, downloading, months));
                 }
+
+                progressBar.setVisibility(noImpediments ? View.VISIBLE: View.INVISIBLE);
             }
         }
 
         if (!showProgress) {
-            balanceLayout.setVisibility(View.VISIBLE);
+//            balanceLayout.setVisibility(View.VISIBLE);
+            balanceLocalTv.setVisibility(View.VISIBLE);
             if (null != balance) {
                 CurrencyTools.setText(balanceBtcTv, mConfig.getFormat(), balance);
                 balanceBtcTv.setVisibility(View.VISIBLE);
@@ -179,10 +177,11 @@ public class WalletBalanceFragment extends BaseFragment {
                 warningTv.setVisibility(View.GONE);
             }
 
-            progressTv.setVisibility(View.GONE);
+            progressLayout.setVisibility(View.GONE);
         } else {
-            balanceLayout.setVisibility(View.INVISIBLE);
-            progressTv.setVisibility(View.VISIBLE);
+//            balanceLayout.setVisibility(View.INVISIBLE);
+            balanceLocalTv.setVisibility(View.INVISIBLE);
+            progressLayout.setVisibility(View.VISIBLE);
         }
 
         log.info("updateView : showProgress {},  balance {}", showProgress, balance);
@@ -198,8 +197,8 @@ public class WalletBalanceFragment extends BaseFragment {
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
         final Coin balance = viewModel.balanceLiveData.getValue();
         boolean hasSomeBalance =  balance != null && !balance.isLessThan(Constants.SOME_BALANCE_THRESHOLD);
-        menu.findItem(R.id.wallet_balance_options_donate).setVisible(true);
-//                .setVisible(Constants.DONATION_ADDRESS != null && hasSomeBalance);
+        menu.findItem(R.id.wallet_balance_options_donate)
+                .setVisible(Constants.DONATION_ADDRESS != null && hasSomeBalance);
                 super.onPrepareOptionsMenu(menu);
     }
 
@@ -212,7 +211,7 @@ public class WalletBalanceFragment extends BaseFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void donateBtc() {
+    private void donateBtc() { // todo donate
         XToast.info(getContext(), "donate some bitcoin").show();
     }
 }
