@@ -60,6 +60,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -473,7 +474,8 @@ public class MyCoolBlockChainManager {
         Date time = head.getHeader().getTime();
         int height = head.getHeight();
         boolean isReplay = head.getHeight() < mConfig.getBestChainHeightEver();
-        Set<Impediment> impediments = impedimentLiveData.getValue();
+        Set<Impediment> impediments = null!= impedimentLiveData?
+                impedimentLiveData.getValue() : EnumSet.noneOf(Impediment.class);
         return new BlockChainState(time, height ,isReplay, impediments);
     }
 

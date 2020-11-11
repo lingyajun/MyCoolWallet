@@ -1,11 +1,13 @@
 package com.bethel.mycoolwallet.manager;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
@@ -22,7 +24,10 @@ import com.bethel.mycoolwallet.utils.CurrencyTools;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +42,8 @@ public class MyCoolNotificationManager {
     private Coin notificationAccumulatedAmount = Coin.ZERO;
     private final List<Address> notificationAddresses = new LinkedList<>();
 
+    private static final Logger log = LoggerFactory.getLogger(MyCoolNotificationManager.class);
+
     public void init(Context service) {
         this.service = service;
         application = CoolApplication.getApplication();
@@ -44,21 +51,36 @@ public class MyCoolNotificationManager {
         manager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
+    /**  测试  */
+    public void testNotifyCoinsReceived() {
+        Address address = Address.fromString(MainNetParams.get(), "116F9AtBDarSfAfv7fUSeepC1EfThnyA3W");
+        log.info("testNotifyCoinsReceived  {}", address);
+        notifyCoinsReceived(address, Coin.COIN, Sha256Hash.ZERO_HASH);
+    }
     public void notifyCoinsReceived(@Nullable final Address address, final Coin amount,
                                     final Sha256Hash transactionHash) {
+        final String channelId = Constants.NOTIFICATION_CHANNEL_ID_RECEIVED;
+        // NotificationChannel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "coin_received_channel", NotificationManager.IMPORTANCE_HIGH);
+            channel.setShowBadge(true);
+            manager.createNotificationChannel(channel);
+        }
+
         notificationCount ++;
         notificationAccumulatedAmount = notificationAccumulatedAmount.add(amount);
         if (null!=address && !notificationAddresses.contains(address)) {
             notificationAddresses.add(address);
         }
 
-        final MonetaryFormat btcFormat = CurrencyTools.getFormat(mConfig.getBtcShift(), mConfig.getBtcPrecision());
+        final MonetaryFormat btcFormat = mConfig.getFormat();
+                // CurrencyTools.getFormat(mConfig.getBtcShift(), mConfig.getBtcPrecision());
         final String pkgFlavor = application.applicationPackageFlavor();
         final String msgSuffix = !TextUtils.isEmpty(pkgFlavor) ? String.format(" [%s]", pkgFlavor): "";
 
         // summary notification
-        final NotificationCompat.Builder summaryNotification = new NotificationCompat.Builder(service,
-                Constants.NOTIFICATION_CHANNEL_ID_RECEIVED);
+        final NotificationCompat.Builder summaryNotification = new NotificationCompat.Builder(service, channelId);
         summaryNotification.setGroup(Constants.NOTIFICATION_GROUP_KEY_RECEIVED);
         summaryNotification.setGroupSummary(true);
         summaryNotification.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN);
@@ -87,8 +109,7 @@ public class MyCoolNotificationManager {
         manager.notify(Constants.NOTIFICATION_ID_COINS_RECEIVED, summaryNotification.build());
 
         // child notification
-        final NotificationCompat.Builder childNotification = new NotificationCompat.Builder(service,
-                Constants.NOTIFICATION_CHANNEL_ID_RECEIVED);
+        final NotificationCompat.Builder childNotification = new NotificationCompat.Builder(service, channelId);
         childNotification.setGroup(Constants.NOTIFICATION_GROUP_KEY_RECEIVED);
         childNotification.setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN);
         childNotification.setWhen(System.currentTimeMillis());
@@ -124,9 +145,18 @@ public class MyCoolNotificationManager {
     }
 
     // startForeground()
-    public static Notification buildPeersCountNotification(Context service, final int numPeers) {
-        final NotificationCompat.Builder notification = new NotificationCompat.Builder(service,
-                Constants.NOTIFICATION_CHANNEL_ID_ONGOING);
+    public  Notification buildPeersCountNotification(final int numPeers) {
+        final String channelId = Constants.NOTIFICATION_CHANNEL_ID_ONGOING;
+        // NotificationChannel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "peers_channel", NotificationManager.IMPORTANCE_LOW);
+            channel.enableVibration(false);
+            channel.setShowBadge(true);
+            manager.createNotificationChannel(channel);
+        }
+
+        final NotificationCompat.Builder notification = new NotificationCompat.Builder(service, channelId);
         notification.setColor(ContextCompat.getColor(service, R.color.fg_network_significant));
         notification.setSmallIcon(R.drawable.stat_notify_peers, Math.min(numPeers, 4));
         notification.setContentTitle(service.getString(R.string.app_name));
@@ -135,6 +165,7 @@ public class MyCoolNotificationManager {
                 new Intent(service, MainActivity.class), 0));
         notification.setWhen(System.currentTimeMillis());
         notification.setOngoing(true);
+//        notification.setChannelId()
         return notification.build();
     }
 }

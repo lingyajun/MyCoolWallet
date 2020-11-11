@@ -102,6 +102,7 @@ public class BlockChainService extends LifecycleService {
 
         startForeground(0);
         broadcastPeerState(0);
+
     }
 
     @Override
@@ -128,7 +129,9 @@ public class BlockChainService extends LifecycleService {
 
     private void startForeground(final int numPeers) {
         startForeground(Constants.NOTIFICATION_ID_CONNECTED,
-                MyCoolNotificationManager.buildPeersCountNotification(this, numPeers));
+                mNotificationManager.buildPeersCountNotification(numPeers));
+
+//        mNotificationManager.testNotifyCoinsReceived();
     }
 
     private void notifyCoinsReceived(@Nullable final Address address, final Coin amount,
