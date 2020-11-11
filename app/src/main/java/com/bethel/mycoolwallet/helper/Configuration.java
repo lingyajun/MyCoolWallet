@@ -6,6 +6,7 @@ import android.text.format.DateUtils;
 
 import com.google.common.base.Strings;
 
+import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,16 @@ public class Configuration {
         return mPreference.getBoolean(PREFS_KEY_TRUSTED_PEER_ONLY, false);
     }
 
+    public MonetaryFormat getFormat() {
+        return getFormat(getBtcShift(), getBtcPrecision());
+    }
+
+    private MonetaryFormat getFormat(int shift, int precision) {
+        final int minPrecision = shift <= 3 ? 2 : 0;
+        final int decimalRepetitions = (precision - minPrecision) / 2;
+        return new MonetaryFormat().shift(shift).minDecimals(minPrecision).repeatOptionalDecimals(2,
+                decimalRepetitions);
+    }
 
     public int getBtcShift() {
         final String precision = mPreference.getString(PREFS_KEY_BTC_PRECISION, null);

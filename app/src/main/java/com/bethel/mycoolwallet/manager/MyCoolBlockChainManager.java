@@ -128,7 +128,7 @@ public class MyCoolBlockChainManager {
         File dir = application.getDir("blockstore", Context.MODE_PRIVATE);
         blockChainFile = new File(dir, Constants.Files.BLOCKCHAIN_FILENAME);
 
-        boolean isBlockChainFileExists = blockChainFile.exists();
+        final boolean isBlockChainFileExists = blockChainFile.exists();
         final Wallet wallet = walletLiveData.getValue();
         if (!isBlockChainFileExists) {
             wallet.reset();
@@ -214,11 +214,12 @@ public class MyCoolBlockChainManager {
         peerGroup.setMaxConnections(connectTrustedPeerOnly ? 1: maxConnectedPeers());
         peerGroup.setConnectTimeoutMillis(Constants.PEER_TIMEOUT_MS);
         peerGroup.setPeerDiscoveryTimeoutMillis(Constants.PEER_DISCOVERY_TIMEOUT_MS);
-        peerGroup.addPeerDiscovery(new MPeerDiscovery());
+        peerGroup.addPeerDiscovery(mPeerDiscovery);
 
         // start
         peerGroup.startAsync();
-        peerGroup.addBlocksDownloadedEventListener(new MBlockChainDownloadListener());
+//        peerGroup.addBlocksDownloadedEventListener(new MBlockChainDownloadListener());
+        peerGroup.startBlockChainDownload(mBlockChainDownloadListener);
         log.info("starting {} asynchronously", peerGroup);
     }
 
@@ -399,6 +400,7 @@ public class MyCoolBlockChainManager {
         }
     }
 
+    private final MPeerDiscovery mPeerDiscovery = new MPeerDiscovery();
     private class MPeerDiscovery implements PeerDiscovery {
         // Builds a suitable set of peer discoveries.
         private final PeerDiscovery normalPeerDiscovery =
@@ -440,6 +442,7 @@ public class MyCoolBlockChainManager {
         }
     }
 
+    private final MBlockChainDownloadListener mBlockChainDownloadListener = new MBlockChainDownloadListener();
     private class MBlockChainDownloadListener extends AbstractPeerDataEventListener {
         private final AtomicLong lastTime = new AtomicLong(0);
 
@@ -453,6 +456,7 @@ public class MyCoolBlockChainManager {
             } else {
                 delayHandler.postDelayed(task, BLOCKCHAIN_STATE_BROADCAST_THROTTLE_MS);
             }
+            log.info("onBlocksDownloaded  {} , peer {}", block.getTime(), peer.getAddress());
         }
 
         Runnable task = () ->{
