@@ -4,4 +4,5 @@
     <item name="wallet_actions_top" type="bool">false</item>
     <item name="show_exchange_rates_option" type="bool">true</item>
     <bool name="show_wallet_address_dialog_hint">false</bool>
+    <item name="show_debug_option" type="bool">true</item>
 </resources>

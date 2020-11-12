@@ -269,16 +269,17 @@ public class MyCoolBlockChainManager {
                     final int numTransactionsReceived = transationReceived.getAndSet(0);
 
                     activeHistoryEntries.add(0, new BlockChainActiveHistoryEntry(numTransactionsReceived, numBlocksDownloaded));
-                    final int historySize =activeHistoryEntries.size();
-                    if (MAX_HISTORY_SIZE < historySize) {
-                        activeHistoryEntries.remove(historySize -1);
+                    final int size =activeHistoryEntries.size();
+                    if (MAX_HISTORY_SIZE < size) {
+                        activeHistoryEntries.remove(size -1);
                     }
                     // determine if block and transaction activity is idling ;
                     // 确定是否空闲，如果闲就结束 service
                     boolean isIdle = false;
-                    if (MIN_COLLECT_HISTORY <= historySize) {
+                    final int length =activeHistoryEntries.size();
+                    if (MIN_COLLECT_HISTORY <= length) {
                         isIdle = true;
-                        for (int i = 0; i < historySize; i++) {
+                        for (int i = 0; i < length; i++) {
                             BlockChainActiveHistoryEntry entry = activeHistoryEntries.get(i);
                             boolean isblocksActive = entry.numBlocksDownloaded>0 && i <= IDLE_BLOCK_TIMEOUT_MIN;
                             boolean isTxActive = entry.numTransactionsReceived>0 && i <= IDLE_TRANSACTION_TIMEOUT_MIN;

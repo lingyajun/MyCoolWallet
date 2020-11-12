@@ -138,6 +138,14 @@ public class CrashReporter {
         }
     }
 
+    public static File getBackgroundTracesFile() {
+        return backgroundTracesFile;
+    }
+
+    public static File getCrashTraceFile() {
+        return crashTraceFile;
+    }
+
     private static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
         private final Thread.UncaughtExceptionHandler previousHandler;
 

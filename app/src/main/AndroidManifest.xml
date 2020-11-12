@@ -10,10 +10,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.DebugActivity"></activity>
         <activity
             android:name=".activity.WalletFilePickerActivity"
             android:theme="@style/MFP_BaseTheme" />
-
         <activity
             android:name=".activity.WalletBackupActivity"
             android:configChanges="orientation|keyboard|keyboardHidden"
@@ -80,11 +80,9 @@
             android:theme="@style/XQRCodeTheme"
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
         <activity android:name=".activity.SettingsActivity" /> <!-- open camera scan qr -->
-
         <service
             android:name=".service.BlockChainJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".service.BlockChainService"
             android:enabled="true"
@@ -94,8 +92,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- dangerous permissions -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- dangerous permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />

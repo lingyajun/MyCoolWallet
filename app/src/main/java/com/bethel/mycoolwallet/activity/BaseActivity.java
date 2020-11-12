@@ -65,6 +65,10 @@ public class BaseActivity extends AppCompatActivity implements IRequestCameraPer
         }
     }
 
+    public RequestPermissionsManager getPermissionsManager() {
+        checkRequestPermissionsManager();
+        return permissionsManager;
+    }
 
     /**
      * 顶部栏

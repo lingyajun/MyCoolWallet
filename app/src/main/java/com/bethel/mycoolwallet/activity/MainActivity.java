@@ -106,6 +106,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 //            requestLegacyOption.setVisible(isLegacyFallback);
 //        }
 
+        boolean debug = res.getBoolean(R.bool.show_debug_option);
+        menu.findItem(R.id.wallet_options_debug).setEnabled(debug);
         return true;
     }
 
@@ -157,6 +159,9 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 break;
             case R.id.wallet_options_help :
                 XToast.info(this, "help doc").show();
+                break;
+            case R.id.wallet_options_debug :
+                DebugActivity.start(this);
                 break;
             default: return super.onOptionsItemSelected(item);
         }

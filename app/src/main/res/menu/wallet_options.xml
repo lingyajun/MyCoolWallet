@@ -86,4 +86,10 @@
         app:showAsAction="never"
         android:title="@string/button_help"/>
 
+    <item
+        android:id="@+id/wallet_options_debug"
+        android:orderInCategory="999"
+        app:showAsAction="never"
+        android:title="Debug"/>
+
 </menu>

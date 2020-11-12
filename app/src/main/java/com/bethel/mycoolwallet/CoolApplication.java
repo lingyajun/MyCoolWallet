@@ -29,7 +29,8 @@ public class CoolApplication extends Application {
             + ".wallet_reference_changed";
 
     private static CoolApplication application = null;
-    private MyCoolWalletManager myWalletManager = null;
+    private final MyCoolWalletManager myWalletManager =  new MyCoolWalletManager();
+
     private ActivityManager activityManager;
     private Configuration mConfig;
 
@@ -63,7 +64,6 @@ public class CoolApplication extends Application {
             CrashReporter.saveBackgroundTrace(throwable, packageInfo());
         };
 
-        myWalletManager = new MyCoolWalletManager();
         myWalletManager.init(this);
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
