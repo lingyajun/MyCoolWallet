@@ -3,7 +3,10 @@ package com.bethel.mycoolwallet;
 import android.content.Context;
 
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
+//import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.bethel.mycoolwallet.http.HttpUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,5 +26,10 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         assertEquals("com.bethel.mycoolwallet", appContext.getPackageName());
+    }
+
+    @Test
+    public void requestExchangeRate() {
+        HttpUtil.requestExchangeRate("CNY");
     }
 }

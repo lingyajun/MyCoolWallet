@@ -20,6 +20,9 @@ public class Configuration {
     public static final String PREFS_KEY_TRUSTED_PEER_ONLY = "trusted_peer_only";
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
     private static final String PREFS_KEY_LAST_USED = "last_used";
+    private static final String PREFS_KEY_CURRENCY_CODE = "currency_code";
+
+    private final static String KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE ="exchange_rate_%s";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -46,12 +49,30 @@ public class Configuration {
             mPreference.putInt(PREFS_KEY_BEST_CHAIN_HEIGHT_EVER, bestChainHeightEver);
     }
 
+    public String getMyCurrencyCode() {
+        return Strings.emptyToNull(mPreference.getString(PREFS_KEY_CURRENCY_CODE, "").trim());
+    }
+
+    public void setMyCurrencyCode(String currencyCode) {
+        mPreference.putString(PREFS_KEY_CURRENCY_CODE, currencyCode);
+    }
+
     public String getTrustedPeerHost() {
         return Strings.emptyToNull(mPreference.getString(PREFS_KEY_TRUSTED_PEER, "").trim());
     }
 
     public boolean getTrustedPeerOnly() {
         return mPreference.getBoolean(PREFS_KEY_TRUSTED_PEER_ONLY, false);
+    }
+
+    public void cacheExchangeRateRequest(String currencyCode, String json) {
+        String key = String.format(KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE, currencyCode);
+        mPreference.putString(key, json);
+    }
+
+    public String getCacheExchangeRateRequest(String currencyCode) {
+        String key = String.format(KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE, currencyCode);
+        return mPreference.getString(key, null);
     }
 
     public MonetaryFormat getFormat() {

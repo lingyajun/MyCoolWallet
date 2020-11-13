@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.format.DateUtils;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.BlockChainState;
+import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletBalanceViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -28,6 +30,7 @@ import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.utils.Fiat;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +67,7 @@ public class WalletBalanceFragment extends BaseFragment {
 
     private WalletBalanceViewModel viewModel;
     private Configuration mConfig;
+    private boolean showLocalBalance;
 
     private static final Logger log = LoggerFactory.getLogger(WalletBalanceFragment.class);
 
@@ -77,6 +81,7 @@ public class WalletBalanceFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mConfig = CoolApplication.getApplication().getConfiguration();
+        showLocalBalance = getResources().getBoolean(R.bool.show_local_balance);
 
         viewModel = getViewModel(WalletBalanceViewModel.class);
         viewModel.balanceLiveData.observe(this, coin -> {
@@ -86,6 +91,7 @@ public class WalletBalanceFragment extends BaseFragment {
         });
 
         viewModel.chainStateLiveData.observe(this, blockChainState -> updateView());
+        viewModel.rateLiveData.observe(this, rateBean -> updateView());
     }
 
     @Override
@@ -118,6 +124,7 @@ public class WalletBalanceFragment extends BaseFragment {
         // todo ExchangeRate
         BlockChainState chainState = viewModel.chainStateLiveData.getValue();
         Coin balance = viewModel.balanceLiveData.getValue();
+        ExchangeRateBean rateBean = viewModel.rateLiveData.getValue();
 
         boolean showProgress =false;
         if (null!= chainState && null!= chainState.bestChainDate) {
@@ -161,10 +168,21 @@ public class WalletBalanceFragment extends BaseFragment {
             if (null != balance) {
                 CurrencyTools.setText(balanceBtcTv, mConfig.getFormat(), balance);
                 balanceBtcTv.setVisibility(View.VISIBLE);
+                if (showLocalBalance) {
+                    if (rateBean != null) {
+                        final Fiat localValue = rateBean.rate.coinToFiat(balance);
+                        MonetaryFormat format = Constants.LOCAL_FORMAT.code(0,
+                                Constants.PREFIX_ALMOST_EQUAL_TO + rateBean.getCurrencyCode());
+                        CurrencyTools.setText(balanceLocalTv, format, localValue);
+                        balanceLocalTv.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_less_significant));
+                    } else {
+                        balanceLocalTv.setVisibility(View.INVISIBLE);
+                    }
+                }
             } else {
                 balanceBtcTv.setVisibility(View.INVISIBLE);
             }
-            // todo viewBalance
+            //  viewBalance
 
             if (balance != null && balance.isGreaterThan(Constants.TOO_MUCH_BALANCE_THRESHOLD)) {
                 warningTv.setVisibility(View.VISIBLE);

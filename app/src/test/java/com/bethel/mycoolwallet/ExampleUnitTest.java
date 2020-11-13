@@ -1,5 +1,7 @@
 package com.bethel.mycoolwallet;
 
+import com.bethel.mycoolwallet.http.HttpUtil;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,5 +15,10 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void requestExchangeRate() {
+        HttpUtil.requestExchangeRate("CNY");
     }
 }

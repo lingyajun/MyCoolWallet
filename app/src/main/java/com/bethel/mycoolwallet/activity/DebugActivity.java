@@ -63,6 +63,7 @@ public class DebugActivity extends BaseActivity {
         return data;
     }
 
+    // todo
     private void backupCrashReporter() {
 
         final DateFormat dateFormat = new Iso8601Format("yyyy-MM-dd-HH-mm");
@@ -77,7 +78,7 @@ public class DebugActivity extends BaseActivity {
         // 请求创建文件
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/txt");
+        intent.setType("application/text");
         intent.putExtra(Intent.EXTRA_TITLE, filename.toString());
         startActivityForResult(intent, REQUEST_CODE_CREATE_DOCUMENT);
     }
