@@ -13,10 +13,6 @@ public class WalletBalanceViewModel extends BaseViewModel {
     public final BlockChainStateLiveData chainStateLiveData;
     public final ExchangeRateLiveData rateLiveData;
 
-    /**
-     * todo
-      SelectedExchangeRateLiveData exchangeRate;
-     */
     public WalletBalanceViewModel(@NonNull Application app) {
         super(app);
         balanceLiveData = new WalletBalanceLiveData(getApplication());

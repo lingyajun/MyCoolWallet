@@ -39,7 +39,7 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
         super.onInactive();
     }
 
-    private void load() {
+    public void load() {
         String currencyCode = getMyCurrencyCode();
         if (TextUtils.isEmpty(currencyCode)) {
             setValue(null);
