@@ -10,6 +10,7 @@
     <item
         android:id="@+id/send_coins_options_fee_category"
         app:showAsAction="never"
+        android:enabled="false"
         android:title="@string/send_coins_options_fee_category">
         <menu>
             <group android:checkableBehavior="single" >

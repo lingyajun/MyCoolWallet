@@ -9,6 +9,7 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.FreshReceiveAddressLiveData;
 import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -21,6 +22,7 @@ import org.bitcoinj.uri.BitcoinURI;
 
 public class RequestCoinsViewModel extends BaseViewModel {
     public final FreshReceiveAddressLiveData freshReceiveAddress;
+    public final ExchangeRateLiveData exchangeRateLiveData;
 
     public final MediatorLiveData<Bitmap> qrCode = new MediatorLiveData<>();
     public final MediatorLiveData<byte[]> paymentRequest = new MediatorLiveData<>();
@@ -29,12 +31,10 @@ public class RequestCoinsViewModel extends BaseViewModel {
     public final MutableLiveData<Coin> amount = new MutableLiveData<>();
     public final MutableLiveData<String> bluetoothMac = new MutableLiveData<>();
 
-    // todo ExchangeRate
-//    public final SelectedExchangeRateLiveData exchangeRate;
-
     public RequestCoinsViewModel(@NonNull Application app) {
         super(app);
         freshReceiveAddress = new FreshReceiveAddressLiveData(application);
+        exchangeRateLiveData = new ExchangeRateLiveData(null);
 
         qrCode.addSource(freshReceiveAddress, address -> maybeGenerateQrCode());
         qrCode.addSource(amount, address -> maybeGenerateQrCode());
@@ -46,7 +46,6 @@ public class RequestCoinsViewModel extends BaseViewModel {
 
         bitcoinUri.addSource(freshReceiveAddress, address -> maybeGenerateBitcoinUri());
         bitcoinUri.addSource(amount, address -> maybeGenerateBitcoinUri());
-//        bitcoinUri.addSource(bluetoothMac, address -> maybeGeneratePaymentRequest());
     }
 
     private void maybeGenerateBitcoinUri() {

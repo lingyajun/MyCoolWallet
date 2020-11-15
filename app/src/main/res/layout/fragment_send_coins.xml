@@ -139,6 +139,12 @@
             </LinearLayout>
         </LinearLayout>
 
+        <com.bethel.mycoolwallet.view.FeeSeekBar
+            android:id="@+id/send_coins_fee_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"/>
+
         <CheckBox
             android:id="@+id/send_coins_direct_payment_enable"
             android:layout_width="match_parent"

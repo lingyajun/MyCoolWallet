@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,26 +28,37 @@ import android.widget.Toast;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
 import com.bethel.mycoolwallet.data.FeeCategory;
+import com.bethel.mycoolwallet.helper.PaymentHelper;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
+import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
+import com.bethel.mycoolwallet.view.FeeSeekBar;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
+import org.bitcoinj.core.Coin;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 支付页面.
  */
 public class SendCoinsFragment extends BaseFragment implements IQrScan {
     /**
      * 扫描跳转Activity RequestCode
      */
-    public static final int REQUEST_QR_SCAN_CODE = 111;
+    private static final int REQUEST_QR_SCAN_CODE = 111;
+    private static final Logger log = LoggerFactory.getLogger(SendCoinsFragment.class);
+
+    private SendCoinsViewModel viewModel;
 
     @BindView(R.id.send_coins_payee_group)
      View payeeGroup;
@@ -90,13 +103,39 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     @BindView(R.id.send_coins_cancel)
      Button viewCancel;
 
+    @BindView(R.id.send_coins_fee_seek_bar)
+    FeeSeekBar feeSeekBar;
+
     @OnClick(R.id.send_coins_go)
     protected void onSendClick() {
-        XToast.warning(getContext(), "send coins!").show();
+//        viewModel.toAddress = null;
+        final Coin amount = (Coin) coinAmountView.getAmount();
+      final String str = receivingAddressView.getText().toString();
+       if (null==amount ||Coin.ZERO == amount || TextUtils.isEmpty(str)) {
+           return;
+       }
+        try {
+            final Address toAddress = Address.fromString(Constants.NETWORK_PARAMETERS, str);
+            viewModel.toAddress = toAddress;
+        } catch (AddressFormatException e) {
+            XToast.error(getContext(), "please input right address").show();
+        }
+        if (null == viewModel.toAddress) return;
+
+        /** todo
+         * 「0。 生成解密钱包所需要格式的'密钥', 用于钱包支付密码解密」
+         * 1. 构造 SendRequest
+         * 2。 SendRequest 参数配置
+         * 3。 对交易进行签名
+         * 4。广播签名后的交易数据
+         */
+
+//        XToast.warning(getContext(), "send coins!  " + feeSeekBar.getSelectedNumber()).show();
     }
 
     @OnClick(R.id.send_coins_cancel)
     protected void onCancelClick() {
+        feeSeekBar.setDefaultValue(2020);
         XToast.warning(getContext(), "cancel !").show();
     }
 
@@ -104,6 +143,8 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        viewModel = getViewModel(SendCoinsViewModel.class);
     }
 
     @Override
@@ -121,6 +162,9 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
         viewCancel.setText(R.string.button_cancel);
         viewGo.setText(R.string.send_coins_fragment_button_send);
+
+        feeSeekBar.setDefaultValue(2000);
+        Log.d("tttttt", "onViewCreated, feeSeekBar: "+ feeSeekBar.getSelectedNumber());
     }
 
     @Override
