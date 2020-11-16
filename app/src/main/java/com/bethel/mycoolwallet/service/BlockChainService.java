@@ -27,6 +27,7 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Peer;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.StoredBlock;
+import org.bitcoinj.core.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,13 @@ public class BlockChainService extends LifecycleService {
         } else {
             intent = new Intent(context, BlockChainService.class);
         }
+        ContextCompat.startForegroundService(context, intent);
+    }
+
+    public static void broadcastTransaction(final Context context, final Transaction tx) {
+        Intent intent = new Intent(context, BlockChainService.class);
+        intent.setAction(ACTION_BROADCAST_TRANSACTION);
+        intent.putExtra(ACTION_BROADCAST_TRANSACTION_HASH, tx.getTxId().getBytes());
         ContextCompat.startForegroundService(context, intent);
     }
     @Nullable

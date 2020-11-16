@@ -4,17 +4,22 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 
+import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.Transaction;
 
 public class SendCoinsViewModel extends BaseViewModel {
-    private final WalletLiveData wallet;
+    public final WalletLiveData wallet;
+    public final ExchangeRateLiveData exchangeRate;
 
-    public Address toAddress;
+    public Address toAddress = null;
+    public Transaction sentTransaction = null;
 
     public SendCoinsViewModel(@NonNull Application app) {
         super(app);
         wallet = new WalletLiveData(getApplication());
+        exchangeRate = new ExchangeRateLiveData(null);
     }
 }

@@ -3,6 +3,7 @@ package com.bethel.mycoolwallet.helper;
 import android.text.TextUtils;
 
 import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
+import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 import com.bethel.mycoolwallet.utils.Constants;
 
@@ -61,6 +62,9 @@ public class PaymentHelper {
      * @param wallet
      * @param password
      */
+    public void deriveKey4DescryptWalet(Wallet wallet, final String password, IDeriveKeyCallBack callBack)  {
+        deriveKey4DescryptWalet(wallet, password, 0, callBack);
+    }
     public void deriveKey4DescryptWalet(Wallet wallet, final String password,
                                         final int appScryptIterations, IDeriveKeyCallBack callBack)  {
         if (!wallet.isEncrypted() || TextUtils.isEmpty(password)) return;
@@ -98,24 +102,25 @@ public class PaymentHelper {
      * @param toAddress
      * @param amount
      */
-    public SendRequest buildSendRequest(Address toAddress, Coin amount) {
+    public static SendRequest buildSendRequest(Address toAddress, Coin amount) {
         return SendRequest.to(toAddress, amount);
     }
 
     /** 2. SendRequest 参数配置
      *
      */
-    public void paramSendRequest(SendRequest req, boolean emptyWallet ,Coin feePerKb,String memo ,
+    public static void paramSendRequest(SendRequest req, boolean emptyWallet ,Coin feePerKb,String memo ,
                                  ExchangeRate exchangeRate,  KeyParameter aesKey) {}
 
     /** 3. 对交易进行签名
      *
      * @param req
      */
-    public void signPayment(Wallet wallet, SendRequest req) {
+    public static void signPayment(Wallet wallet, SendRequest req, ISignPaymentCallback callback) {
         MyCoolWalletManager.propagate();
         try {
             final Transaction transaction =  wallet.sendCoinsOffline(req); // can take a long time
+            if (null != callback) callback.onSuccess(transaction);
         } catch (InsufficientMoneyException e){
             // you don't have enough money available to perform the requested operation.
         }

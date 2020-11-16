@@ -4,6 +4,7 @@ package com.bethel.mycoolwallet.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,10 +28,13 @@ import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
+import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.FeeCategory;
 import com.bethel.mycoolwallet.helper.PaymentHelper;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
+import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
@@ -41,7 +45,13 @@ import com.xuexiang.xui.widget.toast.XToast;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.utils.ExchangeRate;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.bitcoinj.wallet.SendRequest;
+import org.bitcoinj.wallet.Wallet;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +131,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             XToast.error(getContext(), "please input right address").show();
         }
         if (null == viewModel.toAddress) return;
-
         /** todo
          * 「0。 生成解密钱包所需要格式的'密钥', 用于钱包支付密码解密」
          * 1. 构造 SendRequest
@@ -130,8 +139,66 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
          * 4。广播签名后的交易数据
          */
 
+        Wallet wallet = viewModel.wallet.getValue();
+        if (null==wallet) return;
+        if (wallet.isEncrypted()) {
+            // todo
+        } else {
+            // build SendRequest
+            buildSendRequest(amount, null);
+        }
 //        XToast.warning(getContext(), "send coins!  " + feeSeekBar.getSelectedNumber()).show();
     }
+
+    private void buildSendRequest(Coin amount, KeyParameter aesKey) {
+        Wallet wallet = viewModel.wallet.getValue();
+        SendRequest request = PaymentHelper.buildSendRequest(viewModel.toAddress, amount);
+        //  SendRequest 参数配置
+        // boolean emptyWallet ,Coin feePerKb,String memo , ExchangeRate exchangeRate,  KeyParameter aesKey
+        request. emptyWallet = wallet.getBalance(Wallet.BalanceType.AVAILABLE).equals(amount);
+        request. feePerKb = Coin.valueOf(feeSeekBar.getSelectedNumber());
+        request. memo = null;
+        ExchangeRateBean rateBean = viewModel.exchangeRate.getValue();
+        request. exchangeRate = null!=rateBean? rateBean.rate: null;
+        request.aesKey = aesKey;
+
+        // todo check if  amount > fee
+
+        // 对交易进行签名
+        AsyncTask.execute(()-> PaymentHelper.signPayment(wallet, request, iSignPaymentCallback));
+    }
+
+    private  final ISignPaymentCallback iSignPaymentCallback = new ISignPaymentCallback() {
+        @Override
+        public void onSuccess(final Transaction tx) {
+            Wallet wallet = viewModel.wallet.getValue();
+            log.info("ISignPaymentCallback, fee {},  sent {},  toMe {}", tx.getFee(),
+                    tx.getValueSentFromMe(wallet), tx.getValueSentToMe(wallet));
+
+            runOnUiThread(()->{
+                viewModel.sentTransaction = tx;
+                //  监听发送交易的状态/事件
+                TransactionConfidence confidence = tx.getConfidence();
+                confidence.addEventListener(transactionListener);
+                // 广播签名后的交易数据
+                BlockChainService.broadcastTransaction(getContext(), tx);
+
+                // todo http 发送交易； Bluetooth 发送交易
+
+            });
+        }
+
+        @Override
+        public void onFailed(String message) {
+        }
+    };
+
+    private final TransactionConfidence.Listener transactionListener = new TransactionConfidence.Listener() {
+        @Override
+        public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
+            //  todo 监听发送交易的状态/事件
+        }
+    };
 
     @OnClick(R.id.send_coins_cancel)
     protected void onCancelClick() {

@@ -28,7 +28,7 @@ public abstract class BaseFragment extends Fragment {
     protected View mRootView = null;
     protected Unbinder mUnbinder = null;
 
-    protected Handler mainHandler = null;
+//    protected Handler mainHandler = null;
 
 
     @Override
@@ -65,15 +65,8 @@ public abstract class BaseFragment extends Fragment {
 
     protected abstract int getLayoutId();
 
-    protected  void runOnUIthread(Runnable task) {
-        prepareMainHandler();
-        mainHandler.post(task);
-    }
-
-    private synchronized void prepareMainHandler() {
-        if (null == mainHandler) {
-            mainHandler = new Handler(Looper.getMainLooper());
-        }
+    protected final void runOnUiThread(Runnable task) {
+        getActivity().runOnUiThread(task);
     }
 
     protected  <T extends ViewModel> T getViewModel(@NonNull Class<T> modelClass) {
