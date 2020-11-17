@@ -62,10 +62,10 @@ public class PaymentHelper {
      * @param wallet
      * @param password
      */
-    public void deriveKey4DescryptWalet(Wallet wallet, final String password, IDeriveKeyCallBack callBack)  {
+    public static void deriveKey4DescryptWalet(Wallet wallet, final String password, IDeriveKeyCallBack callBack)  {
         deriveKey4DescryptWalet(wallet, password, 0, callBack);
     }
-    public void deriveKey4DescryptWalet(Wallet wallet, final String password,
+    public static void deriveKey4DescryptWalet(Wallet wallet, final String password,
                                         final int appScryptIterations, IDeriveKeyCallBack callBack)  {
         if (!wallet.isEncrypted() || TextUtils.isEmpty(password)) return;
         final KeyCrypter keyCrypter = checkNotNull(wallet.getKeyCrypter());

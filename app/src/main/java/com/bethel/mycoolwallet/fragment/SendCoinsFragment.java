@@ -4,6 +4,8 @@ package com.bethel.mycoolwallet.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -28,10 +30,14 @@ import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
+import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.FeeCategory;
 import com.bethel.mycoolwallet.helper.PaymentHelper;
+import com.bethel.mycoolwallet.helper.parser.InputParser;
+import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
+import com.bethel.mycoolwallet.interfaces.IRequestPassphrase;
 import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
 import com.bethel.mycoolwallet.service.BlockChainService;
@@ -47,6 +53,7 @@ import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.utils.ExchangeRate;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.bitcoinj.wallet.SendRequest;
@@ -139,10 +146,31 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
          * 4。广播签名后的交易数据
          */
 
-        Wallet wallet = viewModel.wallet.getValue();
+       final Wallet wallet = viewModel.wallet.getValue();
         if (null==wallet) return;
         if (wallet.isEncrypted()) {
-            // todo
+            // get decrypt wallet key
+            final String password = privateKeyPasswordView.getText().toString();
+            if (TextUtils.isEmpty(password)) {
+                // todo alert
+                return;
+            }
+            AsyncTask.execute(()->{
+                PaymentHelper.deriveKey4DescryptWalet(wallet, password, 0, new IDeriveKeyCallBack() {
+                    @Override
+                    public void onSuccess(KeyParameter encryptKey, boolean isWalletChanged) {
+                        if (isWalletChanged) {
+                            // todo restore wallet
+                        }
+                        runOnUiThread(()-> buildSendRequest(amount, encryptKey));
+                    }
+
+                    @Override
+                    public void onFailed(String error) {
+                        runOnUiThread(()-> XToast.error(getContext(), error).show());
+                    }
+                });
+            });
         } else {
             // build SendRequest
             buildSendRequest(amount, null);
@@ -177,7 +205,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
             runOnUiThread(()->{
                 viewModel.sentTransaction = tx;
-                //  监听发送交易的状态/事件
+                //  监听 交易的状态变化/事件
                 TransactionConfidence confidence = tx.getConfidence();
                 confidence.addEventListener(transactionListener);
                 // 广播签名后的交易数据
@@ -196,7 +224,27 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     private final TransactionConfidence.Listener transactionListener = new TransactionConfidence.Listener() {
         @Override
         public void onConfidenceChanged(TransactionConfidence confidence, ChangeReason reason) {
-            //  todo 监听发送交易的状态/事件
+            log.info("TransactionConfidence.Listener: {} , {}", reason, confidence.toString());
+            //   监听发送交易的状态/事件
+            runOnUiThread(()->{
+                if (!isResumed()) return;
+                // todo update UI
+                TransactionConfidence.ConfidenceType confidenceType = confidence.getConfidenceType();
+                final int numPeers = confidence.numBroadcastPeers();
+                switch (confidenceType) {
+                    case PENDING:
+                        if (reason == ChangeReason.SEEN_PEERS) {
+                            // play sound
+                            final String sound = String.format("send_coins_broadcast_%d", numPeers);
+                            final int soundId = getResources().getIdentifier(sound, "raw", getContext().getPackageName());
+                            if (soundId > 0) {
+                                String uriString = String.format("android.resource://%s/", getContext().getPackageName(), soundId);
+                                RingtoneManager.getRingtone(getContext(), Uri.parse(uriString)).play();
+                            }
+                        }
+                        break;
+                }
+            });
         }
     };
 
@@ -312,9 +360,38 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
                     String result = bundle.getString(XQRCode.RESULT_DATA);
                     // todo handle bitcoin pay
-                    XToast.success(getContext(), "解析结果: " + result, Toast.LENGTH_LONG).show();
+                    InputParser.StringInputParser parser = new InputParser.StringInputParser(result) {
+
+                        @Override
+                        protected void error(int messageResId, Object... messageArgs) {
+
+                        }
+
+                        @Override
+                        protected void handleWebUrl(String url) {
+                            WebActivity.start(getActivity(), url);
+                        }
+
+                        @Override
+                        protected void requestPassphrase(IRequestPassphrase callback) {
+
+                        }
+
+                        @Override
+                        protected void handlePaymentAddress(Address address) {
+
+                        }
+
+                        @Override
+                        protected void handleDirectTransaction(Transaction transaction) throws VerificationException {
+
+                        }
+                    };
+
+                    parser.parse();
+//                    XToast.success(getContext(), "解析结果: " + result).show();
                 } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
-                    XToast.error(getContext(), R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+                    XToast.error(getContext(), R.string.parse_qr_code_failed).show();
                 }
             }
         }

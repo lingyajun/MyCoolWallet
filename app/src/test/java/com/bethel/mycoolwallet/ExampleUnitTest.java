@@ -2,6 +2,10 @@ package com.bethel.mycoolwallet;
 
 import com.bethel.mycoolwallet.http.HttpUtil;
 
+import org.bitcoinj.core.DumpedPrivateKey;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.crypto.BIP38PrivateKey;
+import org.bitcoinj.params.MainNetParams;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -17,8 +21,23 @@ public class ExampleUnitTest {
         assertEquals(4, 2 + 2);
     }
 
+//    @Test
+//    public void requestExchangeRate() {
+//        HttpUtil.requestExchangeRate("CNY", null);
+//    }
+
     @Test
-    public void requestExchangeRate() {
-        HttpUtil.requestExchangeRate("CNY");
+    public void bip38_noCompression_noEcMultiply_test() throws Exception {
+        //如果你看到一个6P开头的的密钥，这就意味着该密钥是被加密过；输入生成一个加密私钥对象
+        BIP38PrivateKey encryptedKey = BIP38PrivateKey.fromBase58( MainNetParams.get(),
+                "6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg");
+        //用密码解密,长密码作为口令，通常由多个单词或一段复杂的数字字母字符串组成
+        ECKey key = encryptedKey.decrypt("TestingOneTwoThree");
+        //生成转储私钥对象
+        DumpedPrivateKey dumpedPrivateKey=key.getPrivateKeyEncoded( MainNetParams.get());
+        String privateKey= dumpedPrivateKey.toString();
+        //该密钥回到可被用在任何钱包WIF格式的私钥（前缀为5）
+        assertEquals("5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR",
+                privateKey);
     }
 }
