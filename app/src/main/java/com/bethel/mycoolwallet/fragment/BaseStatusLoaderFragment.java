@@ -14,13 +14,6 @@ import com.xuexiang.xui.widget.statelayout.StatusLoader;
  * @author xuexiang
  */
 public abstract class BaseStatusLoaderFragment extends BaseFragment {
-//    private Handler mLoadingHandler = new Handler(Looper.getMainLooper());
-
-    @Override
-    public void onDestroyView() {
-//        mLoadingHandler.removeCallbacksAndMessages(null);
-        super.onDestroyView();
-    }
 
     //=============StatusLoader================//
 
@@ -53,7 +46,6 @@ public abstract class BaseStatusLoaderFragment extends BaseFragment {
      * 重试
      */
     protected void onLoadRetry(View view) {
-//        XToastUtils.toast("点击重试");
         showLoading();
     }
 
@@ -62,14 +54,6 @@ public abstract class BaseStatusLoaderFragment extends BaseFragment {
      */
     protected void showLoading() {
         initLoadingStatusViewIfNeed();
-        // 模拟加载
-//        if (mHolder.getCurState() != STATUS_LOADING) {
-//            mLoadingHandler.postDelayed(() -> {
-//                if (mHolder.getCurState() == STATUS_LOADING) {
-//                    showContent();
-//                }
-//            }, 3000);
-//        }
         mHolder.showLoading();
     }
 

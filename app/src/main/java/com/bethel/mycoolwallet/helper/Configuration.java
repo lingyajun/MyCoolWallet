@@ -6,6 +6,7 @@ import android.text.format.DateUtils;
 
 import com.google.common.base.Strings;
 
+import org.bitcoinj.core.Coin;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ public class Configuration {
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
     private static final String PREFS_KEY_LAST_USED = "last_used";
     private static final String PREFS_KEY_CURRENCY_CODE = "currency_code";
+    public static final String PREFS_KEY_EXCHANGE_CURRENCY = "exchange_currency";
 
     private final static String KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE ="exchange_rate_%s";
     private final static String KEY_CACHE_EXCHANGE_RATE_LIST ="exchange_rate_list";
@@ -109,6 +111,18 @@ public class Configuration {
             return precision.charAt(0) - '0';
         else
             return PREFS_DEFAULT_BTC_PRECISION;
+    }
+
+    public Coin getBtcBase() {
+        final int shift = getBtcShift();
+        if (shift == 0)
+            return Coin.COIN;
+        else if (shift == 3)
+            return Coin.MILLICOIN;
+        else if (shift == 6)
+            return Coin.MICROCOIN;
+        else
+            throw new IllegalStateException("cannot handle shift: " + shift);
     }
 
     public boolean hasBeenUsed() {

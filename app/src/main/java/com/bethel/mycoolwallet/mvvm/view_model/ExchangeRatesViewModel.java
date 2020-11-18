@@ -1,7 +1,6 @@
 package com.bethel.mycoolwallet.mvvm.view_model;
 
 import android.app.Application;
-import android.graphics.Bitmap;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -56,7 +55,7 @@ public class ExchangeRatesViewModel extends BaseViewModel {
             }
         }
         if (!contains) {
-            list.add(bean);
+            list.add(0, bean);
         }
         return list;
     }

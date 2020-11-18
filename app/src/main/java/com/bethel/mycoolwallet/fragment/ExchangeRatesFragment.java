@@ -8,18 +8,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.adapter.ExchangeRatesAdapter;
 import com.bethel.mycoolwallet.adapter.StatusSingleViewAdapter;
+import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.view_model.ExchangeRatesViewModel;
 import com.bethel.mycoolwallet.utils.Utils;
+import com.bethel.mycoolwallet.view.DividerItemDecoration;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
 import com.xuexiang.xui.widget.toast.XToast;
+
+import org.bitcoinj.core.Coin;
 
 import butterknife.BindView;
 
@@ -27,7 +35,7 @@ import butterknife.BindView;
  * 网络请求，数据解析 「live data，view model，http」
  * 加载/成功/失败。。。各种状态展示
  * RecyclerView，adapter
- * 点击事件
+ * todo 点击事件
  */
 public class ExchangeRatesFragment extends BaseStatusLoaderFragment {
 
@@ -37,11 +45,15 @@ public class ExchangeRatesFragment extends BaseStatusLoaderFragment {
     RecyclerView recyclerView;
 
     private ExchangeRatesViewModel viewModel;
+    private ExchangeRatesAdapter ratesAdapter;
+    private Configuration mConfig;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         viewModel = getViewModel(ExchangeRatesViewModel.class);
+        ratesAdapter = new ExchangeRatesAdapter(getContext());
+        mConfig = CoolApplication.getApplication().getConfiguration();
     }
 
     @Override
@@ -49,12 +61,19 @@ public class ExchangeRatesFragment extends BaseStatusLoaderFragment {
         super.onViewCreated(view, savedInstanceState);
         initTitleBar();
         showLoading();
+        recyclerView.setAdapter(ratesAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
+
         viewModel.listExchangeRate.observe(this, exchangeRateBeans -> {
 // todo
             final int size = null!=exchangeRateBeans? exchangeRateBeans.size(): 0;
             XToast.info(getContext(), "ExchangeRates: "+size).show();
             if (size>0) {
                 showContent();
+                final String defaultCurrency = mConfig.getMyCurrencyCode();
+                final Coin rateBase = mConfig.getBtcBase();
+                ratesAdapter.submitList(ExchangeRatesAdapter.buildListItems(exchangeRateBeans, defaultCurrency, rateBase));
                 return;
             }
             // 1. no network , retry
