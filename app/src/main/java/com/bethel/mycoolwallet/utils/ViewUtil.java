@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.TextView;
 
-public class ViewUtils {
+public class ViewUtil {
 
     public static boolean removeFromParent(View v) {
         try {

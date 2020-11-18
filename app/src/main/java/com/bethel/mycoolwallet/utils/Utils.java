@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.bethel.mycoolwallet.data.PasswordStrength;
 
@@ -70,6 +72,16 @@ public final class Utils {
             return PasswordStrength.GOOD;
         } else {
             return PasswordStrength.STRONG;
+        }
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        try {
+            ConnectivityManager  manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+            return null!=networkInfo && networkInfo.isConnected();
+        } catch (Exception e) {
+            return false;
         }
     }
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -13,17 +12,16 @@ import android.webkit.DownloadListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-//import androidx.appcompat.widget.ViewUtils;
+//import androidx.appcompat.widget.ViewUtil;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.utils.Utils;
-import com.bethel.mycoolwallet.utils.ViewUtils;
-//import com.xuexiang.xui.utils.ViewUtils;
+import com.bethel.mycoolwallet.utils.ViewUtil;
+//import com.xuexiang.xui.utils.ViewUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,7 +118,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
                                     String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             log.debug( "onReceivedError url: {}, errorCode: {}", failingUrl, errorCode);
-            ViewUtils.showView(mVLoadFailed, true);
+            ViewUtil.showView(mVLoadFailed, true);
         }
 
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -149,7 +147,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
         if (!mHandler.hasMessages(MSG_SHOW_LOADING)) {
             mHandler.sendEmptyMessageDelayed(MSG_SHOW_LOADING, 500);
         }
-        ViewUtils.showView(mVLoadFailed, false);
+        ViewUtil.showView(mVLoadFailed, false);
         log.debug( "onPageStarted url: {}", url);
     }
 
@@ -158,7 +156,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
         if (mHandler.hasMessages(MSG_SHOW_LOADING)) {
             mHandler.removeMessages(MSG_SHOW_LOADING);
         }
-        ViewUtils.showView(mVLoading, false);
+        ViewUtil.showView(mVLoading, false);
     }
 
     /**
@@ -206,11 +204,11 @@ public class WebFragment extends BaseFragment implements DownloadListener {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (null!=mWebView) {
             mWebView.stopLoading();
             mWebView.freeMemory();
         }
+        super.onDestroyView();
     }
 
     @Override

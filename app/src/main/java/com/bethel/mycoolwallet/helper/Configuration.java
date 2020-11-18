@@ -23,6 +23,7 @@ public class Configuration {
     private static final String PREFS_KEY_CURRENCY_CODE = "currency_code";
 
     private final static String KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE ="exchange_rate_%s";
+    private final static String KEY_CACHE_EXCHANGE_RATE_LIST ="exchange_rate_list";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -73,6 +74,14 @@ public class Configuration {
     public String getCacheExchangeRateRequest(String currencyCode) {
         String key = String.format(KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE, currencyCode);
         return mPreference.getString(key, null);
+    }
+
+    public void cacheExchangeRateListRequest(String json) {
+        mPreference.putString(KEY_CACHE_EXCHANGE_RATE_LIST, json);
+    }
+
+    public String getCacheExchangeRateListRequest() {
+        return mPreference.getString(KEY_CACHE_EXCHANGE_RATE_LIST, null);
     }
 
     public MonetaryFormat getFormat() {

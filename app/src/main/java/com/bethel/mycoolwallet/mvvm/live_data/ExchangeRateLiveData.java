@@ -115,7 +115,7 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
         return code;
     }
 
-    private String defaultCurrencyCode() {
+    public static String defaultCurrencyCode() {
         return Currency.getInstance(Locale.getDefault()).getCurrencyCode();
     }
 }

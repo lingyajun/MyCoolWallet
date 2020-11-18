@@ -8,6 +8,7 @@ import com.google.common.io.CharStreams;
 
 import org.bitcoinj.utils.ExchangeRate;
 import org.bitcoinj.utils.Fiat;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,6 +21,8 @@ import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 public final class HttpUtil {
@@ -33,7 +36,7 @@ public final class HttpUtil {
 
     private static final Logger log = LoggerFactory.getLogger(HttpUtil.class);
 
-    // todo request list
+    //  request list
     public static void requestExchangeRateList(IRequestCallback callback) {
         sendRequest(URL_FORMATE_CURRENCY_EXCHANGE_RATE_LIST, callback);
     }
@@ -106,8 +109,59 @@ public final class HttpUtil {
         return rateBean;
     }
 
+    /**
+     * parse data
+     *
+     * @param json : {
+     *   "status" : "success",
+     *   "data" : {
+     *     "network" : "BTC",
+     *     "prices" : [
+     *       {
+     *         "price" : "14994.0",
+     *         "price_base" : "EUR",
+     *         "exchange" : "bitfinex",
+     *         "time" : 1605680394
+     *       },... ]
+     *             }
+     *      }
+     */
+    public static List<ExchangeRateBean> parseExchangeRateList(final String json,
+                                             final String source) throws JSONException {
+        List<ExchangeRateBean> list = null;
+        log.info("parse json {}", json);
+        final JSONObject jsonObject = new JSONObject(json);
+        if (!"success".equals(jsonObject.getString("status")))  return list;
+        final JSONObject data = jsonObject.getJSONObject("data" );
+        JSONArray prices = null!=data ? data.getJSONArray("prices" ) : null;
+        final int length = null!=prices? prices.length():0;
+        if (length <1)   return list;
+
+        list = new LinkedList<>();
+        for (int i = 0; i < length; i++) {
+            JSONObject p = prices.getJSONObject(i);
+            String currencyCode = p.getString("price_base");
+            String value = p.getString("price" );
+
+            Fiat fiat = parseFiatInexact(currencyCode, value);
+            ExchangeRate ex = new ExchangeRate(fiat);
+            ExchangeRateBean rateBean = new ExchangeRateBean(ex, source);
+            list.add(rateBean);
+            log.info("result: {} {}",i, rateBean);
+        }
+        return list;
+    }
+
+    public static List<ExchangeRateBean> parseExchangeRateList(final String json ) throws JSONException {
+        return parseExchangeRateList(json, SOCHAIN_SOURCE);
+    }
+
     private static Fiat parseFiatInexact(final String currencyCode, final double rate) {
 //        final long value = new BigDecimal(rate).longValue();
+        final long value =  new BigDecimal(rate).movePointRight(Fiat.SMALLEST_UNIT_EXPONENT).longValue();
+        return Fiat.valueOf(currencyCode, value);
+    }
+    private static Fiat parseFiatInexact(final String currencyCode, final String rate) {
         final long value =  new BigDecimal(rate).movePointRight(Fiat.SMALLEST_UNIT_EXPONENT).longValue();
         return Fiat.valueOf(currencyCode, value);
     }
