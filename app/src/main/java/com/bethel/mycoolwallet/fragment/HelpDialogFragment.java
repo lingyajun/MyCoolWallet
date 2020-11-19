@@ -26,13 +26,15 @@ import android.text.Html;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.view.DialogBuilder;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Andreas Schildbach
+ * 显示一段文字信息
  */
 public final class HelpDialogFragment extends DialogFragment {
     private static final String FRAGMENT_TAG = HelpDialogFragment.class.getName();
@@ -74,11 +76,17 @@ public final class HelpDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
         final Bundle args = getArguments();
         final int messageResId = args.getInt(KEY_MESSAGE);
+        MaterialDialog materialDialog = new MaterialDialog.Builder(getContext())
+                .canceledOnTouchOutside(false)
+                .content(Html.fromHtml(getString(messageResId)))
+                .positiveText(R.string.button_ok)
+                .show();
+        return materialDialog;
 
-        final DialogBuilder dialog = new DialogBuilder(getActivity());
-        dialog.setMessage(Html.fromHtml(getString(messageResId)));
-//        dialog.singleDismissButton(null);
-        dialog.singleConfirmButton(null);
-        return dialog.create();
+//        final DialogBuilder dialog = new DialogBuilder(getActivity());
+//        dialog.setMessage(Html.fromHtml(getString(messageResId)));
+////        dialog.singleDismissButton(null);
+//        dialog.singleConfirmButton(null);
+//        return dialog.create();
     }
 }

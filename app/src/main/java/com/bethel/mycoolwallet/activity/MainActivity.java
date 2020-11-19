@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.fragment.EncryptKeysDialogFragment;
+import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
 import com.bethel.mycoolwallet.fragment.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
@@ -57,6 +58,12 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             WalletRestoreDialogFragment.show(getSupportFragmentManager());
         });
         viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
+        viewModel.showHelpDialog.observe(this, new Event.Observer< Integer >(){
+            @Override
+            public void onEvent( Integer content) {
+                HelpDialogFragment.show(getSupportFragmentManager(), content);
+            }
+        });
     }
 
     @Override
@@ -151,15 +158,16 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 SettingsActivity.start(this);
                 break;
             case R.id.wallet_options_safety :
-                XToast.info(this, "safety").show();
+                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_safety));
                 break;
             case R.id.wallet_options_technical_notes :
+                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_technical_notes));
                 break;
             case R.id.wallet_options_report_issue :
                 XToast.info(this, "report issue").show();
                 break;
             case R.id.wallet_options_help :
-                XToast.info(this, "help doc").show();
+                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_wallet));
                 break;
             case R.id.wallet_options_debug :
                 DebugActivity.start(this);
