@@ -2,6 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
     android:background="@color/bg_level3"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground" >
@@ -32,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:text="CNY"
+                    android:textSize="@dimen/list_font_size"
                     android:textStyle="bold" />
 
                 <TextView
@@ -43,6 +45,7 @@
                     android:maxWidth="128sp"
                     android:singleLine="true"
                     android:text="@string/exchange_rates_fragment_default"
+                    android:textSize="@dimen/list_font_size"
                     android:visibility="invisible" />
             </LinearLayout>
 
@@ -52,6 +55,7 @@
                 android:layout_marginLeft="@dimen/list_entry_padding_horizontal"
                 android:layout_weight="1"
                 android:singleLine="true"
+                android:textSize="@dimen/list_font_size"
                 android:text="@string/exchange_rates_fragment_rate" />
 
             <TextView
@@ -59,6 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
+                android:textSize="@dimen/list_font_size"
                 android:layout_marginLeft="@dimen/list_entry_padding_horizontal" />
 
             <!--<de.schildbach.wallet.ui.CurrencyTextView

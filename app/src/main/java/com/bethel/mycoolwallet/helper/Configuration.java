@@ -21,7 +21,7 @@ public class Configuration {
     public static final String PREFS_KEY_TRUSTED_PEER_ONLY = "trusted_peer_only";
     public static final String PREFS_KEY_BTC_PRECISION = "btc_precision";
     private static final String PREFS_KEY_LAST_USED = "last_used";
-    private static final String PREFS_KEY_CURRENCY_CODE = "currency_code";
+    public static final String PREFS_KEY_CURRENCY_CODE = "currency_code";
     public static final String PREFS_KEY_EXCHANGE_CURRENCY = "exchange_currency";
 
     private final static String KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE ="exchange_rate_%s";

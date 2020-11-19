@@ -30,6 +30,7 @@ import java.util.List;
 
 public class ExchangeRatesAdapter extends ListAdapter<ExchangeRatesAdapter.ListItem, ExchangeRatesAdapter.CoolViewHolder> {
 
+    private OnItemClickListener itemClickListener;
     private final LayoutInflater inflater;
     public ExchangeRatesAdapter(Context context) {
         super(new DiffUtil.ItemCallback<ListItem>() {
@@ -66,8 +67,14 @@ public class ExchangeRatesAdapter extends ListAdapter<ExchangeRatesAdapter.ListI
         MonetaryFormat format = Constants.LOCAL_FORMAT.minDecimals(item.baseRateMinDecimals);
         CurrencyTools.setText(holder.rateView, format, item.baseRateAsFiat);
 
-        holder.menuView.setOnClickListener(view ->
-                XToast.info(view.getContext(), "setting").show());
+        if (null!=itemClickListener) {
+            holder.menuView.setOnClickListener(view ->
+                    itemClickListener.onExchangeRateMenuClick(view, item.currencyCode));
+        }
+    }
+
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     public static List<ListItem> buildListItems(final List<ExchangeRateBean> source,
@@ -91,7 +98,7 @@ public class ExchangeRatesAdapter extends ListAdapter<ExchangeRatesAdapter.ListI
         public final String currencyCode;
         public final Fiat baseRateAsFiat;
         public final int baseRateMinDecimals;
-        public final boolean isSelected;
+        public  boolean isSelected;
 
         public ListItem(String currencyCode, Fiat baseRateAsFiat, int baseRateMinDecimals, boolean isSelected) {
             this.currencyCode = currencyCode;
@@ -99,6 +106,19 @@ public class ExchangeRatesAdapter extends ListAdapter<ExchangeRatesAdapter.ListI
             this.baseRateMinDecimals = baseRateMinDecimals;
             this.isSelected = isSelected;
         }
+
+        public void setSelected(boolean selected) {
+            isSelected = selected;
+        }
+    }
+
+    public void updateDefaultCurrencyCode(final String defaultCurrency) {
+        List<ListItem> list = getCurrentList();
+        if (null==list || list.isEmpty() || TextUtils.isEmpty(defaultCurrency)) return;
+        for (ListItem item: list ) {
+            item.setSelected(defaultCurrency.equals(item.currencyCode));
+        }
+        notifyDataSetChanged();
     }
 
     public static class CoolViewHolder extends RecyclerView.ViewHolder {
@@ -114,4 +134,9 @@ public class ExchangeRatesAdapter extends ListAdapter<ExchangeRatesAdapter.ListI
             menuView =  itemView.findViewById(R.id.exchange_rate_row_menu);
         }
     }
+
+    public  interface OnItemClickListener {
+        void onExchangeRateMenuClick(View view, String currencyCode);
+    }
+
 }

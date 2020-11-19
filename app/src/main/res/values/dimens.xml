@@ -26,4 +26,5 @@
     <dimen name="shortcut_size">48dp</dimen>
     <dimen name="shortcut_icon_size">32dp</dimen>
 
+    <dimen name="list_font_size">@dimen/font_size_normal</dimen>
 </resources>

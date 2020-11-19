@@ -40,6 +40,7 @@ public class ExchangeRatesViewModel extends BaseViewModel {
 
     private List<ExchangeRateBean> mergeValue() {
         List<ExchangeRateBean> list = rateListLiveData.getValue();
+        list = checkRepeat(list);
         ExchangeRateBean bean = rateLiveData.getValue();
         if (null==bean || TextUtils.isEmpty(bean.getCurrencyCode())) return list;
         if (null==list) {
@@ -47,6 +48,28 @@ public class ExchangeRatesViewModel extends BaseViewModel {
             list.add(bean);
             return list;
         }
+        boolean contains = isExist(bean, list);
+
+        if (!contains) {
+            list.add(0, bean);
+        }
+        return list;
+    }
+
+    private static List<ExchangeRateBean> checkRepeat(List<ExchangeRateBean> list) {
+        if (null==list || list.isEmpty()) return list;
+        List<ExchangeRateBean> data = new LinkedList<>();
+        for (ExchangeRateBean bean: list ) {
+            boolean contains = isExist(bean, data);
+            if (!contains) {
+                data.add(bean);
+            }
+        }
+        return data;
+    }
+
+    private static boolean isExist(ExchangeRateBean bean, List<ExchangeRateBean> list) {
+        if (null == bean || null == list) return false;
         boolean contains = false;
         for (ExchangeRateBean rate: list  ) {
             if (TextUtils.equals(rate.getCurrencyCode(), bean.getCurrencyCode())) {
@@ -54,9 +77,6 @@ public class ExchangeRatesViewModel extends BaseViewModel {
                 break;
             }
         }
-        if (!contains) {
-            list.add(0, bean);
-        }
-        return list;
+        return contains;
     }
 }
