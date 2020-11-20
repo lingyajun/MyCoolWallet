@@ -75,6 +75,9 @@ public class BaseActivity extends AppCompatActivity implements IRequestCameraPer
      * Toolbar
      * */
     protected Toolbar initTitleBar(int titleRes) {
+        return initTitleBar(titleRes, false);
+    }
+    protected Toolbar initTitleBar(int titleRes, boolean leftBack) {
         //隐藏默认actionbar
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
@@ -88,6 +91,10 @@ public class BaseActivity extends AppCompatActivity implements IRequestCameraPer
             toolBar.setTitle(titleRes);
         //用toolbar替换actionbar
         setSupportActionBar(toolBar);
+        if (leftBack) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);//toolbar的左侧返回按钮
+            toolBar.setNavigationOnClickListener((v)-> onBackPressed());
+        }
         return toolBar;
     }
 

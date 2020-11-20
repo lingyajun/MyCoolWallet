@@ -59,9 +59,10 @@ public class SendCoinsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         log.info("Referrer: {}", ActivityCompat.getReferrer(this));
         setContentView(R.layout.activity_send_coins);
-        Toolbar toolbar= initTitleBar(R.string.send_coins_activity_title);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//toolbar的左侧返回按钮
-        toolbar.setNavigationOnClickListener((v)-> finish());
+//        Toolbar toolbar=
+        initTitleBar(R.string.send_coins_activity_title, true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        toolbar.setNavigationOnClickListener((v)-> finish());
     }
 
     @Override

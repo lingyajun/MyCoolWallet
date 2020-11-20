@@ -41,9 +41,10 @@ public class RequestCoinsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_coins);
-        Toolbar toolbar= initTitleBar(R.string.request_coins_activity_title);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);//显示toolbar的左侧返回按钮
-        toolbar.setNavigationOnClickListener((v)-> finish());
+//        Toolbar toolbar=
+        initTitleBar(R.string.request_coins_activity_title, true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        toolbar.setNavigationOnClickListener((v)-> finish());
 
         viewModel = getViewModel(RequestCoinsActivityViewModel.class);
         viewModel.showHelpDialog.observe(this, new Event.Observer<Integer>() {
