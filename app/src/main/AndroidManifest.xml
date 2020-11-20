@@ -10,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ExchangeRatesActivity"></activity>
+        <activity android:name=".activity.BlockChainNetworkMonitorActivity"></activity>
+        <activity android:name=".activity.ExchangeRatesActivity" />
         <activity android:name=".activity.WebActivity" />
         <activity android:name=".activity.DebugActivity" />
         <activity
@@ -83,7 +84,7 @@
             android:windowSoftInputMode="stateAlwaysHidden" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
         <activity android:name=".activity.SettingsActivity" /> <!-- open camera scan qr -->
         <service
-            android:name=".service.BlockChainJobService"
+            android:name=".service.MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".service.BlockChainService"
@@ -91,8 +92,8 @@
             android:exported="false" />
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- dangerous permissions -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- dangerous permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />

@@ -157,7 +157,7 @@ public class BlockChainService extends LifecycleService {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            BlockChainJobService.startUp();
+            MyJobService.startUp();
         }
         stopForeground(true);
         super.onDestroy();

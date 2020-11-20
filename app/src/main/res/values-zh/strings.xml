@@ -193,12 +193,12 @@
   <string name="transaction_row_message_received_pay_to_many">此项付款除了支付给您以外，还支付给很多其它的钱包，这导致程序运行时间变慢，如果可能，请尝试仅接收支付给您一个人的付款。</string>
   <string name="transaction_row_message_received_rbf">此付款被延迟，因为发件人使用不安全的交易类型。</string>
   <string name="network_monitor_activity_title">网络监视器</string>
-  <string name="network_monitor_peer_list_title">Peers</string>
+  <string name="network_monitor_peer_list_title">节点</string>
   <string name="network_monitor_block_list_title">区块</string>
   <string name="block_row_mining_difficulty_adjustment">挖掘难度调整</string>
   <string name="block_row_mining_reward_adjustment">挖矿奖励减半</string>
   <string name="block_row_now">刚刚</string>
-  <string name="peer_list_fragment_empty">没有已连接的peer</string>
+  <string name="peer_list_fragment_empty">没有已连接的节点</string>
   <string name="peer_list_row_ping_time">⇆ %d&#x2009;ms</string>
   <string name="restore_wallet_permission_dialog_title">读取权限丢失</string>
   <string name="restore_wallet_permission_dialog_message">为了在外部存储上搜索钱包备份，您需要授予读取权限。</string>

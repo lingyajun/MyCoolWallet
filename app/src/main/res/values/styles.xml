@@ -6,7 +6,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/xui_btn_blue_select_color</item>
+        <item name="colorAccent">@color/xui_btn_blue_normal_color</item>
 <!--        <item name="colorAccent">@color/colorAccent</item>-->
 <!--        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>-->
     </style>

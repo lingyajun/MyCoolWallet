@@ -13,6 +13,8 @@ import com.bethel.mycoolwallet.data.PasswordStrength;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 public final class Utils {
     public static boolean startsWithIgnoreCase(final String string, final String prefix) {
         return string.regionMatches(true, 0, prefix, 0, prefix.length());
@@ -87,5 +89,13 @@ public final class Utils {
 
     public static boolean equals(Object a, Object b) {
         return (a == b) || (a != null && a.equals(b));
+    }
+
+    public static boolean isEmpty(Collection  collection) {
+        return null==collection || collection.isEmpty();
+    }
+
+    public static int size(Collection  collection) {
+        return null!=collection ? collection.size() : 0;
     }
 }

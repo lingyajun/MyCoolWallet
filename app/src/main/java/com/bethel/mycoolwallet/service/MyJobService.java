@@ -1,6 +1,5 @@
 package com.bethel.mycoolwallet.service;
 
-import android.app.Service;
 import android.app.job.JobInfo;
 import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
@@ -10,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.os.IBinder;
 import android.text.format.DateUtils;
 
 import androidx.annotation.RequiresApi;
@@ -23,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class BlockChainJobService extends JobService {
-    private static final Logger log = LoggerFactory.getLogger(BlockChainJobService.class);
+public class MyJobService extends JobService {
+    private static final Logger log = LoggerFactory.getLogger(MyJobService.class);
 
     public static void startUp() {
         CoolApplication application = CoolApplication.getApplication();
@@ -47,7 +45,7 @@ public class BlockChainJobService extends JobService {
 
         final JobScheduler jobScheduler = (JobScheduler) application.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         final JobInfo.Builder jobInfo = new JobInfo.Builder(0, new ComponentName(application,
-                BlockChainJobService.class));
+                MyJobService.class));
         jobInfo.setMinimumLatency(interval);
         jobInfo.setOverrideDeadline(DateUtils.WEEK_IN_MILLIS);
         jobInfo.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);

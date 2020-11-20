@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activity.BlockChainNetworkMonitorActivity">
+
+    <include layout="@layout/view_titlebar_common"/>
+
+    <com.xuexiang.xui.widget.tabbar.EasyIndicator
+        android:id="@+id/easy_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        app:indicator_line_show="true"
+        app:indicator_line_height="2dp"
+        app:indicator_height="42dp"
+        app:indicator_textSize="15sp"
+        app:indicator_width="0dp" />
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

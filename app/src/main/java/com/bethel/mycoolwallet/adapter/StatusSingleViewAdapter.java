@@ -56,21 +56,37 @@ public class StatusSingleViewAdapter implements StatusLoader.Adapter {
         statefulLayout.setVisibility(status == STATUS_LOAD_SUCCESS ? View.GONE : View.VISIBLE);
         switch (status) {
             case STATUS_LOADING:
-                statefulLayout.showLoading();
+                showLoading(statefulLayout);
                 break;
             case STATUS_LOAD_FAILED:
-                statefulLayout.showError(holder.getRetryListener());
+                showError(statefulLayout, holder.getRetryListener());
                 break;
             case STATUS_EMPTY_DATA:
-                statefulLayout.showEmpty();
+                showEmpty(statefulLayout);
                 break;
             case STATUS_CUSTOM:
-                statefulLayout.showOffline(holder.getRetryListener());
+                showOffline(statefulLayout, holder.getRetryListener());
                 break;
             default:
                 break;
         }
         return statefulLayout;
+    }
+
+    protected void showOffline(StatefulLayout statefulLayout, View.OnClickListener retryListener) {
+        statefulLayout.showOffline(retryListener);
+    }
+
+    protected void showEmpty(StatefulLayout statefulLayout) {
+        statefulLayout.showEmpty();
+    }
+
+    protected void showError(StatefulLayout statefulLayout, View.OnClickListener retryListener) {
+        statefulLayout.showError(retryListener);
+    }
+
+    protected void showLoading(StatefulLayout statefulLayout) {
+        statefulLayout.showLoading();
     }
 
 
