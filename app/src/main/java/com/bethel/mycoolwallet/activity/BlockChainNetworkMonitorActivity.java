@@ -41,6 +41,8 @@ public class BlockChainNetworkMonitorActivity extends BaseActivity {
         mViewPager.setOffscreenPageLimit(list.size() -1);
 
         initTitleBar(R.string.network_monitor_activity_title, true);
+
+//        mViewPager.setCurrentItem(1,true);// BlocksNetworkMonitorFragment
     }
 
     public static void start(Context context) {

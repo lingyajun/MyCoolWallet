@@ -23,6 +23,7 @@ public class TimeLiveData extends LiveData<Date> {
         // 每分钟收到一次事件
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
         application.registerReceiver(tickReceiver, filter);
+        setValue(new Date());
     }
 
     @Override
