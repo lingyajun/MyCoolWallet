@@ -137,6 +137,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 handleScan(null);
                 break;
             case R.id.wallet_options_address_book :
+                AddressBookActivity.start(this);
                 break;
             case R.id.wallet_options_exchange_rates :
                 ExchangeRatesActivity.start(this);

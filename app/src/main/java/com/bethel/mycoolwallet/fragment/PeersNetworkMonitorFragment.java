@@ -5,22 +5,18 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.PeerListAdapter;
-import com.bethel.mycoolwallet.adapter.PeersStatusViewAdapter;
+import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.mvvm.view_model.PeersNetworkMonitorViewModel;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.view.DividerItemDecoration;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Peer;
 
@@ -99,6 +95,6 @@ public class PeersNetworkMonitorFragment extends BaseStatusLoaderFragment {
 
     @Override
     protected StatusLoader.Adapter getStatusLoaderAdapter() {
-        return new PeersStatusViewAdapter();
+        return new CommonEmptyStatusViewAdapter(R.string.peer_list_fragment_empty);
     }
 }
