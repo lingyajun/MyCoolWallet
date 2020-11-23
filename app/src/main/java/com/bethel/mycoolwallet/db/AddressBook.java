@@ -1,5 +1,6 @@
 package com.bethel.mycoolwallet.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 @Entity(tableName = "address_book")
 public class AddressBook {
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "address")
     private String address;
