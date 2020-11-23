@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.bethel.mycoolwallet.interfaces.IWalletBackupCallback;
 import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.CharStreams;
 
@@ -313,4 +314,18 @@ public class WalletUtils {
         return true;
     }
 
+    public static Wallet restoreWalletFromAutoBackup(final Context context) {
+        try {
+            InputStream is = context.openFileInput(Constants.Files.WALLET_KEY_BACKUP_PROTOBUF);
+            Wallet wallet = new WalletProtobufSerializer().readWallet(is, true, null);
+
+            if (!wallet.isConsistent()) throw new Error("inconsistent backup");
+
+            BlockChainService.resetBlockChain(context);
+            log.info("wallet restored from backup: '{}'" , Constants.Files.WALLET_KEY_BACKUP_PROTOBUF );
+            return wallet;
+        } catch (UnreadableWalletException | IOException e) {
+           throw new Error("cannot read backup", e);
+        }
+    }
 }

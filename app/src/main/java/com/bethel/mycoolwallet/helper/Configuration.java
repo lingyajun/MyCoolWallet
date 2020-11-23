@@ -26,6 +26,9 @@ public class Configuration {
 
     private final static String KEY_CACHE_EXCHANGE_RATE_SINGLE_CURRENCY_FORMATE ="exchange_rate_%s";
     private final static String KEY_CACHE_EXCHANGE_RATE_LIST ="exchange_rate_list";
+    public static final String PREFS_KEY_REMIND_BACKUP = "remind_backup";
+    private static final String PREFS_KEY_LAST_BACKUP = "last_backup";
+    private static final String PREFS_KEY_LAST_RESTORE = "last_restore";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -143,6 +146,30 @@ public class Configuration {
         log.info("just being used - last used {} minutes ago", (now - prefsLastUsed) / DateUtils.MINUTE_IN_MILLIS);
     }
 
+    public boolean remindBackup() {
+        return mPreference.getBoolean(PREFS_KEY_REMIND_BACKUP, true);
+    }
+
+    public long getLastBackupTime() {
+        return mPreference.getLong(PREFS_KEY_LAST_BACKUP, 0);
+    }
+
+    public void armBackupReminder() {
+        mPreference.putBoolean(PREFS_KEY_REMIND_BACKUP, true);
+    }
+
+    public void disarmBackupReminder() {
+        mPreference.putBoolean(PREFS_KEY_REMIND_BACKUP, false);
+           mPreference.putLong(PREFS_KEY_LAST_BACKUP, System.currentTimeMillis());
+    }
+
+    public void updateLastRestoreTime() {
+        mPreference.putLong(PREFS_KEY_LAST_RESTORE, System.currentTimeMillis());
+    }
+
+    public long getLastRestoreTime() {
+        return mPreference.getLong(PREFS_KEY_LAST_RESTORE, 0);
+    }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
         mPreference.registerOnSharedPreferenceChangeListener(listener);

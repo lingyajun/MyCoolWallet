@@ -18,14 +18,17 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.WalletFilePickerActivity;
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.bethel.mycoolwallet.manager.RequestPermissionsManager;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletRestoreViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Crypto;
+import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
@@ -136,7 +139,11 @@ public class WalletRestoreDialogFragment extends BaseDialogFragment {
 
             maybeOpenWalletFilePicker();
 
-            // todo WalletBalanceLiveData , replaceWarningView
+            //  WalletBalanceLiveData , replaceWarningView
+            viewModel.balance.observe(this, coin -> {
+                final boolean hasCoins =null!=coin && coin.signum()>0;
+                ViewUtil.showView(replaceWarningView, hasCoins);
+            });
         });
 
         fileView.setOnClickListener(view1 -> maybeOpenWalletFilePicker());
@@ -238,10 +245,18 @@ public class WalletRestoreDialogFragment extends BaseDialogFragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    // todo : 1. alert && 2. store the configs { 3. reset block chain}
+    //   1. alert && 2. store the configs { 3. reset block chain}
     private IWalletRestoreCallback mWalletRestoreCallback = new IWalletRestoreCallback() {
         @Override
-        public void onSuccess(Wallet restoredWallet) {
+        public void onSuccess(final Wallet restoredWallet) {
+            runOnUIthread(()-> {
+                CoolApplication application = CoolApplication.getApplication();
+                application.replaceWallet(restoredWallet);
+
+                Configuration config = application.getConfiguration();
+                config.disarmBackupReminder();
+                config.updateLastRestoreTime();
+            });
             viewModel.showSuccessDialog.postValue(new Event<>(restoredWallet.isEncrypted()));
         }
 

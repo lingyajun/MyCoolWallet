@@ -1,5 +1,6 @@
 package com.bethel.mycoolwallet.mvvm.live_data;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -16,13 +17,16 @@ import com.bethel.mycoolwallet.http.IRequestCallback;
 import org.json.JSONException;
 
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
-    private final AtomicLong requestTime = new AtomicLong(0);
-    private Configuration mConfig;
-    private final String mCurrencyCode;
+//    private final AtomicLong requestTime = new AtomicLong(0);
+    private final Map<String , Long> requestTime = new HashMap<>();
+    protected Configuration mConfig;
+    protected final String mCurrencyCode;
 
     public ExchangeRateLiveData(String currencyCode) {
         mConfig = CoolApplication.getApplication().getConfiguration();
@@ -34,18 +38,18 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
         load();
     }
 
-    @Override
-    protected void onInactive() {
-        super.onInactive();
-    }
-
     public void load() {
         String currencyCode = getMyCurrencyCode();
+        load(currencyCode);
+    }
+    public void load(String currencyCode) {
         if (TextUtils.isEmpty(currencyCode)) {
             setValue(null);
             return;
         }
-        long duration = System.currentTimeMillis() - requestTime.get();
+
+        final  Long last = requestTime.get(currencyCode);
+        final long duration = System.currentTimeMillis() - (null!=last? last : 0) ;
         if (duration < (DateUtils.MINUTE_IN_MILLIS * 20)) {
             ExchangeRateBean rateBean = loadFromCache();
             if (null!=rateBean && rateBean.rate !=null) {
@@ -61,8 +65,7 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
         String currencyCode = getMyCurrencyCode();
         String json = mConfig.getCacheExchangeRateRequest(currencyCode);
         if (TextUtils.isEmpty(json)) return null;
-        ExchangeRateBean rateBean = parseExchangeRate(currencyCode, json);
-        return rateBean;
+        return parseExchangeRate(currencyCode, json);
     }
 
     private ExchangeRateBean parseExchangeRate(String currencyCode, String json) {
@@ -92,7 +95,7 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
             postValue(rateBean);
 
             if (null!=rateBean) {
-                requestTime.set(System.currentTimeMillis());
+                requestTime.put(currencyCode, System.currentTimeMillis());
                 cacheRequest(currencyCode, result);
             }
         }

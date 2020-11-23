@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
@@ -43,8 +44,8 @@ public class WalletRestoreSuccessDialogFragment extends DialogFragment {
                 .positiveText(R.string.button_ok)
                 .show();
         dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view -> {
-            // todo  block chain reset
-            //  BlockchainService.resetBlockchain(getContext());
+            //   block chain reset
+              BlockChainService.resetBlockChain(getContext());
 //            getActivity().finish();
             dismiss();
                 });

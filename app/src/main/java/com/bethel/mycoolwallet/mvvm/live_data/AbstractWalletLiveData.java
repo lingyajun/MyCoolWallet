@@ -28,6 +28,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.interfaces.OnWalletLoadedListener;
+import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 
 import org.bitcoinj.wallet.Wallet;
 
@@ -55,7 +56,7 @@ public abstract class AbstractWalletLiveData<T> extends ThrottlingLiveData<T> {
     @Override
     protected final void onActive() {
         broadcastManager.registerReceiver(walletReferenceChangeReceiver,
-                new IntentFilter(CoolApplication.ACTION_WALLET_REFERENCE_CHANGED));
+                new IntentFilter(MyCoolWalletManager.ACTION_WALLET_REFERENCE_CHANGED));
         loadWallet();
     }
 

@@ -25,8 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CoolApplication extends Application {
-    public static final String ACTION_WALLET_REFERENCE_CHANGED = CoolApplication.class.getPackage().getName()
-            + ".wallet_reference_changed";
 
     private static CoolApplication application = null;
     private final MyCoolWalletManager myWalletManager =  new MyCoolWalletManager();
@@ -78,6 +76,14 @@ public class CoolApplication extends Application {
 
     public void getWalletAsync(OnWalletLoadedListener listener) {
          myWalletManager.getWalletAsync(listener);
+    }
+
+    public void autoSaveWalletNow() {
+        myWalletManager.autoSaveWalletNow();
+    }
+
+    public void replaceWallet(final Wallet newWallet) {
+        myWalletManager.replaceWallet(newWallet);
     }
 
     public Configuration getConfiguration() {

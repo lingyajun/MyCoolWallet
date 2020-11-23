@@ -15,9 +15,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.BlockChainState;
+import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.manager.MyCoolBlockChainManager;
 import com.bethel.mycoolwallet.manager.MyCoolNotificationManager;
+import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateSelectedLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -57,11 +59,12 @@ public class BlockChainService extends LifecycleService {
     private static final Logger log = LoggerFactory.getLogger(BlockChainService.class);
 
     public static void start(final Context context, final boolean cancelCoinsReceived) {
-        Intent intent ;
+       final Intent intent = new Intent(context, BlockChainService.class);
         if (cancelCoinsReceived) {
-            intent = new Intent(ACTION_CANCEL_COINS_RECEIVED, null, context, BlockChainService.class);
-        } else {
-            intent = new Intent(context, BlockChainService.class);
+            intent.setAction(ACTION_CANCEL_COINS_RECEIVED);
+//            intent = new Intent(ACTION_CANCEL_COINS_RECEIVED, null, context, BlockChainService.class);
+//        } else {
+//            intent = new Intent(context, BlockChainService.class);
         }
         ContextCompat.startForegroundService(context, intent);
     }
@@ -72,6 +75,13 @@ public class BlockChainService extends LifecycleService {
         intent.putExtra(ACTION_BROADCAST_TRANSACTION_HASH, tx.getTxId().getBytes());
         ContextCompat.startForegroundService(context, intent);
     }
+
+    public static void resetBlockChain(final Context context) {
+        Intent intent = new Intent(context, BlockChainService.class);
+        intent.setAction(ACTION_RESET_BLOCKCHAIN);
+        ContextCompat.startForegroundService(context, intent);
+    }
+
     @Nullable
     @Override
     public IBinder onBind(@NonNull Intent intent) {
@@ -91,21 +101,28 @@ public class BlockChainService extends LifecycleService {
         serviceCreatedAt = System.currentTimeMillis();
         log.debug(".onCreate()");
         super.onCreate();
-//        viewModel = ViewModelProviders.of()
+        CoolApplication app = CoolApplication.getApplication();
 
         mNotificationManager.init(this);
 
-        // todo : WalletBalanceLiveData,SelectedExchangeRateLiveData, WalletLiveData
-        wallet = new WalletLiveData(CoolApplication.getApplication());
+        final WalletBalanceLiveData balanceLiveData = new WalletBalanceLiveData(app);
+        final ExchangeRateSelectedLiveData rateSelectedLiveData = new ExchangeRateSelectedLiveData();
+        balanceLiveData.observe(this, coin -> {
+            // todo updateWidgets
+            ExchangeRateBean rateBean = rateSelectedLiveData.getValue();
+        });
+        if (Constants.ENABLE_EXCHANGE_RATES) {
+            rateSelectedLiveData.observe(this, bean -> {
+                // todo updateWidgets
+                Coin value = balanceLiveData.getValue();
+            });
+        }
+
+        wallet = new WalletLiveData(app);
         wallet.observe(this, wallet1 -> {
             wallet.removeObservers(BlockChainService.this);
             mBlockChainManager.init(wallet, BlockChainService.this);
             mBlockChainManager.setBlockChainEventsCallback(mEventsCallback);
-        });
-
-        WalletBalanceLiveData walletBalance = new WalletBalanceLiveData(CoolApplication.getApplication());
-        walletBalance.observe(this, coin -> {
-            // todo: update Widgets
         });
 
         startForeground(0);
@@ -117,7 +134,7 @@ public class BlockChainService extends LifecycleService {
     public int onStartCommand(@NonNull Intent intent, int flags, int startId) {
          super.onStartCommand(intent, flags, startId);
          final String action = null!=intent ? intent.getAction() : null;
-        log.info("service start command: " + intent);
+        log.info("service start command: {}" , action);
 
         if (ACTION_CANCEL_COINS_RECEIVED.equals(action)) {
             mNotificationManager.cancelCoinsReceivedNotification();
@@ -149,12 +166,14 @@ public class BlockChainService extends LifecycleService {
 
     @Override
     public void onDestroy() {
-        // todo restart service , auto saveWallet
+        //  restart service , auto saveWallet
         mBlockChainManager.onDestroy();
 
         if (resetBlockChainOnShutdown) {
             mBlockChainManager.removeBlockChainFile();
         }
+
+        CoolApplication.getApplication().autoSaveWalletNow();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             MyJobService.startUp();

@@ -1,13 +1,17 @@
 package com.bethel.mycoolwallet.manager;
 
+import android.content.Intent;
 import android.os.Looper;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.WorkerThread;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.interfaces.OnWalletLoadedListener;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.WalletUtils;
@@ -32,15 +36,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class MyCoolWalletManager {
-    private static final Logger log = LoggerFactory.getLogger(MyCoolWalletManager.class);
+    public static final String ACTION_WALLET_REFERENCE_CHANGED =
+            MyCoolWalletManager.class.getPackage().getName() + ".wallet_reference_changed";
     private static final String BIP39_WORDLIST_FILENAME = "bip39-wordlist.txt";
 
     private CoolApplication application;
     private File walletFile;
     private WalletFiles walletFiles;
+    private Configuration mConfig;
+
+    private static final Logger log = LoggerFactory.getLogger(MyCoolWalletManager.class);
 
     public void init(CoolApplication app) {
         application = app;
+        mConfig = app.getConfiguration();
         walletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
         cleanupFiles();
     }
@@ -107,17 +116,17 @@ public class MyCoolWalletManager {
                         log.info("wallet loaded from: '{}', took {}", walletFile, watch);
                     } catch (final IOException | UnreadableWalletException x) {
                         log.warn("problem loading wallet, auto-restoring: " + walletFile, x);
-//      todo                  wallet = WalletUtils.restoreWalletFromAutoBackup(WalletApplication.this);
                         wallet = restoreWalletFromAutoBackup();
-                        if (wallet != null)
+                        if (wallet != null) {
                             XToast.info(application, R.string.toast_wallet_reset);
+                        }
                     }
                     if (!wallet.isConsistent()) {
                         log.warn("inconsistent wallet, auto-restoring: " + walletFile);
-//    todo                    wallet = WalletUtils.restoreWalletFromAutoBackup(WalletApplication.this);
                         wallet = restoreWalletFromAutoBackup();
-                        if (wallet != null)
+                        if (wallet != null) {
                             XToast.info(application, R.string.toast_wallet_reset);
+                        }
                     }
 
                     if (!wallet.getParams().equals(Constants.NETWORK_PARAMETERS))
@@ -132,12 +141,11 @@ public class MyCoolWalletManager {
                             Constants.DEFAULT_OUTPUT_SCRIPT_TYPE);
                     walletFiles = wallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
                             TimeUnit.MILLISECONDS, null);
-                    autosaveWalletNow(); // persist...
+                    autoSaveWalletNow(); // persist...
                     WalletUtils.autoBackupWallet(application, wallet); // ...and backup asap
                     watch.stop();
                     log.info("fresh {} wallet created, took {}", Constants.DEFAULT_OUTPUT_SCRIPT_TYPE, watch);
 
-//       todo             config.armBackupReminder();
                     armBackupReminder();
                 }
             }
@@ -158,21 +166,21 @@ public class MyCoolWalletManager {
     }
 
     private void armBackupReminder() {
-//       todo       config.armBackupReminder();
+              mConfig.armBackupReminder();
         // SharedPreferences 存储变量
 //        XToast.info(application, " armBackupReminder").show();
         log.info("armBackupReminder");
     }
 
     private Wallet restoreWalletFromAutoBackup() {
-//    todo       wallet = WalletUtils.restoreWalletFromAutoBackup(WalletApplication.this);
+        Wallet wallet = WalletUtils.restoreWalletFromAutoBackup(application);
         // 存储钱包文件，重置区块链
 //        XToast.info(application, " restoreWalletFromAutoBackup").show();
         log.info("restoreWalletFromAutoBackup");
-        return null;
+        return wallet;
     }
 
-    public void autosaveWalletNow() {
+    public void autoSaveWalletNow() {
         final Stopwatch watch = Stopwatch.createStarted();
         synchronized (getWalletLock) {
             if (walletFiles != null) {
@@ -188,24 +196,24 @@ public class MyCoolWalletManager {
         }
     }
 
-//    public void replaceWallet(final Wallet newWallet) {
-//        newWallet.cleanup();
-//        if (newWallet.isDeterministicUpgradeRequired(Constants.UPGRADE_OUTPUT_SCRIPT_TYPE) && !newWallet.isEncrypted())
-//            newWallet.upgradeToDeterministic(Constants.UPGRADE_OUTPUT_SCRIPT_TYPE, null);
-//        BlockchainService.resetBlockchain(this);
-//
-//        final Wallet oldWallet = getWallet();
-//        synchronized (getWalletLock) {
-//            oldWallet.shutdownAutosaveAndWait(); // this will also prevent BlockchainService to save
-//            walletFiles = newWallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
-//                    TimeUnit.MILLISECONDS, null);
-//        }
-//        config.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());
-//        WalletUtils.autoBackupWallet(this, newWallet);
-//
-//        final Intent broadcast = new Intent(ACTION_WALLET_REFERENCE_CHANGED);
-//        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
-//    }
+    public void replaceWallet(final Wallet newWallet) {
+        newWallet.cleanup();
+        if (newWallet.isDeterministicUpgradeRequired(Constants.UPGRADE_OUTPUT_SCRIPT_TYPE) && !newWallet.isEncrypted())
+            newWallet.upgradeToDeterministic(Constants.UPGRADE_OUTPUT_SCRIPT_TYPE, null);
+        BlockChainService.resetBlockChain(application);
+
+        final Wallet oldWallet = getWallet();
+        synchronized (getWalletLock) {
+            oldWallet.shutdownAutosaveAndWait(); // this will also prevent BlockchainService to save
+            walletFiles = newWallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
+                    TimeUnit.MILLISECONDS, null);
+        }
+        mConfig.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());
+        WalletUtils.autoBackupWallet(application, newWallet);
+
+        final Intent broadcast = new Intent(ACTION_WALLET_REFERENCE_CHANGED);
+        LocalBroadcastManager.getInstance(application).sendBroadcast(broadcast);
+    }
 
     /**
      * Sets the given context as the current thread context.
