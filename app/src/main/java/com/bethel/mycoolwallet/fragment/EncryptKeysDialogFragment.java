@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.PasswordStrength;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Utils;
@@ -78,12 +79,14 @@ public class EncryptKeysDialogFragment extends BaseDialogFragment {
 
     private Wallet wallet;
     private MainActivityViewModel mainActivityViewModel;
+    private Configuration mConfig;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         wallet = CoolApplication.getApplication().getWallet();
         mainActivityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        mConfig = CoolApplication.getApplication().getConfiguration();
     }
 
     @Override
@@ -206,7 +209,7 @@ public class EncryptKeysDialogFragment extends BaseDialogFragment {
                 // 使用新密码加密钱包
                 if (null!=newKey && !wallet.isEncrypted()) {
                     wallet.encrypt(keyCrypter, newKey);
-                    // todo : save to preference ---  config.updateLastEncryptKeysTime();
+                    // todo : save to preference ---  mConfig.updateLastEncryptKeysTime();
                     state = State.DONE;
                     log.info(
                             "wallet successfully encrypted, using key derived by new spending password ({} scrypt iterations)",

@@ -339,6 +339,7 @@
   <string name="address_unlabeled">(無標籤)</string>
   <string name="private_key_password">PIN 碼</string>
   <string name="private_key_bad_password">PIN 碼不對！</string>
+  <string name="qr_code">二維條碼</string>
   <!--generic error messages-->
   <string name="error_io">I/O 發生錯誤: %s</string>
   <string name="error_parse">解析發生錯誤 : %s</string>

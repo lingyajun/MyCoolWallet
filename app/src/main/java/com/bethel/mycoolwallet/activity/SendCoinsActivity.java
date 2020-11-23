@@ -13,6 +13,8 @@ import androidx.core.app.ActivityCompat;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.FeeCategory;
 import com.bethel.mycoolwallet.data.PaymentIntent;
+import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xui.widget.toast.XToast;
 
@@ -63,6 +65,8 @@ public class SendCoinsActivity extends BaseActivity {
         initTitleBar(R.string.send_coins_activity_title, true);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        toolbar.setNavigationOnClickListener((v)-> finish());
+
+        BlockChainService.start(this, false);
     }
 
     @Override
@@ -75,8 +79,9 @@ public class SendCoinsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.send_coins_options_help) {
-            // todo
-            XToast.info(this,R.string.help_send_coins).show();
+            //
+            HelpDialogFragment.show(getSupportFragmentManager(), R.string.help_send_coins);
+//            XToast.info(this,R.string.help_send_coins).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

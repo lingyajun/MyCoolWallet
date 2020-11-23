@@ -16,6 +16,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
+import com.bethel.mycoolwallet.db.AddressBookDao;
+import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.manager.MyCoolBlockChainManager;
 import com.bethel.mycoolwallet.manager.MyCoolNotificationManager;
@@ -52,7 +54,8 @@ public class BlockChainService extends LifecycleService {
     private WalletLiveData wallet;
     private long serviceCreatedAt;
     private boolean resetBlockChainOnShutdown = false;
-//    private BlockChainServiceViewModel viewModel;
+
+    private AddressBookDao addressBookDao;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -125,6 +128,8 @@ public class BlockChainService extends LifecycleService {
             mBlockChainManager.setBlockChainEventsCallback(mEventsCallback);
         });
 
+        addressBookDao = AppDatabase.getInstance(getApplication()).addressBookDao();
+
         startForeground(0);
         broadcastPeerState(0);
 
@@ -161,7 +166,7 @@ public class BlockChainService extends LifecycleService {
 
     private void notifyCoinsReceived(@Nullable final Address address, final Coin amount,
                                      final Sha256Hash transactionHash) {
-        mNotificationManager.notifyCoinsReceived(address, amount, transactionHash);
+        mNotificationManager.notifyCoinsReceived(address, amount, transactionHash, addressBookDao);
     }
 
     @Override

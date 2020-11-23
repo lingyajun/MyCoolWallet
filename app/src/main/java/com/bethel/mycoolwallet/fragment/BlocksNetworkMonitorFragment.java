@@ -18,6 +18,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.adapter.BlockListAdapter;
 import com.bethel.mycoolwallet.adapter.StatusSingleViewAdapter;
+import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.BlocksNetworkMonitorViewModel;
 import com.bethel.mycoolwallet.utils.Commons;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -110,9 +112,10 @@ public class BlocksNetworkMonitorFragment extends BaseStatusLoaderFragment {
     private void maybeSubmitList() {
         final List<StoredBlock> list = viewModel.blocks.getValue();
         if (null!=list) {
+            Map<String , AddressBook> map = AddressBook.asMap(viewModel.addressBook.getValue());
             adapter.submitList(BlockListAdapter.buildListItems(getContext(), list,
                     viewModel.timeTick.getValue(), mConfig.getFormat(),
-                    viewModel.transactions.getValue(), viewModel.wallet.getValue()));
+                    viewModel.transactions.getValue(), viewModel.wallet.getValue(), map));
         }
 //        XToast.info(getContext(), "blocks:  "+ Utils.size(list)).show();
         log.info("blocks: {} ", Utils.size(list));

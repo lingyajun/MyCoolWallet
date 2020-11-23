@@ -257,7 +257,7 @@ public class CustomCaptureActivity extends CaptureActivity implements View.OnCli
 
     /**
      * 处理扫描成功（重写扫描成功，增加applink拦截）
-     * todo
+     *
      * @param bitmap
      * @param result
      */

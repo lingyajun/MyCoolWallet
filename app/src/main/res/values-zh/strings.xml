@@ -360,6 +360,7 @@
   <string name="address_unlabeled">(无标签)</string>
   <string name="private_key_password">PIN</string>
   <string name="private_key_bad_password">错误的 PIN！</string>
+  <string name="qr_code">二维码</string>
   <!--generic error messages-->
   <string name="error_io">I/O 错误: %s</string>
   <string name="error_parse">解析错误: %s</string>

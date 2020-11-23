@@ -75,7 +75,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * public void init(...)
  * public void onDestroy()
  *
- * TODO:
+ *
  * broadcastBlockChainState()
  * onBlockChainIdling()
  * notifyCoinsReceived(...)

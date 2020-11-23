@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.MainActivity;
+import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
@@ -55,10 +56,10 @@ public class MyCoolNotificationManager {
     public void testNotifyCoinsReceived() {
         Address address = Address.fromString(MainNetParams.get(), "116F9AtBDarSfAfv7fUSeepC1EfThnyA3W");
         log.info("testNotifyCoinsReceived  {}", address);
-        notifyCoinsReceived(address, Coin.COIN, Sha256Hash.ZERO_HASH);
+        notifyCoinsReceived(address, Coin.COIN, Sha256Hash.ZERO_HASH, null);
     }
     public void notifyCoinsReceived(@Nullable final Address address, final Coin amount,
-                                    final Sha256Hash transactionHash) {
+                                    final Sha256Hash transactionHash, AddressBookDao addressBookDao) {
         final String channelId = Constants.NOTIFICATION_CHANNEL_ID_RECEIVED;
         // NotificationChannel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -95,10 +96,10 @@ public class MyCoolNotificationManager {
             for (final Address notificationAddress : notificationAddresses) {
                 if (text.length() > 0)
                     text.append(", ");
+
                 final String addressStr = notificationAddress.toString();
-//  todo :        final String label = addressBookDao.resolveLabel(addressStr);
-//                text.append(label != null ? label : addressStr);
-                text.append(addressStr);
+                final String label = null!=addressBookDao ? addressBookDao.resolveLabel(addressStr) : null;
+                text.append(!TextUtils.isEmpty(label) ? label : addressStr);
             }
             summaryNotification.setContentText(text);
         }
@@ -121,11 +122,8 @@ public class MyCoolNotificationManager {
         childNotification.setContentTitle(msg);
         if (address != null) {
             final String addressStr = address.toString();
-//   todo         final String addressLabel = addressBookDao.resolveLabel(addressStr);
-//            if (addressLabel != null)
-//                childNotification.setContentText(addressLabel);
-//            else
-                childNotification.setContentText(addressStr);
+            final String label = null!=addressBookDao ? addressBookDao.resolveLabel(addressStr) : null;
+            childNotification.setContentText(!TextUtils.isEmpty(label) ? label : addressStr);
         }
 
         childNotification.setContentIntent(
@@ -165,7 +163,6 @@ public class MyCoolNotificationManager {
                 new Intent(service, MainActivity.class), 0));
         notification.setWhen(System.currentTimeMillis());
         notification.setOngoing(true);
-//        notification.setChannelId()
         return notification.build();
     }
 }

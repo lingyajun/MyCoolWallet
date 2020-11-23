@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.utils.Utils;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +44,7 @@ import java.util.Set;
 public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, BlockListAdapter.MViewHolder> {
     private final LayoutInflater inflater;
     private  OnItemClickListener itemClickListener;
+//    private  Map<String , AddressBook> addressBookMap;
 
     private static final Logger log = LoggerFactory.getLogger(BlockListAdapter.class);
 
@@ -115,10 +116,10 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
     public static List<ListItem> buildListItems(final Context context, final List<StoredBlock> blocks,
                                                 final Date time, final MonetaryFormat format,
                                                 final @Nullable Set<Transaction> transactions,
-                                                final @Nullable Wallet wallet){
+                                                final @Nullable Wallet wallet, final Map<String , AddressBook> map){
         List<ListItem> list = new ArrayList<>(blocks.size());
         for (StoredBlock b: blocks   ) {
-            ListItem item = new ListItem(context, b, time, format, transactions, wallet);
+            ListItem item = new ListItem(context, b, time, format, transactions, wallet, map);
             list.add(item);
         }
         return list;
@@ -134,8 +135,8 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
         public final List<ListTransaction> transactions;
 
         public ListItem(final Context context, final StoredBlock block, final Date time, final MonetaryFormat format,
-                        final @Nullable Set<Transaction> transactionSet, final @Nullable Wallet wallet)
-//    todo                final @Nullable Map<String, AddressBookEntry> addressBook)
+                        final @Nullable Set<Transaction> transactionSet, final @Nullable Wallet wallet,
+                    final @Nullable Map<String, AddressBook> addressBook)
                         {
                             blockHash = block.getHeader().getHash();
                             height = block.getHeight();
@@ -157,7 +158,7 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
                                 for (Transaction tx: transactionSet ) {
                                     Map<Sha256Hash, Integer> map =  tx.getAppearsInHashes();
                                     if (null!= map && map.containsKey(blockHash)) {
-                                        ListTransaction ltx = new ListTransaction(context, tx, wallet);
+                                        ListTransaction ltx = new ListTransaction(context, tx, wallet, addressBook);
                                         transactions.add(ltx);
                                     }
                                 }
@@ -181,8 +182,8 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
             public final String label;
             public final Coin value;
 
-            public ListTransaction(final Context context, final Transaction tx, final Wallet wallet)
-//       todo                        final @Nullable Map<String, AddressBookEntry> addressBook)
+            public ListTransaction(final Context context, final Transaction tx, final Wallet wallet,
+                               final @Nullable Map<String, AddressBook> addressBook)
             {
                 this.value = tx.getValue(wallet);
                 final boolean sent = value.signum() < 0;
@@ -207,8 +208,15 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
                     label = context.getString(R.string.wallet_transactions_fragment_coinbase);
                 } else if (internal || self) {
                     label =context.getString(R.string.wallet_transactions_fragment_internal);
-                } else {
-                    // todo address 数据库
+                } else if (null!=address && null!= addressBook) {
+                    final AddressBook book = addressBook.get(address.toString());
+                    if (null!=book) {
+                        label = book.getLabel();
+                    } else {
+                        label = "?";
+                    }
+                }
+                else {
                     label = "?";
                 }
             }

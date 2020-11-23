@@ -21,6 +21,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.PasswordStrength;
 import com.bethel.mycoolwallet.interfaces.IWalletBackupCallback;
@@ -180,9 +181,10 @@ public class WalletBackupDialogFragment extends BaseDialogFragment {
                             new IWalletBackupCallback() {
                         @Override
                         public void onSuccess() {
-// todo  handle success
+//   handle success
 //  application.getConfiguration().disarmBackupReminder();
                           runOnUIthread(()->{
+                              CoolApplication.getApplication().getConfiguration().disarmBackupReminder();
                               dismiss();
                               String target = WalletUtils.getFileStorageName(targetUri);
                               WalletBackupSuccessDialogFragment.showDialog(getFragmentManager(),
