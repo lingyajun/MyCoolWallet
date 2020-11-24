@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 
 import android.app.Dialog;
@@ -10,13 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,9 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
-
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * btc地址 二维码

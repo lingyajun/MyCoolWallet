@@ -1,8 +1,7 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.Html;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

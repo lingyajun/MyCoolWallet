@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -33,7 +32,6 @@ import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.google.common.base.Strings;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.crypto.KeyCrypterException;
 import org.bitcoinj.crypto.KeyCrypterScrypt;

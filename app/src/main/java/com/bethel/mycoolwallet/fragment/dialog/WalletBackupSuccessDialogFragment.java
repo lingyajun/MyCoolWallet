@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;

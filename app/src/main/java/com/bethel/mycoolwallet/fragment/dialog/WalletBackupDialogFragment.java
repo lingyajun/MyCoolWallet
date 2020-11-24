@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -32,7 +32,6 @@ import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

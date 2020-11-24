@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -12,12 +12,12 @@ import com.bethel.mycoolwallet.R;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
-public class WalletBackupErrorDialogFragment extends DialogFragment {
-    private static final String TAG = "WalletBackupErrorDialog";
+public class WalletRestoreErrorDialogFragment extends DialogFragment {
+    private static final String TAG = "WalletRestoreErrorDialog";
     private static final String KEY_EXCEPTION_MESSAGE = "exception_message";
 
     public static void showDialog(final FragmentManager fm, final String exceptionMessage) {
-        final DialogFragment newFragment = new WalletBackupErrorDialogFragment();
+        final DialogFragment newFragment = new WalletRestoreErrorDialogFragment();
         final Bundle args = new Bundle();
         args.putString(KEY_EXCEPTION_MESSAGE, exceptionMessage);
         newFragment.setArguments(args);
@@ -31,10 +31,14 @@ public class WalletBackupErrorDialogFragment extends DialogFragment {
         MaterialDialog dialog = new MaterialDialog.Builder(getContext())
                 .iconRes(R.drawable.ic_warning_grey600_24dp)
                 .title(R.string.import_export_keys_dialog_failure_title)
-                .content(getString(R.string.export_keys_dialog_failure, exceptionMessage))
-                .positiveText(R.string.button_ok)
+                .content(getString(R.string.import_keys_dialog_failure, exceptionMessage))
+                .positiveText(R.string.button_retry)
+                .negativeText(R.string.button_dismiss)
                 .show();
-        dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view -> getActivity().finish());
+        dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view -> {
+            dismiss();
+            WalletRestoreDialogFragment.show(getFragmentManager());
+                });
         return dialog;
     }
 }

@@ -3,21 +3,18 @@ package com.bethel.mycoolwallet.fragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.fragment.dialog.WalletAddressDialogFragment;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletAddressViewModel;
-import com.bethel.mycoolwallet.utils.Qr;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Address;

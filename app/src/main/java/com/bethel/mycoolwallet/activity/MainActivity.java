@@ -16,9 +16,9 @@ import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.fragment.EncryptKeysDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
-import com.bethel.mycoolwallet.fragment.WalletRestoreDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;

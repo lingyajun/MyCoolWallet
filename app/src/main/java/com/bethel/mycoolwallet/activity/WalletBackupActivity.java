@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.bethel.mycoolwallet.fragment.WalletBackupDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.WalletBackupDialogFragment;
 
 public class WalletBackupActivity extends BaseActivity {
 
