@@ -9,8 +9,8 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
-import com.bethel.mycoolwallet.mvvm.live_data.FreshReceiveAddressLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.address.FreshReceiveAddressLiveData;
 import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Qr;

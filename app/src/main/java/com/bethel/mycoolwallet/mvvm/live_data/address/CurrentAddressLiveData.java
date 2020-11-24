@@ -1,7 +1,8 @@
-package com.bethel.mycoolwallet.mvvm.live_data;
+package com.bethel.mycoolwallet.mvvm.live_data.address;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
+import com.bethel.mycoolwallet.mvvm.live_data.AbstractWalletLiveData;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;

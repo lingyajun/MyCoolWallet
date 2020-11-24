@@ -21,7 +21,7 @@ import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.manager.MyCoolBlockChainManager;
 import com.bethel.mycoolwallet.manager.MyCoolNotificationManager;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateSelectedLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateSelectedLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 import com.bethel.mycoolwallet.utils.Constants;

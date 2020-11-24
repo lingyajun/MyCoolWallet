@@ -9,7 +9,7 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.mvvm.live_data.CurrentAddressLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.address.CurrentAddressLiveData;
 import com.bethel.mycoolwallet.utils.Qr;
 
 import org.bitcoinj.core.Address;

@@ -29,6 +29,7 @@ public class Configuration {
     public static final String PREFS_KEY_REMIND_BACKUP = "remind_backup";
     private static final String PREFS_KEY_LAST_BACKUP = "last_backup";
     private static final String PREFS_KEY_LAST_RESTORE = "last_restore";
+    public static final String PREFS_KEY_OWN_NAME = "own_name";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -169,6 +170,10 @@ public class Configuration {
 
     public long getLastRestoreTime() {
         return mPreference.getLong(PREFS_KEY_LAST_RESTORE, 0);
+    }
+
+    public String getOwnName() {
+        return Strings.emptyToNull(mPreference.getString(PREFS_KEY_OWN_NAME, "").trim());
     }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {

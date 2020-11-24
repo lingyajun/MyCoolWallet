@@ -5,7 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 
 import com.bethel.mycoolwallet.mvvm.live_data.BlockChainStateLiveData;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
 
 public class WalletBalanceViewModel extends BaseViewModel {

@@ -8,28 +8,21 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.ExchangeRatesAdapter;
 import com.bethel.mycoolwallet.adapter.StatusSingleViewAdapter;
 import com.bethel.mycoolwallet.helper.Configuration;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.view_model.ExchangeRatesViewModel;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.view.DividerItemDecoration;
-import com.xuexiang.xui.adapter.simple.AdapterItem;
-import com.xuexiang.xui.adapter.simple.XUISimpleAdapter;
 import com.xuexiang.xui.widget.popupwindow.popup.XUISimplePopup;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Coin;
 

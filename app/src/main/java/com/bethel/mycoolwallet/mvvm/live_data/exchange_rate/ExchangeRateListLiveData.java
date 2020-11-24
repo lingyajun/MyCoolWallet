@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.mvvm.live_data;
+package com.bethel.mycoolwallet.mvvm.live_data.exchange_rate;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;

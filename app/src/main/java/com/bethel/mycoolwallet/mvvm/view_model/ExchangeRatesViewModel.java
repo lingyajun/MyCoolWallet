@@ -7,8 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MediatorLiveData;
 
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateListLiveData;
-import com.bethel.mycoolwallet.mvvm.live_data.ExchangeRateLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateListLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateLiveData;
 
 import java.util.LinkedList;
 import java.util.List;

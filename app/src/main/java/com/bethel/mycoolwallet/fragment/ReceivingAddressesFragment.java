@@ -20,6 +20,11 @@ import butterknife.BindView;
 
 /**
  * 您的比特币地址.
+ *
+ * 数据「live data, view model」
+ * ui展示 「列表」
+ *
+ * 空页面 /
  */
 public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
 
