@@ -1,6 +1,9 @@
 package com.bethel.mycoolwallet.fragment;
 
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,18 +12,32 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.adapter.AddressListAdapter;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.db.AddressBook;
+import com.bethel.mycoolwallet.db.AddressBookDao;
+import com.bethel.mycoolwallet.db.AppDatabase;
+import com.bethel.mycoolwallet.interfaces.OnItemClickListener;
 import com.bethel.mycoolwallet.mvvm.view_model.ReceivingAddressesViewModel;
+import com.bethel.mycoolwallet.utils.Commons;
+import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Utils;
+import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.bethel.mycoolwallet.view.DividerItemDecoration;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
+import com.xuexiang.xui.widget.toast.XToast;
+
+import org.bitcoinj.core.Address;
 
 import java.util.Map;
 
@@ -31,7 +48,7 @@ import butterknife.BindView;
  *
  * 数据「live data, view model」/
  * ui展示 「列表」
- * todo 列表点击事件
+ * todo  列表点击事件
  * 菜单
  *
  * 空页面 /
@@ -44,11 +61,17 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
     private ReceivingAddressesViewModel viewModel;
     private AddressListAdapter adapter;
 
+    private AddressBookDao addressBookDao;
+    private ClipboardManager clipboardManager;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         viewModel = getViewModel(ReceivingAddressesViewModel.class);
         adapter = new AddressListAdapter(getContext());
+        this.addressBookDao = AppDatabase.getInstance(getContext()).addressBookDao();
+        this.clipboardManager =(ClipboardManager)  getContext().getSystemService(Context.CLIPBOARD_SERVICE);
     }
 
     @Override
@@ -60,6 +83,10 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
 
         showLoading();
         observeData();
+        adapter.setOnItemClickListener((view1, position) -> {
+            MenuCallback menuCallback = new MenuCallback(position);
+            getActivity().startActionMode(menuCallback);
+        });
     }
 
     private void observeData() {
@@ -84,6 +111,68 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
             showEmpty();
         } else {
             showContent();
+        }
+    }
+
+    private final class MenuCallback implements  ActionMode.Callback {
+        protected int position;
+
+        public MenuCallback(int position) {
+            this.position = position;
+        }
+
+        private String getCurrentAddress() {
+            if (Utils.size(adapter.getCurrentList()) > position) {
+                return adapter.getCurrentList().get(position).address;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            final MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.wallet_addresses_context, menu);
+            menu.findItem(R.id.wallet_addresses_context_browse).setVisible(Constants.ENABLE_BROWSE);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            final String address = getCurrentAddress();
+            final String label = addressBookDao.resolveLabel(address);
+            actionMode.setTitle(label != null ? label
+                    : WalletUtils.formatHash(address, Constants.ADDRESS_FORMAT_GROUP_SIZE, 0));
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            final String address = getCurrentAddress();
+            int itemId = menuItem.getItemId();
+            switch (itemId) { // todo qr,edit label
+                case R.id.wallet_addresses_context_edit:break;
+                case R.id.wallet_addresses_context_show_qr:break;
+                case R.id.wallet_addresses_context_copy_to_clipboard:
+                    handleCopyToClipboard(address);
+                    break;
+                case R.id.wallet_addresses_context_browse:
+//                    https://www.blockchain.com/btc/address/18cBEMRxXHqzWWCxZNtU91F5sbUNKhL5PX
+                    String url = Commons.BLOCK_CHAIN_VIEW+ "address/"+ address;
+                    WebActivity.start(getContext(), url);
+                    break;
+                default: return false;
+            }
+            actionMode.finish();
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+        }
+
+        private void handleCopyToClipboard(final String address) {
+            clipboardManager.setPrimaryClip(ClipData.newPlainText("Bitcoin address", address));
+            XToast.success(getContext(),R.string.wallet_address_fragment_clipboard_msg).show();
         }
     }
 

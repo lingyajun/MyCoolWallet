@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.db.AddressBook;
+import com.bethel.mycoolwallet.interfaces.OnItemClickListener;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.utils.WalletUtils;
@@ -43,6 +44,8 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
     private Wallet wallet = null;
     @Nullable
     private Map<String, AddressBook> addressBook = null;
+
+    private OnItemClickListener itemClickListener;
 
     public AddressListAdapter(Context context) {
         super(new DiffUtil.ItemCallback<ListItem>() {
@@ -73,7 +76,7 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MViewHolder holder,final int position) {
         final ListItem item = getItem(position);
         CharSequence addressText = WalletUtils.formatHash(item.address,
                 Constants.ADDRESS_FORMAT_GROUP_SIZE,
@@ -93,6 +96,17 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
         ViewUtil.showView(holder.messageView, 0!=item.messageId);
 
         // todo text color
+        holder.addressView.setTextColor(0==item.messageId ? colorInsignificant : colorSignificant);
+        holder.labelView.setTextColor((TextUtils.isEmpty(item.label) || 0!=item.messageId)?
+                colorLessSignificant: colorInsignificant);
+
+        if (null!=itemClickListener) {
+            holder.itemView.setOnClickListener(view -> itemClickListener.OnItemClicked(view, position));
+        }
+    }
+
+    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     public void replaceDerivedAddresses(final Collection<Address> addresses) {
@@ -202,11 +216,13 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
         TextView addressView;
         TextView labelView;
         TextView messageView;
+        View itemView;
         public MViewHolder(@NonNull View itemView) {
             super(itemView);
             addressView = itemView.findViewById(R.id.address_book_row_address);
             labelView = itemView.findViewById(R.id.address_book_row_label);
             messageView = itemView.findViewById(R.id.address_book_row_message);
+            this.itemView = itemView;
         }
     }
 }
