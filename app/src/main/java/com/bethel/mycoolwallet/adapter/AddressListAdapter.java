@@ -180,8 +180,12 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
 
     private static void updateItem(ListItem item, Wallet wallet, Map<String , AddressBook> map) {
         final String addressStr = item.address;
-        if (null!=map && map.containsKey(addressStr)) {
-            item.label = map.get(addressStr).getLabel();
+        if (null!=map ) {
+            if ( map.containsKey(addressStr)) {
+                item.label = map.get(addressStr).getLabel();
+            } else {
+                item.label = null;
+            }
         }
         if (wallet != null) {
              boolean isRotateKey = false;

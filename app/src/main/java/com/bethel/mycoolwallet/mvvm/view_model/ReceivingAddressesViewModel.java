@@ -28,7 +28,7 @@ public class ReceivingAddressesViewModel extends BaseViewModel {
     public final ConfigOwnNameLiveData ownName;
 
     public final MutableLiveData<Event<Bitmap>> showBitmapDialog = new MutableLiveData<>();
-    public final MutableLiveData<Event<Address>> showEditAddressBookDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<String>> showEditAddressBookDialog = new MutableLiveData<>();
 
     public ReceivingAddressesViewModel(@NonNull Application app) {
         super(app);

@@ -31,6 +31,7 @@ import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
+import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
 import com.bethel.mycoolwallet.interfaces.OnItemClickListener;
 import com.bethel.mycoolwallet.mvvm.view_model.ReceivingAddressesViewModel;
 import com.bethel.mycoolwallet.utils.Commons;
@@ -118,6 +119,12 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
                 BitmapFragment.show(getFragmentManager(), content);
             }
         });
+        viewModel.showEditAddressBookDialog.observe(this, new Event.Observer<String>() {
+            @Override
+            public void onEvent(String content) {
+                EditAddressBookFragment.edit(getFragmentManager(), content);
+            }
+        });
     }
 
     private void checkAndShowList() {
@@ -164,7 +171,9 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
             final String address = getCurrentAddress();
             int itemId = menuItem.getItemId();
             switch (itemId) { // todo ,edit label
-                case R.id.wallet_addresses_context_edit:break;
+                case R.id.wallet_addresses_context_edit:
+                    viewModel.showEditAddressBookDialog.setValue(new Event<>(address));
+                    break;
                 case R.id.wallet_addresses_context_show_qr:
                     if (TextUtils.isEmpty(address)) break;
                     final String label = viewModel.ownName.getValue();
