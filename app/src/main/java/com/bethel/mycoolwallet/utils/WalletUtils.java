@@ -236,6 +236,10 @@ public class WalletUtils {
         }
     };
 
+    public static Spanned formatAddress(final Address address, final int groupSize, final int lineSize) {
+        return formatHash(address.toString(), groupSize, lineSize);
+    }
+
     public static Spanned formatHash(final String hash, final int groupSize, final int lineSize) {
         return formatHash(null, hash, groupSize, lineSize, Constants.CHAR_THIN_SPACE);
     }
