@@ -4,6 +4,8 @@ package com.bethel.mycoolwallet.fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +27,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.adapter.AddressListAdapter;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
+import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
@@ -31,6 +35,7 @@ import com.bethel.mycoolwallet.interfaces.OnItemClickListener;
 import com.bethel.mycoolwallet.mvvm.view_model.ReceivingAddressesViewModel;
 import com.bethel.mycoolwallet.utils.Commons;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.Qr;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.bethel.mycoolwallet.view.DividerItemDecoration;
@@ -38,6 +43,8 @@ import com.xuexiang.xui.widget.statelayout.StatusLoader;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.uri.BitcoinURI;
 
 import java.util.Map;
 
@@ -104,6 +111,13 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
             adapter.updateAddressBook(map);
         });
         viewModel.ownName.observe(this, s -> adapter.notifyDataSetChanged());
+
+        viewModel.showBitmapDialog.observe(this, new Event.Observer<Bitmap>() {
+            @Override
+            public void onEvent(Bitmap content) {
+                BitmapFragment.show(getFragmentManager(), content);
+            }
+        });
     }
 
     private void checkAndShowList() {
@@ -149,9 +163,18 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             final String address = getCurrentAddress();
             int itemId = menuItem.getItemId();
-            switch (itemId) { // todo qr,edit label
+            switch (itemId) { // todo ,edit label
                 case R.id.wallet_addresses_context_edit:break;
-                case R.id.wallet_addresses_context_show_qr:break;
+                case R.id.wallet_addresses_context_show_qr:
+                    if (TextUtils.isEmpty(address)) break;
+                    final String label = viewModel.ownName.getValue();
+                    final String uri = BitcoinURI.convertToBitcoinURI(Constants.NETWORK_PARAMETERS,
+                            address,null, label, null);
+                    AsyncTask.execute(()->{
+                        Bitmap bitmap = Qr.bitmap(uri);
+                        viewModel.showBitmapDialog.postValue(new Event<>(bitmap));
+                    });
+                    break;
                 case R.id.wallet_addresses_context_copy_to_clipboard:
                     handleCopyToClipboard(address);
                     break;
