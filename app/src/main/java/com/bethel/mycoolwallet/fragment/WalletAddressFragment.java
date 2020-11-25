@@ -60,7 +60,8 @@ public class WalletAddressFragment extends BaseFragment {
 //     viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
 
         viewModel.showWalletAddressDialog.observe(this, (event)->{
-            final String address = String.valueOf(viewModel.currentAddress.getValue());
+            final Address addr = viewModel.currentAddress.getValue();
+            final String address = null!=addr? addr.toString(): null;
             if (TextUtils.isEmpty(address)) return;
 
             final String label = viewModel.addressBookDao.resolveLabel(address );
