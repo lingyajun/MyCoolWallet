@@ -127,7 +127,15 @@ public class AddressListAdapter extends ListAdapter<AddressListAdapter.ListItem,
         list.addAll(randomAddresses);
         submitList(list);
     }
+    public static List<ListItem> buildItems(List<AddressBook> books) {
+        List<ListItem> list = new LinkedList<>();
+        if (null==books) return list;
 
+        for (AddressBook book: books  ) {
+            list.add(new ListItem(book,0));
+        }
+        return list;
+    }
     public static List<ListItem> buildItems(Collection<Address> addresses, Wallet wallet, Map<String , AddressBook> map) {
         List<ListItem> list = new LinkedList<>();
         for (Address address: addresses ) {

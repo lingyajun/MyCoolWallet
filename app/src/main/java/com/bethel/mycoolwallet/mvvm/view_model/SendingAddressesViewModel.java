@@ -1,10 +1,13 @@
 package com.bethel.mycoolwallet.mvvm.view_model;
 
 import android.app.Application;
+import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
@@ -22,6 +25,9 @@ public class SendingAddressesViewModel extends BaseViewModel {
 
     public final AddressBookDao addressBookDao;
     public LiveData<List<AddressBook>> addressBook;
+
+    public final MutableLiveData<Event<Bitmap>> showBitmapDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<String>> showEditAddressBookDialog = new MutableLiveData<>();
 
     public SendingAddressesViewModel(@NonNull Application app) {
         super(app);

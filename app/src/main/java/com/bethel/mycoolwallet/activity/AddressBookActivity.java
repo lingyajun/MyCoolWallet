@@ -1,25 +1,35 @@
 package com.bethel.mycoolwallet.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.fragment.BaseFragment;
 import com.bethel.mycoolwallet.fragment.ReceivingAddressesFragment;
 import com.bethel.mycoolwallet.fragment.SendingAddressesFragment;
+import com.bethel.mycoolwallet.interfaces.IToolbar;
 import com.xuexiang.xui.adapter.FragmentAdapter;
 import com.xuexiang.xui.widget.tabbar.EasyIndicator;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddressBookActivity extends BaseActivity {
-    EasyIndicator mEasyIndicator;
-    ViewPager mViewPager;
+public class AddressBookActivity extends BaseActivity implements IToolbar {
+    private   EasyIndicator mEasyIndicator;
+    private  ViewPager mViewPager;
+    private Toolbar toolBar;
+
+    private static final Logger log = LoggerFactory.getLogger(AddressBookActivity.class);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +48,15 @@ public class AddressBookActivity extends BaseActivity {
         mEasyIndicator.setViewPager(mViewPager, new FragmentAdapter<>(getSupportFragmentManager(), list));
         mViewPager.setOffscreenPageLimit(list.size() -1);
 
-        initTitleBar(R.string.address_book_activity_title, true);
-
+        toolBar =  initTitleBar(R.string.address_book_activity_title, true);
     }
 
     public static void start(Context context) {
         context.startActivity(new Intent(context, AddressBookActivity.class));
+    }
+
+    @Override
+    public Toolbar getToolbar() {
+        return toolBar;
     }
 }
