@@ -180,6 +180,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
                     classes[i] = String.class;
                 }
             }
+            if (null==method || null== params) return false;
             try {//WebFragment.class
                 Method m = getClass().getDeclaredMethod(method, classes);
                 m.setAccessible(true);

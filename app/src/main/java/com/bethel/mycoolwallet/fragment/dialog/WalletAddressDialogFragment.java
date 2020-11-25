@@ -21,9 +21,11 @@ import android.widget.TextView;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Qr;
+import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 
 import org.bitcoinj.core.Address;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.uri.BitcoinURI;
 import org.slf4j.Logger;
@@ -38,19 +40,19 @@ public  class WalletAddressDialogFragment extends DialogFragment {
     private static final String TAG = "WalletAddressDialogFragment";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_ADDRESS_LABEL = "address_label";
-    private Handler mHandler;
+//    private Handler mHandler;
 
     private static final Logger log = LoggerFactory.getLogger(WalletAddressDialogFragment.class);
 
-    public static void show(final FragmentManager fm, final Address address, @Nullable final String addressLabel) {
+    public static void show(final FragmentManager fm, final String address, @Nullable final String addressLabel) {
         instance(address, addressLabel).show(fm, TAG);
     }
 
-    private static WalletAddressDialogFragment instance(final Address address, @Nullable final String addressLabel) {
+    private static WalletAddressDialogFragment instance(final String address, @Nullable final String addressLabel) {
         final WalletAddressDialogFragment fragment = new WalletAddressDialogFragment();
 
         final Bundle args = new Bundle();
-        args.putString(KEY_ADDRESS, address.toString());
+        args.putString(KEY_ADDRESS, address );
         if (addressLabel != null)
             args.putString(KEY_ADDRESS_LABEL, addressLabel);
         fragment.setArguments(args);
@@ -66,16 +68,22 @@ public  class WalletAddressDialogFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new Handler();
+//        mHandler = new Handler();
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         final Bundle args = getArguments();
-        final Address address = Address.fromString(Constants.NETWORK_PARAMETERS, args.getString(KEY_ADDRESS));
-        final String addressStr = address.toString();
+        final String addressStr = args.getString(KEY_ADDRESS);
         final String addressLabel = args.getString(KEY_ADDRESS_LABEL);
+
+        Address address = null;
+        try {
+            address = Address.fromString(Constants.NETWORK_PARAMETERS, addressStr);
+        } catch (AddressFormatException e) {
+            log.error("AddressFormatException",e);
+        }
 
         final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -83,11 +91,14 @@ public  class WalletAddressDialogFragment extends DialogFragment {
         dialog.setCanceledOnTouchOutside(true);
 
         final String addressUri;
-        if (address instanceof LegacyAddress || addressLabel != null)
-            addressUri = BitcoinURI.convertToBitcoinURI(address, null, addressLabel, null);
-        else
-            addressUri = address.toString().toUpperCase(Locale.US);
-
+        if (null!= address) {
+            if (address instanceof LegacyAddress || addressLabel != null)
+                addressUri = BitcoinURI.convertToBitcoinURI(address, null, addressLabel, null);
+            else
+                addressUri = address.toString().toUpperCase(Locale.US);
+        } else {
+            addressUri = BitcoinURI.convertToBitcoinURI(Constants.NETWORK_PARAMETERS, addressStr, null, addressLabel, null);
+        }
         final ImageView imageView = dialog.findViewById(R.id.wallet_address_dialog_image);
         showQrBmp(imageView, addressUri);
 
@@ -108,7 +119,8 @@ public  class WalletAddressDialogFragment extends DialogFragment {
 
         final View hintView = dialog.findViewById(R.id.wallet_address_dialog_hint);
         int visible = getResources().getBoolean(R.bool.show_wallet_address_dialog_hint) ? View.VISIBLE : View.GONE;
-        hintView.setVisibility(visible);
+//        hintView.setVisibility(visible);
+        ViewUtil.setVisibility(hintView, visible);
 
         final View dialogView = dialog.findViewById(R.id.wallet_address_dialog_group);
         dialogView.setOnClickListener((v)->  dismissAllowingStateLoss());
@@ -120,10 +132,14 @@ public  class WalletAddressDialogFragment extends DialogFragment {
         new Thread(() -> {
             final BitmapDrawable bitmap = new BitmapDrawable(getResources(), Qr.bitmap(addressUri));
             bitmap.setFilterBitmap(false);
-            mHandler.post(() -> {
+            getActivity().runOnUiThread(()->{
                 if (isAdded())
-                imageView.setImageDrawable(bitmap);
+                    imageView.setImageDrawable(bitmap);
             });
+//            mHandler.post(() -> {
+//                if (isAdded())
+//                imageView.setImageDrawable(bitmap);
+//            });
         }).start();
     }
 }

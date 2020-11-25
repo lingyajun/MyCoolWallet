@@ -7,6 +7,7 @@ import androidx.cardview.widget.CardView;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -55,10 +56,15 @@ public class WalletAddressFragment extends BaseFragment {
         cardView.setMaxCardElevation(0);
 
         viewModel.qrCode.observe(this, ( bitmap)-> showQrBmp(bitmap));
-//        viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
+//    todo NfcAdapter
+//     viewModel.bitcoinUri.observe(this, (uri)-> XToast.info(getActivity(), uri.toString()));
+
         viewModel.showWalletAddressDialog.observe(this, (event)->{
-            final Address address = viewModel.currentAddress.getValue();
-            WalletAddressDialogFragment.show(getFragmentManager(), address, null);
+            final String address = String.valueOf(viewModel.currentAddress.getValue());
+            if (TextUtils.isEmpty(address)) return;
+
+            final String label = viewModel.addressBookDao.resolveLabel(address );
+            WalletAddressDialogFragment.show(getFragmentManager(), address, label);
         });
     }
 

@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.text.format.DateUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +18,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
+import com.bethel.mycoolwallet.data.Impediment;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
@@ -25,6 +28,7 @@ import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateSelected
 import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.Utils;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
@@ -58,6 +62,7 @@ public class BlockChainService extends LifecycleService {
     private AddressBookDao addressBookDao;
 
     private final IBinder mBinder = new LocalBinder();
+    private final Handler mHandler = new Handler();
 
     private static final Logger log = LoggerFactory.getLogger(BlockChainService.class);
 
@@ -185,6 +190,8 @@ public class BlockChainService extends LifecycleService {
         }
         stopForeground(true);
         super.onDestroy();
+        mHandler.removeCallbacksAndMessages(null);
+
         long duration = System.currentTimeMillis() - serviceCreatedAt;
         log.info(String.format("service was up for  %s  minutes", duration / 1000 / 60));
     }
@@ -208,7 +215,24 @@ public class BlockChainService extends LifecycleService {
 
         @Override
         public void onNetworkOrStorageChanged() {
-            broadcastBlockChainState();
+            BlockChainState state = broadcastBlockChainState();
+            // todo 网络断开，检查节点连接数量 ———— 应对断网时通知栏节点连接数量不准确
+           final boolean isOffline = null != state && null != state.impediments
+                    && state.impediments.contains(Impediment.NETWORK);
+           log.info("isOffline {}", isOffline);
+            if (isOffline) {
+                mHandler.postDelayed(()-> checkConnectedPeers(), Constants.PEER_TIMEOUT_MS +10);
+                checkConnectedPeers();
+            }
+        }
+
+        private void checkConnectedPeers() {
+            List<Peer> list = getConnectedPeers();
+            if (Utils.isEmpty(list)) {
+                onPeerConnectionChanged(0);
+            }
+            log.info("ConnectedPeers   {}", Utils.size(list));
+//                    DateUtils.formatDateTime(getApplication(), System.currentTimeMillis(), DateUtils.FORMAT_UTC));
         }
 
         @Override
@@ -227,12 +251,13 @@ public class BlockChainService extends LifecycleService {
         }
     };
 
-    private void broadcastBlockChainState() {
+    private BlockChainState broadcastBlockChainState() {
         Intent intent = new Intent(ACTION_BLOCKCHAIN_STATE);
         BlockChainState state = getBlockChainState();
         if (null!=state) state.putExtras(intent);
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        return state;
     }
 
     private void broadcastPeerState(int peerCount) {

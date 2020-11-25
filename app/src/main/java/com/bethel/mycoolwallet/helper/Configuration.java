@@ -31,6 +31,8 @@ public class Configuration {
     private static final String PREFS_KEY_LAST_RESTORE = "last_restore";
     public static final String PREFS_KEY_OWN_NAME = "own_name";
 
+    public static final String PREFS_KEY_DISCLAIMER = "disclaimer";
+
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
 
@@ -174,6 +176,10 @@ public class Configuration {
 
     public String getOwnName() {
         return Strings.emptyToNull(mPreference.getString(PREFS_KEY_OWN_NAME, "").trim());
+    }
+
+    public boolean getDisclaimerEnabled() {
+        return mPreference.getBoolean(PREFS_KEY_DISCLAIMER, true);
     }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {

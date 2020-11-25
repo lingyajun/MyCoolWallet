@@ -9,6 +9,8 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.db.AddressBookDao;
+import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.mvvm.live_data.address.CurrentAddressLiveData;
 import com.bethel.mycoolwallet.utils.Qr;
 
@@ -18,21 +20,26 @@ import org.bitcoinj.uri.BitcoinURI;
 public class WalletAddressViewModel extends BaseViewModel {
     public final CurrentAddressLiveData currentAddress;
     public final MediatorLiveData<Bitmap> qrCode = new MediatorLiveData<>();
-    public final MediatorLiveData<Uri> bitcoinUri = new MediatorLiveData<>();
+    public final MediatorLiveData<Uri> bitcoinUri = new MediatorLiveData<>(); // NFC
     public final MutableLiveData<Event<Void>> showWalletAddressDialog = new MutableLiveData<>();
+
+    public final AddressBookDao addressBookDao;
 
     public WalletAddressViewModel(@NonNull Application app) {
         super(app);
         currentAddress = new CurrentAddressLiveData(application);
         qrCode.addSource(currentAddress, (address)-> maybeGenerateQrCode());
         bitcoinUri.addSource(currentAddress, (address)-> maybeGenerateBitcoinUri());
+
+        addressBookDao = AppDatabase.getInstance(app).addressBookDao();
     }
 
     private void maybeGenerateQrCode() {
         final Address address = currentAddress.getValue();
         if (address != null) {
             executeAsyncTask(()->{
-                qrCode.postValue(Qr.bitmap(uri(address)));
+                Bitmap bitmap = Qr.bitmap(uri(address, addressBookDao.resolveLabel(address.toString())));
+                qrCode.postValue(bitmap);
             });
         }
     }
@@ -41,12 +48,13 @@ public class WalletAddressViewModel extends BaseViewModel {
     private void maybeGenerateBitcoinUri() {
         final Address address = currentAddress.getValue();
         if (address != null) {
-            bitcoinUri.setValue(Uri.parse(uri(address)));
+            Uri uri = Uri.parse(uri(address, addressBookDao.resolveLabel(address.toString())));
+            bitcoinUri.setValue(uri);
         }
     }
 
-    private String uri(final Address address) {
-        return BitcoinURI.convertToBitcoinURI(address, null, null, null);
+    private String uri(final Address address, String label) {
+        return BitcoinURI.convertToBitcoinURI(address, null, label, null);
     }
 
 }
