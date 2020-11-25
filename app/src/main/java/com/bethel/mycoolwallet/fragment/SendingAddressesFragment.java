@@ -14,27 +14,45 @@ import android.view.ViewGroup;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
+import com.bethel.mycoolwallet.mvvm.view_model.SendingAddressesViewModel;
+import com.bethel.mycoolwallet.utils.Utils;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
 
 import butterknife.BindView;
 
 /**
- * A simple {@link Fragment} subclass.
+ *  ui展示 「列表」
+ *  * todo  列表点击事件
+ *  * 菜单
  */
 public class SendingAddressesFragment extends BaseStatusLoaderFragment {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    public SendingAddressesFragment() {
-        // Required empty public constructor
-    }
+    private SendingAddressesViewModel viewModel;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = getViewModel(SendingAddressesViewModel.class);
+        viewModel.receivingAddresses.observe(this, addresses -> {
+            viewModel.initAddressBook(addresses);
+            viewModel.addressBook.observe(SendingAddressesFragment.this, list -> {
+                // todo list ui
+                if (Utils.isEmpty(list)) {
+                    showEmpty();
+                } else {
+                    showContent();
+                }
+            });
+        });
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        showEmpty();
+        showLoading();
     }
 
     @Override

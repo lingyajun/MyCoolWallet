@@ -170,7 +170,7 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
             final String address = getCurrentAddress();
             int itemId = menuItem.getItemId();
-            switch (itemId) { // todo ,edit label
+            switch (itemId) { //  ,edit label
                 case R.id.wallet_addresses_context_edit:
                     viewModel.showEditAddressBookDialog.setValue(new Event<>(address));
                     break;
