@@ -6,6 +6,7 @@
   <string name="parse_qr_code_failed">解析二維碼失敗</string>
   <string name="wrong_wallet_file_alarm">這不是錢包文件，請選擇正確的錢包文件</string>
   <string name="pls_select_wallet_file">請選擇你的錢包文件</string>
+  <string name="bad_password">密碼錯誤</string>
 
   <!--    Andreas Schildbach -->
   <string name="toast_wallet_reset">錢包重置了！\n恢復需要花一點時間。</string>

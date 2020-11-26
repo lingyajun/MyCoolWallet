@@ -1,11 +1,8 @@
 package com.bethel.mycoolwallet.helper.parser;
 
-import androidx.core.util.Preconditions;
-
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.data.payment.PaymentOutput;
 import com.bethel.mycoolwallet.data.payment.PaymentStandard;
-import com.bethel.mycoolwallet.data.payment.PaymentUtil;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.google.common.hash.Hashing;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -25,8 +22,8 @@ import java.security.KeyStoreException;
 import java.util.Date;
 import java.util.LinkedList;
 
-public final class InputParserUtil {
-    private static final Logger log = LoggerFactory.getLogger(InputParserUtil.class);
+public final class InputParserTool {
+    private static final Logger log = LoggerFactory.getLogger(InputParserTool.class);
 
     public static PaymentData parsePaymentRequest(final byte[] paymentRequestBytes) throws PaymentProtocolException {
         final  int size = null!= paymentRequestBytes? paymentRequestBytes.length : 0;

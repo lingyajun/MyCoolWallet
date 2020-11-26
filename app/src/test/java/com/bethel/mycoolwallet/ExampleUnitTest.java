@@ -1,9 +1,14 @@
 package com.bethel.mycoolwallet;
 
+import com.bethel.mycoolwallet.data.payment.PaymentData;
+import com.bethel.mycoolwallet.helper.parser.BinaryInputParser;
+import com.bethel.mycoolwallet.helper.parser.StringInputParser;
 import com.bethel.mycoolwallet.http.HttpUtil;
 
 import org.bitcoinj.core.DumpedPrivateKey;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.BIP38PrivateKey;
 import org.bitcoinj.params.MainNetParams;
 import org.junit.Test;
@@ -39,5 +44,42 @@ public class ExampleUnitTest {
         //该密钥回到可被用在任何钱包WIF格式的私钥（前缀为5）
         assertEquals("5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR",
                 privateKey);
+    }
+
+    @Test
+    public void inputParser_test() {
+        new StringInputParser("5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR") {
+            @Override
+            public void error(int messageResId, Object... messageArgs) {
+
+            }
+
+            @Override
+            public void handlePaymentData(PaymentData data) {
+
+            }
+
+            @Override
+            public void handleDirectTransaction(Transaction transaction) throws VerificationException {
+
+            }
+
+            @Override
+            public void requestPassphrase(BIP38PrivateKey encryptKey) {
+
+            }
+        };
+
+        new BinaryInputParser("abc", new byte[]{'a', 'c'}) {
+            @Override
+            public void error(int messageResId, Object... messageArgs) {
+
+            }
+
+            @Override
+            public void handlePaymentData(PaymentData data) {
+
+            }
+        };
     }
 }
