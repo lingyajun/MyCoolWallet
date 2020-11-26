@@ -14,8 +14,6 @@ import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptPattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
@@ -39,7 +37,7 @@ public class PaymentData implements Parcelable {
     @Nullable
     public final byte[] paymentRequestHash;
 
-    private static final Logger log = LoggerFactory.getLogger(PaymentData.class);
+//    private static final Logger log = LoggerFactory.getLogger(PaymentData.class);
 
     public PaymentData(@Nullable PaymentStandard standard, @Nullable String payeeName,
                        @Nullable String payeeVerifiedBy, @Nullable PaymentOutput[] outputs,

@@ -3,7 +3,7 @@ package com.bethel.mycoolwallet.interfaces;
 /**
  * 请求输入密码
  *
- * InputParser
+ * InputParserOld
  * BIP38PrivateKey
  */
 public interface IRequestPassphrase {

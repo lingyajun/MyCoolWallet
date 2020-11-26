@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 构造 PaymentData ，PaymentOutput ，SendRequest
  */
-public class PaymentUtil {
+public final class PaymentUtil {
     private static final Logger log = LoggerFactory.getLogger(PaymentUtil.class);
 
     public static PaymentData blank() {
@@ -123,7 +123,7 @@ public class PaymentUtil {
         try {
             return BASE64URL.decode(encoded);
         } catch (final IllegalArgumentException x) {
-            log.info("cannot base64url-decode: " + encoded);
+            log.info("cannot base64url-decode: {}" , encoded);
             return null;
         }
     }

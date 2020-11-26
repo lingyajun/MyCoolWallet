@@ -11,11 +11,9 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,15 +24,13 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
-import com.bethel.mycoolwallet.data.FeeCategory;
 import com.bethel.mycoolwallet.helper.PaymentHelper;
-import com.bethel.mycoolwallet.helper.parser.InputParser;
+import com.bethel.mycoolwallet.helper.parser.InputParserOld;
 import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestPassphrase;
@@ -54,7 +50,6 @@ import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.VerificationException;
-import org.bitcoinj.utils.ExchangeRate;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.bitcoinj.wallet.SendRequest;
 import org.bitcoinj.wallet.Wallet;
@@ -366,7 +361,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
                     String result = bundle.getString(XQRCode.RESULT_DATA);
                     // todo handle bitcoin pay
-                    InputParser.StringInputParser parser = new InputParser.StringInputParser(result) {
+                    InputParserOld.StringInputParser parser = new InputParserOld.StringInputParser(result) {
 
                         @Override
                         protected void error(int messageResId, Object... messageArgs) {

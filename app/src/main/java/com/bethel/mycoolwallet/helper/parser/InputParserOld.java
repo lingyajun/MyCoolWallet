@@ -43,14 +43,14 @@ import java.util.regex.Pattern;
 /**
  * @author Andreas Schildbach
  */
-public abstract class InputParser {
-    private static final Logger log = LoggerFactory.getLogger(InputParser.class);
+public abstract class InputParserOld {
+    private static final Logger log = LoggerFactory.getLogger(InputParserOld.class);
 
     public abstract void parse();
 
     protected abstract void error(int messageResId, Object... messageArgs);
 
-    public abstract static class StringInputParser extends InputParser {
+    public abstract static class StringInputParser extends InputParserOld {
         private final String input;
 
         public StringInputParser(String input) {
@@ -157,7 +157,7 @@ public abstract class InputParser {
     }
 
 
-    //--------- InputParser -----------/
+    //--------- InputParserOld -----------/
 
     private static void handleBitcoinURI(BitcoinURI bitcoinUri) {
         final Address address = bitcoinUri.getAddress();
