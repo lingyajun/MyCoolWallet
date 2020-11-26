@@ -115,6 +115,7 @@ public class PaymentHelper {
     /** 3. 对交易进行签名
      *
      * @param req
+     * todo handle  Exceptions
      */
     public static void signPayment(Wallet wallet, SendRequest req, ISignPaymentCallback callback) {
         MyCoolWalletManager.propagate();

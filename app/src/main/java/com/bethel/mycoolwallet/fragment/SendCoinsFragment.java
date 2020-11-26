@@ -67,6 +67,12 @@ import butterknife.OnClick;
 
 /**
  * 支付页面.
+ *
+ * todo
+ * 构造支付数据；
+ * 解析扫码结果；
+ * 金额输入框联动；
+ * 输入地址/标签响应；
  */
 public class SendCoinsFragment extends BaseFragment implements IQrScan {
     /**
