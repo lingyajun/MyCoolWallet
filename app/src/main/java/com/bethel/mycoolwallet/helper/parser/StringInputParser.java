@@ -17,12 +17,11 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.core.ProtocolException;
 import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.BIP38PrivateKey;
 import org.bitcoinj.protocols.payments.PaymentProtocolException;
 import org.bitcoinj.uri.BitcoinURI;
 import org.bitcoinj.uri.BitcoinURIParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
@@ -35,8 +34,6 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
     private static final Pattern PATTERN_TRANSACTION = Pattern
             .compile("[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$\\*\\+\\-\\.\\/\\:]{100,}");
 
-//    private static final Logger log = LoggerFactory.getLogger(StringInputParser.class);
-
     private final String input;
 
     public StringInputParser(String input) {
@@ -45,6 +42,7 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
 
     @Override
     public void parse() {
+//        log.info("input {}", input);
         Preconditions.checkArgument(!TextUtils.isEmpty(input));
         if (input.startsWith(Prefix_PaymentRequest)) {
             parseAndHandlePaymentRequest();
@@ -59,10 +57,17 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
             return;
         }
 
+        if (input.startsWith("http://") || input.startsWith("https://")) {
+            //  web
+            handleWebUrl(input);
+            return;
+        }
         // handlePrivateKey
         // handlePayment
         parseAndHandleAddress();
     }
+
+    protected abstract void handleWebUrl(String link);
 
     /**
      * 将 {input} 解析成 Address
@@ -77,14 +82,16 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
             try {
                 final BIP38PrivateKey bip38PrivateKey = BIP38PrivateKey.fromBase58(Constants.NETWORK_PARAMETERS, input);
 //            bip38PrivateKey.decrypt(String passphrase); // todo need a passphrase
-                requestPassphrase(bip38PrivateKey);
-//                responsePassphrase(BIP38PrivateKey encryptKey, String passphrase);
+                requestBIP38PrivateKeyPassphrase();
+//                responseBIP38PrivateKeyPassphrase( String passphrase);
             } catch (AddressFormatException ex) {
                 log.info(" BIP38PrivateKey ", ex);
                 parseAndHandleNormalAddress();
             }
         }
     }
+
+    protected abstract void requestBIP38PrivateKeyPassphrase();
 
     /**
      * 将 {input} 解析成 Address
@@ -104,17 +111,20 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
         }
     }
 
-   public abstract void requestPassphrase(BIP38PrivateKey encryptKey);
+    public abstract  void handleDirectTransaction(Transaction transaction) throws VerificationException;
 
     /**
      * 外部调用
      * 用户输入完密码，调用此方法回应
      * 与 requestPassphrase() 成对使用
-     * @param encryptKey
+     *
      * @param passphrase
      */
-    public void responsePassphrase(BIP38PrivateKey encryptKey, String passphrase) {
+    public void responseBIP38PrivateKeyPassphrase(String passphrase) {
+        if (TextUtils.isEmpty(input)) return;
+
         try {
+            final BIP38PrivateKey encryptKey = BIP38PrivateKey.fromBase58(Constants.NETWORK_PARAMETERS, input);
             ECKey key = encryptKey.decrypt(passphrase);
             final Address address = LegacyAddress.fromKey(Constants.NETWORK_PARAMETERS, key);
             handlePaymentData(PaymentUtil.fromAddress(address, null));

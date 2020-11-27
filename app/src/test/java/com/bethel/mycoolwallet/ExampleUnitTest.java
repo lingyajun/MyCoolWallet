@@ -46,29 +46,29 @@ public class ExampleUnitTest {
                 privateKey);
     }
 
-    @Test
+//    @Test
     public void inputParser_test() {
-        new StringInputParser("5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR") {
-            @Override
-            public void error(int messageResId, Object... messageArgs) {
-
-            }
-
-            @Override
-            public void handlePaymentData(PaymentData data) {
-
-            }
-
-            @Override
-            public void handleDirectTransaction(Transaction transaction) throws VerificationException {
-
-            }
-
-            @Override
-            public void requestPassphrase(BIP38PrivateKey encryptKey) {
-
-            }
-        };
+//        new StringInputParser("5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR") {
+//            @Override
+//            public void error(int messageResId, Object... messageArgs) {
+//
+//            }
+//
+//            @Override
+//            public void handlePaymentData(PaymentData data) {
+//
+//            }
+//
+//            @Override
+//            public void handleDirectTransaction(Transaction transaction) throws VerificationException {
+//
+//            }
+//
+//            @Override
+//            public void requestPassphrase(BIP38PrivateKey encryptKey) {
+//
+//            }
+//        };
 
         new BinaryInputParser("abc", new byte[]{'a', 'c'}) {
             @Override

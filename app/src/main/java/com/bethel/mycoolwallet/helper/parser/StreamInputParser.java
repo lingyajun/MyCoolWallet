@@ -15,8 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public abstract class StreamInputParser extends AbsInputParser { //implements IInputParser
-//    private static final Logger log = LoggerFactory.getLogger(StreamInputParser.class);
+public abstract class StreamInputParser extends AbsInputParser {
 
     private final String inputType;
     private final InputStream is;

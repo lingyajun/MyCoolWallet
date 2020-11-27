@@ -29,11 +29,11 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
+import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.helper.PaymentHelper;
-import com.bethel.mycoolwallet.helper.parser.InputParserOld;
+import com.bethel.mycoolwallet.helper.parser.StringInputParser;
 import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
-import com.bethel.mycoolwallet.interfaces.IRequestPassphrase;
 import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
 import com.bethel.mycoolwallet.service.BlockChainService;
@@ -343,7 +343,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //处理二维码扫描结果
+        // 处理二维码扫描结果
         if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == Activity.RESULT_OK) {
             handleScanResult(data);
         }
@@ -361,34 +361,33 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
                     String result = bundle.getString(XQRCode.RESULT_DATA);
                     // todo handle bitcoin pay
-                    InputParserOld.StringInputParser parser = new InputParserOld.StringInputParser(result) {
+                    StringInputParser parser = new StringInputParser(result) {
+                        @Override
+                        protected void handleWebUrl(String link) {
+                            WebActivity.start(getContext(), link);
+                        }
 
                         @Override
-                        protected void error(int messageResId, Object... messageArgs) {
+                        protected void requestBIP38PrivateKeyPassphrase() {
+                            // todo
+                            responseBIP38PrivateKeyPassphrase("todo");
+                        }
+
+                        @Override
+                        public void handleDirectTransaction(Transaction transaction) throws VerificationException {
 
                         }
 
                         @Override
-                        protected void handleWebUrl(String url) {
-                            WebActivity.start(getActivity(), url);
-                        }
-
-                        @Override
-                        protected void requestPassphrase(IRequestPassphrase callback) {
+                        public void error(int messageResId, Object... messageArgs) {
 
                         }
 
                         @Override
-                        protected void handlePaymentAddress(Address address) {
-
-                        }
-
-                        @Override
-                        protected void handleDirectTransaction(Transaction transaction) throws VerificationException {
+                        public void handlePaymentData(PaymentData data) {
 
                         }
                     };
-
                     parser.parse();
 //                    XToast.success(getContext(), "解析结果: " + result).show();
                 } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {

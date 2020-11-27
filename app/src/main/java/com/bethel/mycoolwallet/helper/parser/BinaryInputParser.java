@@ -9,9 +9,6 @@ import com.bethel.mycoolwallet.utils.Constants;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.protocols.payments.PaymentProtocol;
-import org.bitcoinj.protocols.payments.PaymentProtocolException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class BinaryInputParser extends AbsInputParser { //implements IInputParser
     private final String inputType;
@@ -22,7 +19,6 @@ public abstract class BinaryInputParser extends AbsInputParser { //implements II
         this.input = input;
     }
 
-//    private static final Logger log = LoggerFactory.getLogger(BinaryInputParser.class);
     @Override
     public void parse() {
         Preconditions.checkArgument(null!= inputType && null != input);
@@ -48,8 +44,7 @@ public abstract class BinaryInputParser extends AbsInputParser { //implements II
         cannotClassify(inputType);
     }
 
-    @Override
-    public void handleDirectTransaction(Transaction transaction) throws VerificationException {
+    private void handleDirectTransaction(Transaction transaction) throws VerificationException {
         throw new UnsupportedOperationException();
     }
 

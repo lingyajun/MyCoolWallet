@@ -7,9 +7,15 @@ import org.bitcoinj.protocols.payments.PaymentProtocolException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *  StringInputParser, StreamInputParser, BinaryInputParser
+ */
 public abstract class AbsInputParser implements IInputParser {
     protected static final Logger log = LoggerFactory.getLogger(AbsInputParser.class);
 
+    /**
+     * 将 {payload} 解析成 Protos.PaymentRequest, 构造 PaymentData
+     */
     protected void baseParseAndHandlePaymentRequestBytes(final byte[] payload) {
         try {
             final PaymentData paymentData = InputParserTool.parsePaymentRequest(payload);
