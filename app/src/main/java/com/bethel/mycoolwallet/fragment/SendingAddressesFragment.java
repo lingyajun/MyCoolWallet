@@ -3,7 +3,6 @@ package com.bethel.mycoolwallet.fragment;
 
 import android.app.Activity;
 import android.content.ClipData;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,32 +10,25 @@ import android.os.Bundle;
 import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.SendCoinsActivity;
-import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.adapter.AddressListAdapter;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.data.PaymentIntent;
-import com.bethel.mycoolwallet.db.AddressBook;
+import com.bethel.mycoolwallet.data.payment.PaymentUtil;
 import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
 import com.bethel.mycoolwallet.interfaces.IToolbar;
 import com.bethel.mycoolwallet.mvvm.view_model.SendingAddressesViewModel;
-import com.bethel.mycoolwallet.utils.Commons;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Qr;
 import com.bethel.mycoolwallet.utils.Utils;
@@ -51,8 +43,6 @@ import org.bitcoinj.uri.BitcoinURI;
 import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 import butterknife.BindView;
 
@@ -291,7 +281,7 @@ public class SendingAddressesFragment extends BaseStatusLoaderFragment {
 
     private void handleSend(final String address, final String label) {
 //        XToast.info(getContext(), String.format("send coins %s : %s" ,label, address)).show();
-        SendCoinsActivity.start(getActivity(), PaymentIntent.fromAddress(address, label));
+        SendCoinsActivity.start(getActivity(), PaymentUtil.fromAddress(address, label));
     }
 
     @Override
