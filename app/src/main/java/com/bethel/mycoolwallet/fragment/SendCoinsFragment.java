@@ -2,6 +2,7 @@ package com.bethel.mycoolwallet.fragment;
 
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
@@ -27,10 +28,12 @@ import android.widget.TextView;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
+import com.bethel.mycoolwallet.activity.SendCoinsActivity;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.helper.PaymentHelper;
+import com.bethel.mycoolwallet.helper.parser.IntentDataParser;
 import com.bethel.mycoolwallet.helper.parser.StringInputParser;
 import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
@@ -57,6 +60,9 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
@@ -68,6 +74,10 @@ import butterknife.OnClick;
  * 解析扫码结果；
  * 金额输入框联动；
  * 输入地址/标签响应；
+ *
+ * -----
+ * 获取 activity 的 PaymentData 数据
+ * 将这数据 初始化,同步到ui
  */
 public class SendCoinsFragment extends BaseFragment implements IQrScan {
     /**
@@ -77,6 +87,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     private static final Logger log = LoggerFactory.getLogger(SendCoinsFragment.class);
 
     private SendCoinsViewModel viewModel;
+    private ContentResolver contentResolver;
 
     @BindView(R.id.send_coins_payee_group)
      View payeeGroup;
@@ -261,6 +272,47 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         setHasOptionsMenu(true);
 
         viewModel = getViewModel(SendCoinsViewModel.class);
+        contentResolver = getContext().getContentResolver();
+
+        if (null == savedInstanceState) {
+            handleIntentData();
+        }
+    }
+
+    private void handleIntentData() {
+        Intent intent = getActivity().getIntent();
+        log.debug("Intent  {}", intent);
+        if (null == intent) {
+            return;
+        }
+
+        new IntentDataParser(intent){
+            @Override
+            public void error(int messageResId, Object... messageArgs) {
+                log.error("IntentDataParser {}", getString(messageResId, messageArgs));
+            }
+
+            @Override
+            public void handlePaymentData(PaymentData data) {
+                log.debug("handlePaymentData: {}", data);
+                if (isAdded()) {
+                    updateStateFrom(data);
+                }
+            }
+
+            @Override
+            protected InputStream openInputStream(Uri bitcoinUri) {
+                try {
+                    return contentResolver.openInputStream(bitcoinUri);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }.parse();
+    }
+
+    private void updateStateFrom(PaymentData data) {
+        // todo
     }
 
     @Override
@@ -280,7 +332,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         viewGo.setText(R.string.send_coins_fragment_button_send);
 
         feeSeekBar.setDefaultValue(2000);
-        Log.d("tttttt", "onViewCreated, feeSeekBar: "+ feeSeekBar.getSelectedNumber());
+        log.info( "onViewCreated, feeSeekBar: "+ feeSeekBar.getSelectedNumber());
     }
 
     @Override
@@ -302,15 +354,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         final MenuItem emptyAction = menu.findItem(R.id.send_coins_options_empty);
 //        emptyAction.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT
 //                && viewModel.paymentIntent.mayEditAmount() && viewModel.balance.getValue() != null);
-
-//        final MenuItem feeCategoryAction = menu.findItem(R.id.send_coins_options_fee_category);
-//        feeCategoryAction.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT);
-//        if (viewModel.feeCategory == FeeCategory.ECONOMIC)
-//            menu.findItem(R.id.send_coins_options_fee_category_economic).setChecked(true);
-//        else if (viewModel.feeCategory == FeeCategory.NORMAL)
-//            menu.findItem(R.id.send_coins_options_fee_category_normal).setChecked(true);
-//        else if (viewModel.feeCategory == FeeCategory.PRIORITY)
-//            menu.findItem(R.id.send_coins_options_fee_category_priority).setChecked(true);
 
         super.onPrepareOptionsMenu(menu);
     }

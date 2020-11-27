@@ -7,8 +7,10 @@ import java.nio.charset.Charset;
 /**
  * @author Bethel
  */
-public class Commons {
+public final class Commons {
     public static final Charset UTF_8 = Charset.forName("UTF-8");
+    public static final Charset US_ASCII = Charset.forName("US-ASCII");
+
     // https://www.blockchain.com/btc/block/000000000000000000029aa834ab9127c23fc66e4b2268a9584fc88a48d6b288
     public static final String MAIN_NET_VIEW = "https://www.blockchain.com/btc/";
     // https://www.blockchain.com/btc-testnet/block/00000000000000493226636e9139fb52bc22cbdb294bb19b60a735ea1ce7cf17

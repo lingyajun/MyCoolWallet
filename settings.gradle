@@ -1,2 +1,2 @@
-include ':app', ':file_picker_library'
+include ':app', ':file_picker_library', ':integration-androidx'
 rootProject.name='MyCoolWallet'
