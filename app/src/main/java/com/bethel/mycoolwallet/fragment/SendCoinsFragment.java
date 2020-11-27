@@ -312,7 +312,24 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     }
 
     private void updateStateFrom(PaymentData data) {
+        if (null == data) return;
         // todo
+        viewModel.paymentData = data;
+
+        // delay these actions until fragment is resumed
+        runOnUiThread(() -> {
+            if (data.hasPaymentRequestUrl() && data.isBluetoothPaymentRequestUrl()) {
+                // bluetooth
+                return;
+            }
+
+            if (data.hasPaymentRequestUrl() && data.isHttpPaymentRequestUrl()) {
+                // http
+                return;
+            }
+
+            // ui todo
+        });
     }
 
     @Override

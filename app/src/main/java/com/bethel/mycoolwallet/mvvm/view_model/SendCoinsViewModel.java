@@ -4,6 +4,7 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 
+import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 
@@ -16,6 +17,8 @@ public class SendCoinsViewModel extends BaseViewModel {
 
     public Address toAddress = null;
     public Transaction sentTransaction = null;
+
+    public PaymentData paymentData = null;
 
     public SendCoinsViewModel(@NonNull Application app) {
         super(app);
