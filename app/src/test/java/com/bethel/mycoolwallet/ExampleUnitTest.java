@@ -2,13 +2,9 @@ package com.bethel.mycoolwallet;
 
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.helper.parser.BinaryInputParser;
-import com.bethel.mycoolwallet.helper.parser.StringInputParser;
-import com.bethel.mycoolwallet.http.HttpUtil;
 
 import org.bitcoinj.core.DumpedPrivateKey;
 import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.BIP38PrivateKey;
 import org.bitcoinj.params.MainNetParams;
 import org.junit.Test;

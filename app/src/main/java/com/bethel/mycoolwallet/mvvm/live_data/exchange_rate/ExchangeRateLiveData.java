@@ -1,18 +1,16 @@
 package com.bethel.mycoolwallet.mvvm.live_data.exchange_rate;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.TimeUtils;
 
 import androidx.lifecycle.LiveData;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.helper.Configuration;
-import com.bethel.mycoolwallet.http.HttpUtil;
-import com.bethel.mycoolwallet.http.IRequestCallback;
+import com.bethel.mycoolwallet.request.HttpUtil;
+import com.bethel.mycoolwallet.request.IRequestCallback;
 
 import org.json.JSONException;
 
@@ -20,7 +18,6 @@ import java.util.Currency;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
 //    private final AtomicLong requestTime = new AtomicLong(0);

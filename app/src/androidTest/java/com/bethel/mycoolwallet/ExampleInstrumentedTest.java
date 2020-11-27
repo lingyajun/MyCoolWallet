@@ -6,7 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 //import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.bethel.mycoolwallet.http.HttpUtil;
+import com.bethel.mycoolwallet.request.HttpUtil;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

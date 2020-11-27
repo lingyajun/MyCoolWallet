@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.http;
+package com.bethel.mycoolwallet.request;
 
 import android.text.TextUtils;
 

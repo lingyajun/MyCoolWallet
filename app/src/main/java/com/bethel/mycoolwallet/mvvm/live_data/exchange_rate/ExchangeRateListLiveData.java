@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.helper.Configuration;
-import com.bethel.mycoolwallet.http.HttpUtil;
-import com.bethel.mycoolwallet.http.IRequestCallback;
+import com.bethel.mycoolwallet.request.HttpUtil;
+import com.bethel.mycoolwallet.request.IRequestCallback;
 
 import org.json.JSONException;
 
