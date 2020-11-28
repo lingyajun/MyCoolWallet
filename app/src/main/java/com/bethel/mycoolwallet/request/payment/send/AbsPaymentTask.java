@@ -1,4 +1,6 @@
-package com.bethel.mycoolwallet.request.payment;
+package com.bethel.mycoolwallet.request.payment.send;
+
+import com.bethel.mycoolwallet.request.payment.AbsTask;
 
 public abstract class AbsPaymentTask extends AbsTask {
     protected final IPaymentTaskCallback callback;

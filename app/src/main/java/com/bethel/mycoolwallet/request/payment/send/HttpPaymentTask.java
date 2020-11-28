@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.request.payment;
+package com.bethel.mycoolwallet.request.payment.send;
 
 import androidx.annotation.Nullable;
 

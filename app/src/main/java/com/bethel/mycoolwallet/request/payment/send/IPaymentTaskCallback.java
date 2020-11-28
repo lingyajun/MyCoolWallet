@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.request.payment;
+package com.bethel.mycoolwallet.request.payment.send;
 
 public interface IPaymentTaskCallback {
     void onResult(boolean ack);
