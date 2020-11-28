@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * 通过 BLE 接收对方的支付[交易]请求
+ */
 public class BluetoothPaymentRequestTask extends AbsPaymentRequestTask {
     private final BluetoothAdapter adapter;
     private final String url;

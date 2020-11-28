@@ -17,6 +17,9 @@ import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * 通过http 接收对方的支付[交易]请求
+ */
 public  class HttpPaymentRequestTask extends AbsPaymentRequestTask {
     private final String userAgent;
     private final String url;

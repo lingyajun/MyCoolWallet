@@ -85,6 +85,8 @@ import butterknife.OnClick;
  * -----
  * 获取 activity 的 PaymentData 数据
  * 将这数据 初始化,同步到ui
+ *
+ * 签名，发送交易数据
  */
 public class SendCoinsFragment extends BaseFragment implements IQrScan {
     /**
