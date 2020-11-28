@@ -1,5 +1,6 @@
 package com.bethel.mycoolwallet.fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,10 @@ public abstract class BaseFragment extends Fragment {
 
     protected final void runOnUiThread(Runnable task) {
         getActivity().runOnUiThread(task);
+    }
+
+    protected final void executeAsyncTask(Runnable task) {
+        AsyncTask.execute(task);
     }
 
     protected  <T extends ViewModel> T getViewModel(@NonNull Class<T> modelClass) {

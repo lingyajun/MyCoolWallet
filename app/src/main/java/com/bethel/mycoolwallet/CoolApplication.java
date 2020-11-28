@@ -18,6 +18,7 @@ import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.Logging;
 import com.xuexiang.xui.XUI;
 
+import org.bitcoinj.core.VersionMessage;
 import org.bitcoinj.crypto.LinuxSecureRandom;
 import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.Wallet;
@@ -127,6 +128,16 @@ public class CoolApplication extends Application {
             return packageName.substring(index + 1);
         else
             return null;
+    }
+
+    public static String httpUserAgent(final String versionName) {
+        final VersionMessage versionMessage = new VersionMessage(Constants.NETWORK_PARAMETERS, 0);
+        versionMessage.appendToSubVer(Constants.USER_AGENT, versionName, null);
+        return versionMessage.subVer;
+    }
+
+    public String httpUserAgent() {
+        return httpUserAgent(packageInfo().versionName);
     }
 
 }

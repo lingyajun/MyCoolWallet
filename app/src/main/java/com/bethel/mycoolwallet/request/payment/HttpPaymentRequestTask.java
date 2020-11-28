@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.request.tasks;
+package com.bethel.mycoolwallet.request.payment;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
@@ -20,7 +20,6 @@ import okhttp3.Response;
 public  class HttpPaymentRequestTask extends AbsPaymentRequestTask {
     private final String userAgent;
     private final String url;
-//    private final IPaymentRequestListener listener;
 
     public HttpPaymentRequestTask(String userAgent, String url, IPaymentRequestListener listener) {
         super(listener);

@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.request.tasks;
+package com.bethel.mycoolwallet.request.payment;
 
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 

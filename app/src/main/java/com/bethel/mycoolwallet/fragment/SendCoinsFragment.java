@@ -2,6 +2,7 @@ package com.bethel.mycoolwallet.fragment;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,9 +26,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
-import com.bethel.mycoolwallet.activity.SendCoinsActivity;
 import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
@@ -39,9 +39,16 @@ import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
+import com.bethel.mycoolwallet.request.payment.AbsPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.BluetoothPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.DeriveKeyTask;
+import com.bethel.mycoolwallet.request.payment.HttpPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.IPaymentRequestListener;
 import com.bethel.mycoolwallet.service.BlockChainService;
+import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
+import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
 import com.bethel.mycoolwallet.view.FeeSeekBar;
 import com.xuexiang.xqrcode.XQRCode;
@@ -88,6 +95,8 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
     private SendCoinsViewModel viewModel;
     private ContentResolver contentResolver;
+    private BluetoothAdapter bluetoothAdapter;
+    private CoolApplication application;
 
     @BindView(R.id.send_coins_payee_group)
      View payeeGroup;
@@ -136,102 +145,30 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     FeeSeekBar feeSeekBar;
 
     @OnClick(R.id.send_coins_go)
-    protected void onSendClick() {
-//        viewModel.toAddress = null;
-        final Coin amount = (Coin) coinAmountView.getAmount();
-      final String str = receivingAddressView.getText().toString();
-       if (null==amount ||Coin.ZERO == amount || TextUtils.isEmpty(str)) {
-           return;
-       }
-        try {
-            final Address toAddress = Address.fromString(Constants.NETWORK_PARAMETERS, str);
-            viewModel.toAddress = toAddress;
-        } catch (AddressFormatException e) {
-            XToast.error(getContext(), "please input right address").show();
-        }
-        if (null == viewModel.toAddress) return;
-        /** todo
-         * 「0。 生成解密钱包所需要格式的'密钥', 用于钱包支付密码解密」
-         * 1. 构造 SendRequest
-         * 2。 SendRequest 参数配置
-         * 3。 对交易进行签名
-         * 4。广播签名后的交易数据
-         */
+    void onSendClick() {
+        privateKeyBadPasswordView.setVisibility(View.INVISIBLE);
+        final Wallet wallet = viewModel.wallet.getValue();
+        if (null!=wallet && wallet.isEncrypted()) {
+            new DeriveKeyTask(wallet, privateKeyPasswordView.getText().toString().trim(), application.scryptIterationsTarget()) {
+                @Override
+                protected void onSuccess(KeyParameter encryptionKey, boolean changed) {
+                    signAndSendPayment(encryptionKey);
 
-       final Wallet wallet = viewModel.wallet.getValue();
-        if (null==wallet) return;
-        if (wallet.isEncrypted()) {
-            // get decrypt wallet key
-            final String password = privateKeyPasswordView.getText().toString();
-            if (TextUtils.isEmpty(password)) {
-                // todo alert
-                return;
-            }
-            AsyncTask.execute(()->{
-                PaymentHelper.deriveKey4DescryptWalet(wallet, password, 0, new IDeriveKeyCallBack() {
-                    @Override
-                    public void onSuccess(KeyParameter encryptKey, boolean isWalletChanged) {
-                        if (isWalletChanged) {
-                            // todo restore wallet
-                        }
-                        runOnUiThread(()-> buildSendRequest(amount, encryptKey));
+                    if (changed) {
+                        SendCoinsFragment.this.executeAsyncTask(() ->
+                                WalletUtils.autoBackupWallet(getContext(), wallet));
                     }
-
-                    @Override
-                    public void onFailed(String error) {
-                        runOnUiThread(()-> XToast.error(getContext(), error).show());
-                    }
-                });
-            });
-        } else {
-            // build SendRequest
-            buildSendRequest(amount, null);
+                }
+            }.executeAsyncTask();
+            // todo   setState(SendCoinsViewModel.State.DECRYPTING);
+            return;
         }
-//        XToast.warning(getContext(), "send coins!  " + feeSeekBar.getSelectedNumber()).show();
+        signAndSendPayment(null);
     }
 
-    private void buildSendRequest(Coin amount, KeyParameter aesKey) {
-        Wallet wallet = viewModel.wallet.getValue();
-        SendRequest request = PaymentHelper.buildSendRequest(viewModel.toAddress, amount);
-        //  SendRequest 参数配置
-        // boolean emptyWallet ,Coin feePerKb,String memo , ExchangeRate exchangeRate,  KeyParameter aesKey
-        request. emptyWallet = wallet.getBalance(Wallet.BalanceType.AVAILABLE).equals(amount);
-        request. feePerKb = Coin.valueOf(feeSeekBar.getSelectedNumber());
-        request. memo = null;
-        ExchangeRateBean rateBean = viewModel.exchangeRate.getValue();
-        request. exchangeRate = null!=rateBean? rateBean.rate: null;
-        request.aesKey = aesKey;
-
-        // todo check if  amount > fee
-
-        // 对交易进行签名
-        AsyncTask.execute(()-> PaymentHelper.signPayment(wallet, request, iSignPaymentCallback));
+    private void signAndSendPayment(KeyParameter encryptionKey) {
+//    todo    setState(SendCoinsViewModel.State.SIGNING);
     }
-
-    private  final ISignPaymentCallback iSignPaymentCallback = new ISignPaymentCallback() {
-        @Override
-        public void onSuccess(final Transaction tx) {
-            Wallet wallet = viewModel.wallet.getValue();
-            log.info("ISignPaymentCallback, fee {},  sent {},  toMe {}", tx.getFee(),
-                    tx.getValueSentFromMe(wallet), tx.getValueSentToMe(wallet));
-
-            runOnUiThread(()->{
-                viewModel.sentTransaction = tx;
-                //  监听 交易的状态变化/事件
-                TransactionConfidence confidence = tx.getConfidence();
-                confidence.addEventListener(transactionListener);
-                // 广播签名后的交易数据
-                BlockChainService.broadcastTransaction(getContext(), tx);
-
-                // todo http 发送交易； Bluetooth 发送交易
-
-            });
-        }
-
-        @Override
-        public void onFailed(String message) {
-        }
-    };
 
     private final TransactionConfidence.Listener transactionListener = new TransactionConfidence.Listener() {
         @Override
@@ -273,6 +210,8 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
         viewModel = getViewModel(SendCoinsViewModel.class);
         contentResolver = getContext().getContentResolver();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        application = CoolApplication.getApplication();
 
         if (null == savedInstanceState) {
             handleIntentData();
@@ -320,16 +259,65 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         runOnUiThread(() -> {
             if (data.hasPaymentRequestUrl() && data.isBluetoothPaymentRequestUrl()) {
                 // bluetooth
+                if (bluetoothAdapter.isEnabled()) {
+                    handlePaymentRequest();
+                    return;
+                }
+                // todo  ask for permission to enable bluetooth
                 return;
             }
 
             if (data.hasPaymentRequestUrl() && data.isHttpPaymentRequestUrl()) {
                 // http
+                handlePaymentRequest();
                 return;
             }
 
             // ui todo
         });
+    }
+
+    /** send request
+     * todo requestListener
+     */
+    private void handlePaymentRequest() {
+        final String paymentRequestUrl = viewModel.paymentData.paymentRequestUrl;
+        final String paymentRequestHost ;
+        if (!BluetoothTools.isBluetoothUrl(paymentRequestUrl)) {
+            paymentRequestHost = Uri.parse(paymentRequestUrl).getHost();
+        } else {
+            // Bluetooth
+            final String mac = BluetoothTools.getBluetoothMac(paymentRequestUrl);
+            paymentRequestHost = BluetoothTools.decompressMac(mac);
+        }
+
+        final IPaymentRequestListener requestListener = new IPaymentRequestListener() {
+            @Override
+            public void onPaymentData(PaymentData data) {
+                log.info("PaymentRequest {}", data);
+                if (!isAdded()) return;
+
+                // todo
+            }
+
+            @Override
+            public void onFail(int messageResId, Object... messageArgs) {
+                log.error("PaymentRequest, fail: {}", getString(messageResId, messageArgs));
+                if (!isAdded()) return;
+
+                // todo
+            }
+        };
+
+       final AbsPaymentRequestTask paymentTask;
+        if (!BluetoothTools.isBluetoothUrl(paymentRequestUrl)) {
+            paymentTask = new HttpPaymentRequestTask(CoolApplication.getApplication().httpUserAgent(), paymentRequestUrl, requestListener);
+        } else {
+            // Bluetooth
+            paymentTask = new BluetoothPaymentRequestTask(bluetoothAdapter, paymentRequestUrl, requestListener);
+        }
+
+        paymentTask.executeAsyncTask();
     }
 
     @Override
@@ -382,12 +370,12 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             case R.id.send_coins_options_scan:
                     startScan(null);
                 break;
-            case R.id.send_coins_options_fee_category_economic:
-                break;
-            case R.id.send_coins_options_fee_category_normal:
-                break;
-            case R.id.send_coins_options_fee_category_priority:
-                break;
+//            case R.id.send_coins_options_fee_category_economic:
+//                break;
+//            case R.id.send_coins_options_fee_category_normal:
+//                break;
+//            case R.id.send_coins_options_fee_category_priority:
+//                break;
             case R.id.send_coins_options_empty:
                 break;
                 default:    return super.onOptionsItemSelected(item);

@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.request.tasks;
+package com.bethel.mycoolwallet.request.payment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -22,7 +22,6 @@ import java.io.OutputStream;
 public class BluetoothPaymentRequestTask extends AbsPaymentRequestTask {
     private final BluetoothAdapter adapter;
     private final String url;
-//    private final IPaymentRequestListener listener;
 
     public BluetoothPaymentRequestTask(BluetoothAdapter adapter, String url, IPaymentRequestListener listener) {
        super(listener);
