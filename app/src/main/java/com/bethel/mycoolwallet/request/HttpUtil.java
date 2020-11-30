@@ -54,7 +54,7 @@ public final class HttpUtil {
                         connection.getResponseCode(), connection.getResponseMessage()) ;
                 if (null!=callback) callback.onFailed(message);
                 //  handle request error
-                log.error(" req error, Response:   {}", message);
+                log.warn(" req error, Response:   {}", message);
                 return;
             }
 
@@ -73,7 +73,7 @@ public final class HttpUtil {
         } catch (Exception e) {
             if (null!=callback) callback.onFailed(e.getMessage());
             //  handle request error
-            log.error(" req exception ", e);
+            log.warn(" req exception ", e);
         }
     }
 

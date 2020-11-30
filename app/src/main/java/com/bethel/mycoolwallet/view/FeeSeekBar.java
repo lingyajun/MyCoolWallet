@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import com.bethel.mycoolwallet.R;
 import com.xuexiang.xui.widget.picker.XSeekBar;
 
+import org.bitcoinj.core.Coin;
+
 public class FeeSeekBar extends FrameLayout {
     private XSeekBar mSeekBar;
     private TextView mFeeTv;
@@ -78,5 +80,9 @@ public class FeeSeekBar extends FrameLayout {
 
     public void reset() {
         mSeekBar.reset();
+    }
+
+    public Coin getFee() {
+        return Coin.valueOf(getSelectedNumber());
     }
 }

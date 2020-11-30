@@ -85,28 +85,28 @@ public final class PaymentUtil {
                                                     @Nullable final Address editedAddress) {
         Preconditions.checkArgument(source !=null);
         final PaymentOutput[] outputs;
-//        if (source.hasOutputs()) {
-//            // merge
-//            if (mayEditAmount(source)) {
-//                Preconditions.checkArgument(editedAmount !=null);
-//                outputs = new PaymentOutput[]{new PaymentOutput(editedAmount, source.outputs[0].script)};
-//            } else {
-//                outputs = source.outputs;
-//            }
-//
-//        } else {
-//            Preconditions.checkArgument(editedAddress !=null);
-//            Preconditions.checkArgument(editedAmount !=null);
-//            outputs = buildSimplePayTo(editedAmount, editedAddress);
-//        }
+        if (source.hasOutputs()) {
+            // merge
+            if (mayEditAmount(source)) {
+                Preconditions.checkArgument(editedAmount !=null);
+                outputs = new PaymentOutput[]{new PaymentOutput(editedAmount, source.outputs[0].script)};
+            } else {
+                outputs = source.outputs;
+            }
 
-        if (!source.hasOutputs() || (source.hasOutputs() && mayEditAmount(source))){
+        } else {
             Preconditions.checkArgument(editedAddress !=null);
             Preconditions.checkArgument(editedAmount !=null);
             outputs = buildSimplePayTo(editedAmount, editedAddress);
-        } else {
-            outputs = source.outputs;
         }
+
+//        if (!source.hasOutputs() || (source.hasOutputs() && mayEditAmount(source))){
+//            Preconditions.checkArgument(editedAddress !=null);
+//            Preconditions.checkArgument(editedAmount !=null);
+//            outputs = buildSimplePayTo(editedAmount, editedAddress);
+//        } else {
+//            outputs = source.outputs;
+//        }
 
         return new PaymentData(source.standard, source.payeeName, source.payeeVerifiedBy, outputs,
                 source.memo, source.paymentUrl, source.payeeData, source.paymentRequestUrl, source.paymentRequestHash);

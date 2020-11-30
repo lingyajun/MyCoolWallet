@@ -1,13 +1,28 @@
 package com.bethel.mycoolwallet.helper;
 
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.net.Uri;
 import android.text.TextUtils;
+import android.view.View;
 
+import androidx.annotation.Nullable;
+
+import com.bethel.mycoolwallet.CoolApplication;
+import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.interfaces.IDeriveKeyCallBack;
 import com.bethel.mycoolwallet.interfaces.ISignPaymentCallback;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
+import com.bethel.mycoolwallet.request.payment.AbsPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.BluetoothPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.HttpPaymentRequestTask;
+import com.bethel.mycoolwallet.request.payment.IPaymentRequestListener;
+import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
-import org.bitcoin.protocols.payments.Protos;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
@@ -25,19 +40,68 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-
 import static androidx.core.util.Preconditions.checkNotNull;
 
-/**
+/** { SendCoinsFragment }
+ *  把{SendCoinsFragment}一部分代码整理到这里，让庞杂的{SendCoinsFragment}看起来简洁一些
+ *
+ *------------------------------------
  * 「0。 生成解密钱包所需要格式的'密钥', 用于钱包支付密码解密」
  * 1. 构造 SendRequest
  * 2。 SendRequest 参数配置
  * 3。 对交易进行签名
  * 4。广播签名后的交易数据
  */
-public class PaymentHelper {
-    private static final Logger log = LoggerFactory.getLogger(PaymentHelper.class);
+public class SendCoinsHelper {
+    private static final Logger log = LoggerFactory.getLogger(SendCoinsHelper.class);
+
+    // ///////////////////////////////////////
+    // ///////////////////////////////////////
+    // ///////////////////////////////////////
+    // ////////////////////////////////////////////////////////
+    public static void handlePaymentRequest(final String paymentRequestUrl,
+                                            final BluetoothAdapter bluetoothAdapter,
+                                            final IPaymentRequestListener requestListener) {
+        final AbsPaymentRequestTask paymentTask;
+        if (!BluetoothTools.isBluetoothUrl(paymentRequestUrl)) {
+            final String userAgent = CoolApplication.getApplication().httpUserAgent();
+            paymentTask = new HttpPaymentRequestTask(userAgent, paymentRequestUrl, requestListener);
+        } else {
+            // Bluetooth
+            paymentTask = new BluetoothPaymentRequestTask(bluetoothAdapter, paymentRequestUrl, requestListener);
+        }
+
+        paymentTask.executeAsyncTask();
+    }
+
+    public static String getPaymentRequestHost(final String paymentRequestUrl) {
+        final String paymentRequestHost;
+        if (!BluetoothTools.isBluetoothUrl(paymentRequestUrl)) {
+            paymentRequestHost = Uri.parse(paymentRequestUrl).getHost();
+        } else {
+            // Bluetooth
+            final String mac = BluetoothTools.getBluetoothMac(paymentRequestUrl);
+            paymentRequestHost = BluetoothTools.decompressMac(mac);
+        }
+        return paymentRequestHost;
+    }
+
+    public static  void dialog(final Context context, @Nullable final View.OnClickListener dismissListener, final int titleResId,
+                               final int messageResId, final Object... messageArgs) {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
+        if (0!=titleResId) {
+            builder.title(titleResId);
+        }
+        builder.content(context.getString(messageResId, messageArgs));
+        builder.neutralText(R.string.button_ok);
+        MaterialDialog dialog = builder.show();
+        dialog.getActionButton(DialogAction.NEUTRAL).setOnClickListener(dismissListener);
+    }
+
+    // ////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
+    // ///////////////////////////////////////
+    // ///////////////////////////////////////
 
     private void sendCoins(Address toAddress, Coin amount, Wallet wallet) throws InsufficientMoneyException {
         Script outputScript = ScriptBuilder.createOutputScript(toAddress);
@@ -153,4 +217,5 @@ public class PaymentHelper {
 
         // bluetooth
     }
+
 }

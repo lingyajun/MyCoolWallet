@@ -32,6 +32,8 @@ public class Configuration {
     public static final String PREFS_KEY_OWN_NAME = "own_name";
 
     public static final String PREFS_KEY_DISCLAIMER = "disclaimer";
+    private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
+    public static final String PREFS_KEY_SEND_COINS_AUTOCLOSE = "send_coins_autoclose";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -131,6 +133,16 @@ public class Configuration {
             throw new IllegalStateException("cannot handle shift: " + shift);
     }
 
+    public MonetaryFormat getMaxPrecisionFormat() {
+        final int shift = getBtcShift();
+        if (shift == 0)
+            return new MonetaryFormat().shift(0).minDecimals(2).optionalDecimals(2, 2, 2);
+        else if (shift == 3)
+            return new MonetaryFormat().shift(3).minDecimals(2).optionalDecimals(2, 1);
+        else
+            return new MonetaryFormat().shift(6).minDecimals(0).optionalDecimals(2);
+    }
+
     public boolean hasBeenUsed() {
         return mPreference.getSharedPreferences().contains(PREFS_KEY_LAST_USED);
     }
@@ -180,6 +192,18 @@ public class Configuration {
 
     public boolean getDisclaimerEnabled() {
         return mPreference.getBoolean(PREFS_KEY_DISCLAIMER, true);
+    }
+
+    public boolean getLastExchangeDirection() {
+        return mPreference.getBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, true);
+    }
+
+    public void setLastExchangeDirection(final boolean exchangeDirection) {
+        mPreference.putBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, exchangeDirection) ;
+    }
+
+    public boolean getSendCoinsAutoClose() {
+        return mPreference.getBoolean(PREFS_KEY_SEND_COINS_AUTOCLOSE, true);
     }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {

@@ -223,6 +223,33 @@ public class PaymentData implements Parcelable {
         return isHttpPaymentRequestUrl() || isBluetoothPaymentRequestUrl();
     }
 
+    public boolean isExtendedBy(PaymentData other) {
+        // check hash
+        if (PaymentStandard.BIP21 == standard && PaymentStandard.BIP70 == other.standard) {
+            if (null!=paymentRequestHash && Arrays.equals(paymentRequestHash, other.paymentRequestHash)) {
+                return true;
+            }
+        }
+        return equalsAddress(other) && equalsAmount(other);
+    }
+
+    public boolean equalsAmount(final PaymentData other) {
+        final boolean hasAmount = hasAmount();
+        if (hasAmount != other.hasAmount())
+            return false;
+        if (hasAmount && !getAmount().equals(other.getAmount()))
+            return false;
+        return true;
+    }
+
+    public boolean equalsAddress(final PaymentData other) {
+        final boolean hasAddress = hasAddress();
+        if (hasAddress != other.hasAddress())
+            return false;
+        if (hasAddress && !getAddress().equals(other.getAddress()))
+            return false;
+        return true;
+    }
 
     @NonNull
     @Override
