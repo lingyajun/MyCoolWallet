@@ -63,7 +63,6 @@ import com.bethel.mycoolwallet.request.payment.SendCoinsOfflineTask;
 import com.bethel.mycoolwallet.request.payment.send.IPaymentTaskCallback;
 import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
-import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.utils.WalletUtils;
@@ -93,13 +92,9 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -198,14 +193,14 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         validateReceivingAddress();
 
         if (everythingPlausible()) {
-            sendPay();
+            handleSendPayAction();
         } else {
             requestFocusFirst();
         }
         updateView();
     }
 
-    private void sendPay() {
+    private void handleSendPayAction() {
         ViewUtil.setVisibility(privateKeyBadPasswordView, View.INVISIBLE);
 
         final Wallet wallet = viewModel.wallet.getValue();
