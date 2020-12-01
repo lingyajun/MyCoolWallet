@@ -14,6 +14,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 
 import android.os.Handler;
 import android.text.Editable;
@@ -45,6 +46,7 @@ import com.bethel.mycoolwallet.data.payment.PaymentUtil;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
+import com.bethel.mycoolwallet.fragment.dialog.ProgressDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.helper.SendCoinsHelper;
 import com.bethel.mycoolwallet.helper.parser.IntentDataParser;
@@ -246,7 +248,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     }
 
     private void observeData() {
-        // todo
         if (Constants.ENABLE_EXCHANGE_RATES) {
             viewModel.exchangeRate.observe(this, bean -> {
                 if (null == bean || bean.rate == null) return;
@@ -256,6 +257,14 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 }
             });
         }
+
+        viewModel.wallet.observe(this, wallet -> updateView());
+        viewModel.addressBook.observe(this, list -> updateView());
+        viewModel.blockChain.observe(this, blockChainState -> updateView());
+        viewModel.balance.observe(this, coin -> getActivity().invalidateOptionsMenu());
+
+        final FragmentManager fragmentManager = getFragmentManager();
+        viewModel.progress.observe(this, new  ProgressDialogFragment.Observer(fragmentManager));
     }
 
     private void handleIntentData() {
@@ -304,6 +313,9 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
      */
     private void handlePaymentRequest() {
         final String paymentRequestUrl = viewModel.paymentData.paymentRequestUrl;
+        final String paymentRequestHost = SendCoinsHelper.getPaymentRequestHost(paymentRequestUrl);
+        viewModel.progress.setValue(
+                getString(R.string.send_coins_fragment_request_payment_request_progress, paymentRequestHost));
         setState(SendCoinsViewModel.State.REQUEST_PAYMENT_REQUEST);
 
         final IPaymentRequestListener requestListener = new IPaymentRequestListener() {
@@ -331,7 +343,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 if (reasons.isEmpty())
                     reasons.add("unknown");
                 //  show failed alert
-                final String paymentRequestHost = SendCoinsHelper.getPaymentRequestHost(paymentRequestUrl);
                 final String msg = getString(R.string.send_coins_fragment_request_payment_request_failed_message,
                         paymentRequestHost, Joiner.on(", ").join(reasons));
                 MaterialDialog dialog = new MaterialDialog.Builder(getContext())
