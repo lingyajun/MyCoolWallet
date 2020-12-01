@@ -4,6 +4,7 @@ package com.bethel.mycoolwallet.fragment;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import android.os.Handler;
 import android.text.Editable;
@@ -23,19 +25,24 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.TextView;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
 import com.bethel.mycoolwallet.activity.WebActivity;
+import com.bethel.mycoolwallet.adapter.AddressLabelListAdapter;
 import com.bethel.mycoolwallet.data.AddressBean;
+import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.data.payment.PaymentUtil;
+import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.helper.Configuration;
@@ -49,6 +56,7 @@ import com.bethel.mycoolwallet.request.payment.DeriveKeyTask;
 import com.bethel.mycoolwallet.request.payment.IPaymentRequestListener;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
+import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
@@ -76,8 +84,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -115,13 +125,14 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     private static final Logger log = LoggerFactory.getLogger(SendCoinsFragment.class);
 
     private SendCoinsViewModel viewModel;
-    private ContentResolver contentResolver;
+//    private ContentResolver contentResolver;
     private BluetoothAdapter bluetoothAdapter;
     private CoolApplication application;
     private CurrencyCalculatorLink amountCalculatorLink;
     private Configuration mConfig;
     private final Handler mHandler = new Handler();
     private AddressBookDao addressBookDao;
+    private AddressLabelListAdapter addressLabelListAdapter;
 
 
     @BindView(R.id.send_coins_payee_group)
@@ -221,7 +232,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         setHasOptionsMenu(true);
 
         viewModel = getViewModel(SendCoinsViewModel.class);
-        contentResolver = getContext().getContentResolver();
+//        contentResolver = getContext().getContentResolver();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         application = CoolApplication.getApplication();
         mConfig = application.getConfiguration();
@@ -251,6 +262,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         Intent intent = getActivity().getIntent();
         log.debug("Intent  {}", intent);
         if (null == intent) {
+            updateStateFrom(PaymentUtil.blank());
             return;
         }
 
@@ -271,13 +283,10 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             }
 
             @Override
-            protected InputStream openInputStream(Uri bitcoinUri) {
-                try {
-                    return contentResolver.openInputStream(bitcoinUri);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
+            protected Context getContext() {
+                return SendCoinsFragment.this.getContext();
             }
+
         }.parse();
     }
 
@@ -367,6 +376,14 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // address input
+        addressLabelListAdapter = new AddressLabelListAdapter(getContext());
+        addressLabelListAdapter.setAddressLabelListFilter(mAddressLabelListFilter);
+        receivingAddressView.setAdapter(addressLabelListAdapter);
+        receivingAddressView.setOnFocusChangeListener(receivingAddressListener);
+        receivingAddressView.addTextChangedListener(receivingAddressListener);
+        receivingAddressView.setOnItemClickListener(receivingAddressListener);
+
         //  ui
         coinAmountView.setCurrencySymbol(mConfig.getFormat().code());
         coinAmountView.setInputFormat(mConfig.getMaxPrecisionFormat());
@@ -386,15 +403,257 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             }
         });
 
-        viewCancel.setText(R.string.button_cancel);
-        viewGo.setText(R.string.send_coins_fragment_button_send);
+//        viewCancel.setText(R.string.button_cancel);
+//        viewGo.setText(R.string.send_coins_fragment_button_send);
 
-        feeSeekBar.setDefaultValue(2000);
+        feeSeekBar.setDefaultValue(2020);
         log.info( "onViewCreated, feeSeekBar: "+ feeSeekBar.getSelectedNumber());
     }
 
     private void  updateView() {
-        // todo
+        if (null==viewModel.paymentData) {
+            ViewUtil.showView(getView(), false);
+            return;
+        }
+
+        ViewUtil.showView(getView(), true);
+
+//        final Coin fee = feeSeekBar.getFee();
+//        final BlockChainState chainState = viewModel.blockChain.getValue();
+//        final Map<String, AddressBook> addressBookMap = AddressBook.asMap(viewModel.addressBook.getValue());
+//        final MonetaryFormat btcFormat = mConfig.getFormat();
+
+        if (viewModel.paymentData.hasPayee()) {
+            payeeNameView.setText(viewModel.paymentData.payeeName);
+
+            final String verifiedBy = viewModel.paymentData.payeeVerifiedBy != null
+                    ? viewModel.paymentData.payeeVerifiedBy
+                    : getString(R.string.send_coins_fragment_payee_verified_by_unknown);
+            final String verifiedByText =Constants.CHAR_CHECKMARK
+                    + String.format(getString(R.string.send_coins_fragment_payee_verified_by), verifiedBy);
+            payeeVerifiedByView.setText(verifiedByText);
+
+            ViewUtil.showView(payeeNameView, true);
+            ViewUtil.showView(payeeVerifiedByView, true);
+        } else {
+            ViewUtil.showView(payeeNameView, false);
+            ViewUtil.showView(payeeVerifiedByView, false);
+        }
+
+        if (viewModel.paymentData.hasOutputs()) {
+            ViewUtil.showView(payeeGroup, true);
+            ViewUtil.showView(receivingAddressView, false);
+            boolean receiveStatic = !viewModel.paymentData.hasPayee() || viewModel.paymentData.payeeVerifiedBy == null;
+            ViewUtil.showView(receivingStaticView, receiveStatic);
+
+            receivingStaticLabelView.setText(viewModel.paymentData.memo);
+
+            if (viewModel.paymentData.hasAddress()) {
+                final CharSequence address = WalletUtils.formatAddress(viewModel.paymentData.getAddress(),
+                        Constants.ADDRESS_FORMAT_GROUP_SIZE, Constants.ADDRESS_FORMAT_LINE_SIZE);
+                receivingStaticAddressView.setText(address);
+            } else {
+                receivingStaticAddressView.setText(R.string.send_coins_fragment_receiving_address_complex);
+            }
+        } else if (null!=viewModel.validatedAddress) {
+            ViewUtil.showView(payeeGroup, true);
+            ViewUtil.showView(receivingAddressView, false);
+            ViewUtil.showView(receivingStaticView, true);
+
+            final CharSequence address = WalletUtils.formatAddress(viewModel.validatedAddress.address,
+                    Constants.ADDRESS_FORMAT_GROUP_SIZE, Constants.ADDRESS_FORMAT_LINE_SIZE);
+            receivingStaticAddressView.setText(address);
+
+            final String label = addressBookDao.resolveLabel(viewModel.validatedAddress.getAddressStr());
+            final String staticLabel;
+            if (!TextUtils.isEmpty(label)) {
+                staticLabel = label;
+            } else if (!TextUtils.isEmpty(viewModel.validatedAddress.label)) {
+                staticLabel = viewModel.validatedAddress.label;
+            } else {
+                staticLabel = getString(R.string.address_unlabeled);
+            }
+            receivingStaticLabelView.setText(staticLabel);
+
+            int colorResId = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
+                    R.color.fg_significant : R.color.fg_insignificant;
+            receivingStaticLabelView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+        } else if (null==viewModel.paymentData.standard) {
+            ViewUtil.showView(payeeGroup, true);
+            ViewUtil.showView(receivingAddressView, true);
+            ViewUtil.showView(receivingStaticView, false);
+        } else {
+            ViewUtil.showView(payeeGroup, false);
+        }
+
+        receivingAddressView.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT);
+        final boolean amountVisible = viewModel.paymentData.hasAmount()
+                || (null!=viewModel.state && viewModel.state.ordinal() >= SendCoinsViewModel.State.INPUT.ordinal());
+        ViewUtil.showView(amountGroup, amountVisible);
+        final boolean amountLink = viewModel.state == SendCoinsViewModel.State.INPUT
+                && PaymentUtil.mayEditAmount(viewModel.paymentData);
+        amountCalculatorLink.setEnabled(amountLink);
+
+        // directPaymentEnableView
+        updateDirectPaymentView();
+
+        // hintView
+        updateHintView();
+
+        // sentTransactionViewGroup
+        updateTransactionView();
+
+        // directPaymentMessageView
+        if (null!=viewModel.directPaymentAck) {
+            ViewUtil.showView(directPaymentMessageView, true);
+            directPaymentMessageView.setText(viewModel.directPaymentAck ?
+                            R.string.send_coins_fragment_direct_payment_ack
+                            : R.string.send_coins_fragment_direct_payment_nack);
+        } else {
+            ViewUtil.showView(directPaymentMessageView, false);
+        }
+
+        // viewCancel, viewGo
+        updateBottomActionsView();
+
+        // privateKeyPassword
+        final Wallet wallet = viewModel.wallet.getValue();
+        final boolean privateKeyPasswordViewVisible = (viewModel.state == SendCoinsViewModel.State.INPUT
+                || viewModel.state == SendCoinsViewModel.State.DECRYPTING) && wallet != null
+                && wallet.isEncrypted();
+        ViewUtil.showView(privateKeyPasswordViewGroup, privateKeyPasswordViewVisible);
+        privateKeyPasswordView.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT);
+
+        // NextFocus id
+        updateFocusLinking();
+    }
+
+    private void updateDirectPaymentView() {
+        final boolean directPaymentVisible;
+        if (viewModel.paymentData.hasPaymentUrl()) {
+            if (viewModel.paymentData.isBluetoothPaymentUrl())
+                directPaymentVisible = bluetoothAdapter != null;
+            else
+                directPaymentVisible = true;
+        } else {
+            directPaymentVisible = false;
+        }
+        ViewUtil.showView(directPaymentEnableView, directPaymentVisible);
+        directPaymentEnableView.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT);
+    }
+
+    private void updateFocusLinking() {
+        final boolean privateKeyPasswordViewVisible = privateKeyPasswordViewGroup.getVisibility() == View.VISIBLE;
+        final int activeAmountViewId = amountCalculatorLink.activeTextView().getId();
+        receivingAddressView.setNextFocusDownId(activeAmountViewId);
+        receivingAddressView.setNextFocusForwardId(activeAmountViewId);
+
+        amountCalculatorLink.setNextFocusId(privateKeyPasswordViewVisible ?
+                R.id.send_coins_private_key_password : R.id.send_coins_go);
+
+        privateKeyPasswordView.setNextFocusUpId(activeAmountViewId);
+        privateKeyPasswordView.setNextFocusDownId(R.id.send_coins_go);
+        privateKeyPasswordView.setNextFocusForwardId(R.id.send_coins_go);
+
+        viewGo.setNextFocusUpId(privateKeyPasswordViewVisible ?
+                        R.id.send_coins_private_key_password : activeAmountViewId);
+    }
+
+    private void updateBottomActionsView() {
+        final boolean cancelable = SendCoinsViewModel.State.REQUEST_PAYMENT_REQUEST != viewModel.state
+                && SendCoinsViewModel.State.DECRYPTING != viewModel.state
+                && SendCoinsViewModel.State.SIGNING != viewModel.state;
+        viewCancel.setEnabled(cancelable);
+
+        final Wallet wallet = viewModel.wallet.getValue();
+        final Coin fee = feeSeekBar.getFee();
+        final   BlockChainState blockChainState = viewModel.blockChain.getValue();
+        final boolean payable = everythingPlausible() && null!=viewModel.dryrunTransaction
+                && null!= wallet && null!=fee && (null==blockChainState || !blockChainState.replaying);
+        viewGo.setEnabled(payable);
+
+        if (viewModel.state == null ||
+                viewModel.state == SendCoinsViewModel.State.REQUEST_PAYMENT_REQUEST) {
+            viewCancel.setText(R.string.button_cancel);
+            viewGo.setText(null);
+        } else if (viewModel.state == SendCoinsViewModel.State.INPUT) {
+            viewCancel.setText(R.string.button_cancel);
+            viewGo.setText(R.string.send_coins_fragment_button_send);
+        } else if (viewModel.state == SendCoinsViewModel.State.DECRYPTING) {
+            viewCancel.setText(R.string.button_cancel);
+            viewGo.setText(R.string.send_coins_fragment_state_decrypting);
+        } else if (viewModel.state == SendCoinsViewModel.State.SIGNING) {
+            viewCancel.setText(R.string.button_cancel);
+            viewGo.setText(R.string.send_coins_preparation_msg);
+        } else if (viewModel.state == SendCoinsViewModel.State.SENDING) {
+            viewCancel.setText(R.string.send_coins_fragment_button_back);
+            viewGo.setText(R.string.send_coins_sending_msg);
+        } else if (viewModel.state == SendCoinsViewModel.State.SENT) {
+            viewCancel.setText(R.string.send_coins_fragment_button_back);
+            viewGo.setText(R.string.send_coins_sent_msg);
+        } else if (viewModel.state == SendCoinsViewModel.State.FAILED) {
+            viewCancel.setText(R.string.send_coins_fragment_button_back);
+            viewGo.setText(R.string.send_coins_failed_msg);
+        }
+
+    }
+
+    private void updateTransactionView() {
+        // todo  TransactionsAdapter.ListItem.TransactionItem()
+        //  if (viewModel.sentTransaction != null && wallet != null) {
+        ViewUtil.showView(sentTransactionViewGroup, false);
+    }
+
+    private void updateHintView() {
+        ViewUtil.showView(hintView, false);
+        if (SendCoinsViewModel.State.INPUT == viewModel.state) {
+            final   BlockChainState blockChainState = viewModel.blockChain.getValue();
+            final MonetaryFormat btcFormat = mConfig.getFormat();
+            final Wallet wallet = viewModel.wallet.getValue();
+
+            if (null!=blockChainState && blockChainState.replaying) {
+                ViewUtil.showView(hintView, true);
+                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+                hintView.setText(R.string.send_coins_fragment_hint_replaying);
+            } else if (null==viewModel.validatedAddress
+                    && PaymentUtil.mayEditAmount(viewModel.paymentData)
+                    && !TextUtils.isEmpty(receivingAddressView.getText())) {
+                ViewUtil.showView(hintView, true);
+                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+                hintView.setText(R.string.send_coins_fragment_receiving_address_error);
+            } else if (null!=viewModel.dryrunException) {
+                ViewUtil.showView(hintView, true);
+                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+
+                final String hintText;
+                Exception e = viewModel.dryrunException;
+                if (e instanceof Wallet.DustySendRequested) {
+                    hintText= getString(R.string.send_coins_fragment_hint_dusty_send);
+                } else if (e instanceof InsufficientMoneyException) {
+                    hintText = getString(R.string.send_coins_fragment_hint_insufficient_money,
+                            btcFormat.format(((InsufficientMoneyException) e).missing));
+                } else if (e instanceof Wallet.CouldNotAdjustDownwards) {
+                    hintText = getString(R.string.send_coins_fragment_hint_empty_wallet_failed);
+                } else {
+                    hintText = e.toString();
+                }
+                hintView.setText(hintText);
+            } else if (null!=viewModel.dryrunTransaction &&
+                    null!=viewModel.dryrunTransaction.getFee()) {
+                ViewUtil.showView(hintView, true);
+                final int hintResId= R.string.send_coins_fragment_hint_fee;
+                final int colorResId = R.color.fg_insignificant;
+                hintView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+                hintView.setText(getString(hintResId,
+                        btcFormat.format(viewModel.dryrunTransaction.getFee())));
+            } else if (null!= viewModel.validatedAddress && null!= wallet
+                    && PaymentUtil.mayEditAmount(viewModel.paymentData)
+                    && wallet.isAddressMine(viewModel.validatedAddress.address)) {
+                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_insignificant));
+                ViewUtil.showView(hintView, true);
+                hintView.setText(R.string.send_coins_fragment_receiving_address_own);
+            }
+        }
     }
 
     private void setState(SendCoinsViewModel.State state){
@@ -491,7 +750,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                 || pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT));
 
         scanAction.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT);
-//        scanAction.setEnabled(true);
 
         final MenuItem emptyAction = menu.findItem(R.id.send_coins_options_empty);
         emptyAction.setEnabled(viewModel.state == SendCoinsViewModel.State.INPUT
@@ -508,12 +766,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             case R.id.send_coins_options_scan:
                     startScan(null);
                 break;
-//            case R.id.send_coins_options_fee_category_economic:
-//                break;
-//            case R.id.send_coins_options_fee_category_normal:
-//                break;
-//            case R.id.send_coins_options_fee_category_priority:
-//                break;
             case R.id.send_coins_options_empty:
                 handleEmpty();
                 break;
@@ -671,6 +923,77 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     // ////////////////////// 内部变量，接口实现 ////////////////////////////
     // ////////////////////////////////////////////////////////
     // ////////////////////////////////////////////////////////
+
+    private final ReceivingAddressListener receivingAddressListener = new ReceivingAddressListener();
+    private class ReceivingAddressListener implements View.OnFocusChangeListener,
+            TextWatcher, AdapterView.OnItemClickListener {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            final String content = editable.toString().trim();
+            if (content.isEmpty()) {
+                updateView();
+            } else {
+                validateReceivingAddress();
+            }
+        }
+
+        @Override
+        public void onFocusChange(View view, boolean b) {
+            if (!b) {
+                validateReceivingAddress();
+                updateView();
+            }
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            try {
+                final AddressBook book = addressLabelListAdapter.getItem(position);
+                viewModel.validatedAddress = new AddressBean(Constants.NETWORK_PARAMETERS,
+                        book.getAddress(), book.getLabel());
+                receivingAddressView.setText(null);
+                log.info("Picked valid address from suggestions: {}", viewModel.validatedAddress);
+            } catch (Exception e) {
+                log.info("address suggestions onItemClick:", e);
+            }
+        }
+    }
+
+    private final Filter mAddressLabelListFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            final String trimmedConstraint = charSequence.toString().trim();
+            final FilterResults results = new FilterResults();
+            if (null==viewModel.validatedAddress && !trimmedConstraint.isEmpty()) {
+                List<AddressBook> list = addressBookDao.get(trimmedConstraint);
+                results.count = Utils.size(list);
+                results.values = list;
+            } else {
+                results.count =0;
+                results.values = Collections.emptyList();
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+
+            addressLabelListAdapter.setNotifyOnChange(false);
+            addressLabelListAdapter.clear();
+            if (filterResults.count >0) {
+                addressLabelListAdapter.addAll( (List<AddressBook>) filterResults.values);
+            }
+            addressLabelListAdapter.notifyDataSetChanged();
+        }
+    };
 
     private final TransactionConfidence.Listener transactionListener = new TransactionConfidence.Listener() {
         @Override

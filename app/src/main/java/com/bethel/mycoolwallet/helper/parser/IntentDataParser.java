@@ -1,5 +1,7 @@
 package com.bethel.mycoolwallet.helper.parser;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.nfc.NdefMessage;
@@ -20,6 +22,7 @@ import org.bitcoinj.protocols.payments.PaymentProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /** 解析 Intent 传递的数据
@@ -85,21 +88,27 @@ public abstract class IntentDataParser implements IInputParser {
     }
 
     private void parseAndHandleIntentUri(String mimeType, Uri bitcoinUri) {
-        final InputStream is = openInputStream(bitcoinUri);
-        new StreamInputParser(mimeType, is) {
-            @Override
-            public void error(int messageResId, Object... messageArgs) {
-                IntentDataParser.this.error(messageResId, messageArgs);
-            }
+        try {
+            final ContentResolver resolver = getContext().getContentResolver();
+            final InputStream is = resolver.openInputStream(bitcoinUri);
+            new StreamInputParser(mimeType, is) {
+                @Override
+                public void error(int messageResId, Object... messageArgs) {
+                    IntentDataParser.this.error(messageResId, messageArgs);
+                }
 
-            @Override
-            public void handlePaymentData(PaymentData data) {
-                IntentDataParser.this.handlePaymentData(data);
-            }
-        }.parse();
+                @Override
+                public void handlePaymentData(PaymentData data) {
+                    IntentDataParser.this.handlePaymentData(data);
+                }
+            }.parse();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    protected abstract InputStream openInputStream(Uri bitcoinUri);
+//    protected abstract InputStream openInputStream(Uri bitcoinUri);
+    protected abstract Context getContext();
 
     private void parseAndHandleNfcPaymentRequestData() {
         Parcelable[]  datas = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);

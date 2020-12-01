@@ -28,4 +28,8 @@ public class AddressBean {
     public String toString() {
         return String.format("{%s} : {%s}", label, address.toString());
     }
+
+    public String getAddressStr() {
+        return null!=address? address.toString() : null;
+    }
 }

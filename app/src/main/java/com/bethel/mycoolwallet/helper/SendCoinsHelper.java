@@ -86,8 +86,8 @@ public class SendCoinsHelper {
         return paymentRequestHost;
     }
 
-    public static  void dialog(final Context context, @Nullable final View.OnClickListener dismissListener, final int titleResId,
-                               final int messageResId, final Object... messageArgs) {
+    public static  void dialog(final Context context, @Nullable final View.OnClickListener dismissListener,
+                               final int titleResId, final int messageResId, final Object... messageArgs) {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
         if (0!=titleResId) {
             builder.title(titleResId);

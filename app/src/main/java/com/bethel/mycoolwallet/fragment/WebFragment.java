@@ -184,7 +184,9 @@ public class WebFragment extends BaseFragment implements DownloadListener {
             try {//WebFragment.class
                 Method m = getClass().getDeclaredMethod(method, classes);
                 m.setAccessible(true);
-                m.invoke(WebFragment.this, params);
+                final Object[] objects = params;
+                m.invoke(WebFragment.this, objects);
+//                m.invoke(WebFragment.this, params); // 警告: 最后一个参数使用了不准确的变量类型的 varargs 方法的非 varargs 调用
             } catch (Exception e) {
                 e.printStackTrace();
             }

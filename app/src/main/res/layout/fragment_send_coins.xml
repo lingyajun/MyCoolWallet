@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg_level3"
     android:divider="?android:attr/dividerHorizontal"
     android:dividerPadding="0dp"
     android:orientation="vertical"
