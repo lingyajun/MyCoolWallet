@@ -293,7 +293,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                     final Intent result = new Intent();
                     BitcoinIntegration.transactionHashToResult(result,
                             viewModel.sentTransaction.getTxId().toString());
-                    if (viewModel.paymentData.standard == PaymentStandard.BIP70){
+                    if (viewModel.paymentData.standard == PaymentStandard.BIP70) {
                         BitcoinIntegration.paymentToResult(result, payment.toByteArray());
                     }
                     getActivity().setResult(Activity.RESULT_OK, result);
