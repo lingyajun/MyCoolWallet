@@ -198,8 +198,9 @@ public class PaymentData implements Parcelable {
     }
 
     public boolean isHttpPaymentUrl() {
-        return paymentUrl != null && (Utils.startsWithIgnoreCase(paymentUrl, "http:")
-                || Utils.startsWithIgnoreCase(paymentUrl, "https:"));
+        return Utils.isHttpUrl(paymentUrl);
+//        return paymentUrl != null && (Utils.startsWithIgnoreCase(paymentUrl, "http:")
+//                || Utils.startsWithIgnoreCase(paymentUrl, "https:"));
     }
 
     public boolean isHttpPaymentRequestUrl() {

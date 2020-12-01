@@ -20,6 +20,11 @@ public final class Utils {
         return string.regionMatches(true, 0, prefix, 0, prefix.length());
     }
 
+    public static boolean isHttpUrl(String url) {
+        return url != null && (Utils.startsWithIgnoreCase(url, "http:")
+                || Utils.startsWithIgnoreCase(url, "https:"));
+    }
+
     /**
      * 将本地资源图片大小缩放
      * @param resId

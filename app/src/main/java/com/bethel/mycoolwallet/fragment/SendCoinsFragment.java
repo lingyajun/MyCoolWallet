@@ -3,6 +3,7 @@ package com.bethel.mycoolwallet.fragment;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +35,7 @@ import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.TextView;
 
+import com.bethel.integration_android.BitcoinIntegration;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.CustomCaptureActivity;
@@ -42,6 +44,7 @@ import com.bethel.mycoolwallet.adapter.AddressLabelListAdapter;
 import com.bethel.mycoolwallet.data.AddressBean;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
+import com.bethel.mycoolwallet.data.payment.PaymentStandard;
 import com.bethel.mycoolwallet.data.payment.PaymentUtil;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
@@ -56,6 +59,9 @@ import com.bethel.mycoolwallet.interfaces.ITask;
 import com.bethel.mycoolwallet.mvvm.view_model.SendCoinsViewModel;
 import com.bethel.mycoolwallet.request.payment.DeriveKeyTask;
 import com.bethel.mycoolwallet.request.payment.IPaymentRequestListener;
+import com.bethel.mycoolwallet.request.payment.SendCoinsOfflineTask;
+import com.bethel.mycoolwallet.request.payment.send.IPaymentTaskCallback;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.utils.Utils;
@@ -70,6 +76,7 @@ import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoin.protocols.payments.Protos;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
@@ -77,7 +84,9 @@ import org.bitcoinj.core.InsufficientMoneyException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.core.VerificationException;
+import org.bitcoinj.protocols.payments.PaymentProtocol;
 import org.bitcoinj.utils.MonetaryFormat;
+import org.bitcoinj.wallet.KeyChain;
 import org.bitcoinj.wallet.SendRequest;
 import org.bitcoinj.wallet.Wallet;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -86,6 +95,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,7 +107,7 @@ import butterknife.OnClick;
 /**
  * 支付页面.
  *
- * todo
+ *
  * 构造支付数据；
  * 解析扫码结果；
  * 金额输入框联动；
@@ -220,7 +230,179 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     }
 
     private void signAndSendPayment(KeyParameter encryptionKey) {
-//    todo    setState(SendCoinsViewModel.State.SIGNING);
+        setState(SendCoinsViewModel.State.SIGNING);
+        final PaymentData paymentData = PaymentUtil.mergeWithEditedValues(viewModel.paymentData,
+                amountCalculatorLink.getAmount(),
+                null!=viewModel.validatedAddress? viewModel.validatedAddress.address:null);
+        final Coin finalAmount = paymentData.getAmount();
+        final Wallet wallet = viewModel.wallet.getValue();
+
+        final SendRequest sendRequest = PaymentUtil.getSendRequest(paymentData);
+        sendRequest.emptyWallet = PaymentUtil.mayEditAmount(viewModel.paymentData)
+                && finalAmount.equals(wallet.getBalance(Wallet.BalanceType.AVAILABLE));
+        sendRequest.feePerKb = feeSeekBar.getFee();
+        sendRequest.memo = viewModel.paymentData.memo;
+        sendRequest.exchangeRate = amountCalculatorLink.getExchangeRate();
+        sendRequest.aesKey = encryptionKey;
+
+        final Coin fee = viewModel.dryrunTransaction.getFee();
+        if (fee.isGreaterThan(finalAmount)) {
+            setState(SendCoinsViewModel.State.INPUT);
+
+            final MonetaryFormat btcFormat = mConfig.getFormat();
+            MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                    .title(R.string.send_coins_fragment_significant_fee_title)
+                    .content(getString(R.string.send_coins_fragment_significant_fee_message,
+                            btcFormat.format(fee), btcFormat.format(finalAmount)))
+                    .positiveText(R.string.send_coins_fragment_button_send)
+                    .negativeText(R.string.button_cancel)
+                    .show();
+            dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(
+                    view -> sendPayment(sendRequest, finalAmount) );
+        } else {
+            sendPayment(sendRequest, finalAmount);
+        }
+    }
+
+    private void sendPayment(final SendRequest sendRequest, final Coin finalAmount) {
+        final Wallet wallet = viewModel.wallet.getValue();
+        new SendCoinsOfflineTask(wallet, sendRequest){
+            @Override
+            protected void onSuccess(Transaction transaction) {
+                viewModel.sentTransaction = transaction;
+                setState(SendCoinsViewModel.State.SENDING);
+                transaction.getConfidence().addEventListener(transactionListener);
+
+                final Address refundAddress = viewModel.paymentData.standard == PaymentStandard.BIP70
+                        ? wallet.freshAddress(KeyChain.KeyPurpose.REFUND) : null;
+                LinkedList<Transaction> txList = new LinkedList<>();
+                txList.add(transaction);
+                final Protos.Payment payment = PaymentProtocol.createPaymentMessage(
+                        txList, finalAmount, refundAddress, null, viewModel.paymentData.payeeData);
+                //  broadcastTransaction
+                if (directPaymentEnableView.isChecked()) {
+                    directPay(payment);
+                }
+                BlockChainService.broadcastTransaction(getContext(), viewModel.sentTransaction);
+
+                // callback
+                final ComponentName callingActivity = getActivity().getCallingActivity();
+                if (callingActivity != null) {
+                    log.info("returning result to calling activity: {}", callingActivity.flattenToString());
+
+                    final Intent result = new Intent();
+                    BitcoinIntegration.transactionHashToResult(result,
+                            viewModel.sentTransaction.getTxId().toString());
+                    if (viewModel.paymentData.standard == PaymentStandard.BIP70){
+                        BitcoinIntegration.paymentToResult(result, payment.toByteArray());
+                    }
+                    getActivity().setResult(Activity.RESULT_OK, result);
+                }
+            }
+
+            private void directPay(final Protos.Payment payment) {
+                // http, bluetooth
+                final IPaymentTaskCallback callback = new IPaymentTaskCallback() {
+                    @Override
+                    public void onResult(boolean ack) {
+                        viewModel.directPaymentAck = ack;
+
+                        if (viewModel.state == SendCoinsViewModel.State.SENDING) {
+                            setState(SendCoinsViewModel.State.SENT);
+                        }
+                        updateView();
+                    }
+
+                    @Override
+                    public void onFail(int messageResId, Object... messageArgs) {
+                        final StringBuilder msg = new StringBuilder();
+                        msg.append(viewModel.paymentData.paymentUrl).append( "\n" )
+                                .append(getString(messageResId, messageArgs)).append( "\n\n" )
+                                .append(getString(R.string.send_coins_fragment_direct_payment_failed_msg));
+
+                        MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+                                .title(R.string.send_coins_fragment_direct_payment_failed_title)
+                                .content(msg.toString())
+                                .positiveText(R.string.button_retry)
+                                .negativeText(R.string.button_dismiss)
+                                .show();
+                        dialog.getActionButton(DialogAction.POSITIVE)
+                                .setOnClickListener(view -> directPay(payment));
+                    }
+                };
+
+                SendCoinsHelper.sendPayment(viewModel.paymentData.paymentUrl, payment,
+                        bluetoothAdapter, callback);
+            }
+
+            @Override
+            protected void onInsufficientMoney(Coin missing) {
+//    not enough coin
+                setState(SendCoinsViewModel.State.INPUT);
+
+                final Coin estimated = wallet.getBalance(Wallet.BalanceType.ESTIMATED);
+                final Coin available = wallet.getBalance(Wallet.BalanceType.AVAILABLE);
+                final Coin pending = estimated.subtract(available);
+
+                final MonetaryFormat btcFormat = mConfig.getFormat();
+                final StringBuilder msg = new StringBuilder();
+                msg.append(getString(R.string.send_coins_fragment_insufficient_money_msg1,
+                        btcFormat.format(missing)));
+
+                if (pending.signum() > 0) {
+                    msg.append("\n\n").append(getString(R.string.send_coins_fragment_pending,
+                                    btcFormat.format(pending)));
+                }
+                if (PaymentUtil.mayEditAmount(viewModel.paymentData)) {
+                    msg.append("\n\n")
+                            .append(getString(R.string.send_coins_fragment_insufficient_money_msg2));
+                }
+
+                // dialog
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(getContext());
+                builder.title( R.string.send_coins_fragment_insufficient_money_title)
+                        .iconRes(R.drawable.ic_warning_grey600_24dp).content(msg);
+                if (PaymentUtil.mayEditAmount(viewModel.paymentData)) {
+                    builder.positiveText(R.string.send_coins_options_empty)
+                            .negativeText(R.string.button_cancel);
+                } else {
+                    builder.neutralText(R.string.button_ok);
+                }
+
+                MaterialDialog dialog = builder.show();
+
+                if (PaymentUtil.mayEditAmount(viewModel.paymentData)) {
+                    dialog.getActionButton(DialogAction.POSITIVE)
+                            .setOnClickListener(view -> handleEmpty());
+                }
+            }
+
+            @Override
+            protected void onInvalidEncryptionKey() {
+                // error password
+                setState(SendCoinsViewModel.State.INPUT);
+
+                ViewUtil.showView(privateKeyBadPasswordView, true);
+                privateKeyPasswordView.requestFocus();
+            }
+
+            @Override
+            protected void onEmptyWalletFailed(Exception e) {
+                //super.onEmptyWalletFailed(e);
+                setState(SendCoinsViewModel.State.INPUT);
+                SendCoinsHelper.dialogWarn(getContext(),
+                        R.string.send_coins_fragment_empty_wallet_failed_title,
+                        R.string.send_coins_fragment_hint_empty_wallet_failed);
+            }
+
+            @Override
+            protected void onFailure(Exception exception) {
+                setState(SendCoinsViewModel.State.FAILED);
+
+                SendCoinsHelper.dialogWarn(getContext(),
+                        R.string.send_coins_error_msg, exception.toString());
+            }
+        }.executeAsyncTask();
     }
 
     @OnClick(R.id.send_coins_cancel)
@@ -234,7 +416,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         setHasOptionsMenu(true);
 
         viewModel = getViewModel(SendCoinsViewModel.class);
-//        contentResolver = getContext().getContentResolver();
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         application = CoolApplication.getApplication();
         mConfig = application.getConfiguration();
@@ -413,9 +594,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                         REQUEST_CODE_ENABLE_BLUETOOTH_FOR_DIRECT_PAYMENT);
             }
         });
-
-//        viewCancel.setText(R.string.button_cancel);
-//        viewGo.setText(R.string.send_coins_fragment_button_send);
 
         feeSeekBar.setDefaultValue(2020);
         log.info( "onViewCreated, feeSeekBar: "+ feeSeekBar.getSelectedNumber());
@@ -800,8 +978,8 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
         mHandler.post(()-> onActivityResultResumed(requestCode, resultCode, data));
+        super.onActivityResult(requestCode, resultCode, data);
     }
     private void onActivityResultResumed(final int requestCode, final int resultCode, final Intent data) {
         switch (requestCode) {
@@ -1145,7 +1323,6 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
         @Override
         public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
             ViewUtil.setVisibility(privateKeyBadPasswordView, View.INVISIBLE);
-//            privateKeyBadPasswordView.setVisibility(View.INVISIBLE);
             updateView();
         }
 

@@ -57,12 +57,16 @@ public abstract class SendCoinsOfflineTask extends AbsTask {
             });
             log.info("send failed, key crypter exception: {}", e.getMessage());
         } catch (final Wallet.CouldNotAdjustDownwards e) {
-            runOnCallbackThread(() -> onFailure(e) );
+            runOnCallbackThread(() -> onEmptyWalletFailed(e) );
             log.info("send failed, could not adjust downwards: {}", e.getMessage());
         } catch (final Wallet.CompletionException e) {
             runOnCallbackThread(() -> onFailure(e) );
             log.info("send failed, cannot complete: {}", e.getMessage());
         }
+    }
+
+    protected void onEmptyWalletFailed(Exception e) {
+        onFailure(e);
     }
 
     protected abstract void onSuccess(Transaction transaction);

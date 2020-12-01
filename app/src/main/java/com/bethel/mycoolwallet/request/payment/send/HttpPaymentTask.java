@@ -30,10 +30,10 @@ public  class HttpPaymentTask extends AbsPaymentTask {
     private final String userAgent;
     private final Protos.Payment payment;
 
-    public HttpPaymentTask(String url, @Nullable String userAgent, Protos.Payment payment,
+    public HttpPaymentTask(String paymentUrl, @Nullable String userAgent, Protos.Payment payment,
                            IPaymentTaskCallback callback) {
         super(callback);
-        this.url = url;
+        this.url = paymentUrl;
         this.userAgent = userAgent;
         this.payment = payment;
     }

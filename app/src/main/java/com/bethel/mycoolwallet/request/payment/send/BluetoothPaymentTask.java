@@ -26,10 +26,10 @@ public class BluetoothPaymentTask extends AbsPaymentTask {
     private final String bluetoothMac;
     private final Protos.Payment payment;
 
-    public BluetoothPaymentTask(BluetoothAdapter adapter, String bluetoothMac, Protos.Payment payment, IPaymentTaskCallback callback) {
+    public BluetoothPaymentTask(BluetoothAdapter adapter, String paymentUrl, Protos.Payment payment, IPaymentTaskCallback callback) {
         super(callback);
         this.adapter = adapter;
-        this.bluetoothMac = bluetoothMac;
+        this.bluetoothMac = BluetoothTools.getBluetoothMac(paymentUrl);
         this.payment = payment;
     }
 
@@ -49,7 +49,7 @@ public class BluetoothPaymentTask extends AbsPaymentTask {
             final DataOutputStream os = new DataOutputStream(socket.getOutputStream());
             final DataInputStream is = new DataInputStream(socket.getInputStream());
             socket.connect();
-            log.info("connected to payment protocol {}", bluetoothMac);
+            log.info("connected to payment protocol {},  BLE address: {}", bluetoothMac, address);
 
             payment.writeDelimitedTo(os);
             os.flush();

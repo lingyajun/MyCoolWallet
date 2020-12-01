@@ -18,11 +18,16 @@ import com.bethel.mycoolwallet.request.payment.AbsPaymentRequestTask;
 import com.bethel.mycoolwallet.request.payment.BluetoothPaymentRequestTask;
 import com.bethel.mycoolwallet.request.payment.HttpPaymentRequestTask;
 import com.bethel.mycoolwallet.request.payment.IPaymentRequestListener;
+import com.bethel.mycoolwallet.request.payment.send.BluetoothPaymentTask;
+import com.bethel.mycoolwallet.request.payment.send.HttpPaymentTask;
+import com.bethel.mycoolwallet.request.payment.send.IPaymentTaskCallback;
 import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.Utils;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
+import org.bitcoin.protocols.payments.Protos;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
@@ -96,6 +101,29 @@ public class SendCoinsHelper {
         builder.neutralText(R.string.button_ok);
         MaterialDialog dialog = builder.show();
         dialog.getActionButton(DialogAction.NEUTRAL).setOnClickListener(dismissListener);
+    }
+
+    public static void dialogWarn(final Context context, final int titleResId, final int messageId ) {
+        dialogWarn(context, titleResId, context.getString(messageId));
+    }
+    public static void dialogWarn(final Context context, final int titleResId, final String message ) {
+        new  MaterialDialog.Builder(context)
+                .title(titleResId)
+                .iconRes(R.drawable.ic_warning_grey600_24dp)
+                .content(message)
+                .neutralText(R.string.button_ok)
+                .show();
+    }
+
+    public static void sendPayment(final String paymentUrl,  final Protos.Payment payment,
+                                   final BluetoothAdapter adapter, final IPaymentTaskCallback callback) {
+        if (Utils.isHttpUrl(paymentUrl)) {
+            final String userAgent = CoolApplication.getApplication().httpUserAgent();
+            new HttpPaymentTask(paymentUrl, userAgent, payment, callback).executeAsyncTask();
+        } else if (BluetoothTools.isBluetoothUrl(paymentUrl)
+                && null!=adapter && adapter.isEnabled()) {
+            new BluetoothPaymentTask(adapter, paymentUrl, payment, callback).executeAsyncTask();
+        }
     }
 
     // ////////////////////////////////////////////////////////
