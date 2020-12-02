@@ -88,7 +88,7 @@
         <service
             android:name=".service.AcceptBluetoothService"
             android:enabled="true"
-            android:exported="false"></service> <!-- open camera scan qr -->
+            android:exported="false"/>
         <service
             android:name=".service.MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
