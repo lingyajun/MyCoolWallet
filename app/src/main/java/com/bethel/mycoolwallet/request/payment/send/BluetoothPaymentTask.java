@@ -20,6 +20,9 @@ import java.io.IOException;
 
 /**
  * 通过 BLE 发送支付[交易]信息
+ *
+ * server : AcceptPaymentProtocolTask
+ * client : BluetoothPaymentTask
  */
 public class BluetoothPaymentTask extends AbsPaymentTask {
     private final BluetoothAdapter adapter;

@@ -11,12 +11,13 @@ public abstract class AbsTask implements Runnable {
         callbackHandler = new Handler(Looper.myLooper());
     }
 
-    public final void executeAsyncTask() {
+    public  void executeAsyncTask() {
         AsyncTask.execute(this);
+//        new Thread(this).start();
     }
 
 
-    protected final void runOnCallbackThread(Runnable runnable) {
+    protected  void runOnCallbackThread(Runnable runnable) {
         if (null!= callbackHandler) callbackHandler.post(runnable);
     }
 }

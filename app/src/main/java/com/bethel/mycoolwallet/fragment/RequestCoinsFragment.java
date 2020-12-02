@@ -2,6 +2,7 @@ package com.bethel.mycoolwallet.fragment;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,8 +22,10 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,14 +37,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.RequestCoinsActivity;
 import com.bethel.mycoolwallet.activity.SendCoinsActivity;
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.RequestCoinsViewModel;
+import com.bethel.mycoolwallet.service.AcceptBluetoothService;
+import com.bethel.mycoolwallet.utils.BluetoothTools;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
+import com.bethel.mycoolwallet.utils.NfcTools;
 import com.bethel.mycoolwallet.utils.Qr;
+import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.view.CurrencyAmountView;
 import com.bethel.mycoolwallet.view.CurrencyCalculatorLink;
 import com.xuexiang.xui.widget.toast.XToast;
@@ -55,13 +65,18 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 收款页.
  */
 public class RequestCoinsFragment extends BaseFragment {
     private ClipboardManager clipboardManager;
 
     private RequestCoinsViewModel viewModel;
 
+    private NfcAdapter nfcAdapter;
+    private BluetoothAdapter bluetoothAdapter;
+    private Configuration mConfig;
+
+    private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 0;
     private static final String KEY_RECEIVE_ADDRESS = "receive_address";
     private static final Logger log = LoggerFactory.getLogger(RequestCoinsFragment.class);
 
@@ -103,6 +118,7 @@ public class RequestCoinsFragment extends BaseFragment {
         this.clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
         setHasOptionsMenu(true);
         viewModel = getViewModel(RequestCoinsViewModel.class);
+        mConfig = CoolApplication.getApplication().getConfiguration();
 
         final Intent intent = getActivity().getIntent();
         String scriptName = RequestCoinsActivity.INTENT_EXTRA_OUTPUT_SCRIPT_TYPE;
@@ -114,6 +130,9 @@ public class RequestCoinsFragment extends BaseFragment {
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState);
         }
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(getContext());
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     @Override
@@ -127,20 +146,73 @@ public class RequestCoinsFragment extends BaseFragment {
         qrCard.setUseCompatPadding(false);
         qrCard.setMaxCardElevation(0); // we're using Lollipop elevation
 
-        //  test ui; todo SharedPreferences 存储
-        coinAmountView.setCurrencySymbol(MonetaryFormat.CODE_MBTC);
-        coinAmountView.setInputFormat(CurrencyTools.getMaxPrecisionFormat(3));
-        coinAmountView.setHintFormat(CurrencyTools.getFormat(3, 2));
+        //  ui;  SharedPreferences 存储
+        coinAmountView.setCurrencySymbol(mConfig.getFormat().code());
+        coinAmountView.setInputFormat(mConfig.getMaxPrecisionFormat());
+        coinAmountView.setHintFormat(mConfig.getFormat());
 
         localAmountView.setInputFormat(Constants.LOCAL_FORMAT);
         localAmountView.setHintFormat(Constants.LOCAL_FORMAT);
-        localAmountView.setCurrencySymbol("usd"); // exchangeRate.fiat.currencyCode
 
         amountCalculatorLink = new CurrencyCalculatorLink(coinAmountView, localAmountView);
-
-        // todo amountCalculatorLink.setExchangeDirection(config.getLastExchangeDirection());
+        amountCalculatorLink.setExchangeDirection(mConfig.getLastExchangeDirection());
         amountCalculatorLink.setExchangeDirection(true);
         amountCalculatorLink.requestFocus();
+
+        final boolean acceptBluetooth = null!=bluetoothAdapter
+                && !TextUtils.isEmpty(BluetoothTools.getAddress(bluetoothAdapter));
+        ViewUtil.showView(bleCheckBox, acceptBluetooth);
+        bleCheckBox.setChecked(null!=bluetoothAdapter && bluetoothAdapter.isEnabled());
+        bleCheckBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (null!=bluetoothAdapter && b) {
+                if (bluetoothAdapter.isEnabled()) {
+                    maybeStartBluetoothListening();
+                } else {
+                    // ask for permission to enable bluetooth
+                    startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                            REQUEST_CODE_ENABLE_BLUETOOTH);
+                }
+            }else {
+                stopBluetoothListening();
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CODE_ENABLE_BLUETOOTH) {
+            boolean started = false;
+            if (resultCode == Activity.RESULT_OK && bluetoothAdapter != null) {
+                started = maybeStartBluetoothListening();
+            }
+            bleCheckBox.setChecked(started);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean maybeStartBluetoothListening() {
+        final String address = BluetoothTools.getAddress(bluetoothAdapter);
+        if (isAdded() && bleCheckBox.isChecked() && !TextUtils.isEmpty(address)) {
+            // AcceptBluetoothService
+            final Activity activity = getActivity();
+            Intent intent = new Intent(activity, AcceptBluetoothService.class);
+            activity.startService(intent);
+
+            viewModel.bluetoothServiceIntent  = intent;
+            final String mac = BluetoothTools.compressMac(address);
+            viewModel.bluetoothMac.setValue(mac);
+
+            log.debug("Bluetooth: {} , {}", address, mac);
+        }
+        return false;
+    }
+
+    private void stopBluetoothListening() {
+        if (viewModel.bluetoothServiceIntent != null) {
+            getActivity().stopService(viewModel.bluetoothServiceIntent);
+            viewModel.bluetoothServiceIntent = null;
+        }
+        viewModel.bluetoothMac.setValue(null);
     }
 
     @Override
@@ -160,13 +232,22 @@ public class RequestCoinsFragment extends BaseFragment {
             }
         });
 
-        // todo  Start Bluetooth Listening
+        //   Start Bluetooth Listening
+        if (null!=bluetoothAdapter && bluetoothAdapter.isEnabled() && bleCheckBox.isChecked()) {
+            maybeStartBluetoothListening();
+        }
     }
 
     @Override
     public void onPause() {
         amountCalculatorLink.setListener(null);
         super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mConfig.setLastExchangeDirection(amountCalculatorLink.getExchangeDirection());
+        super.onDestroyView();
     }
 
     @Override
@@ -190,10 +271,15 @@ public class RequestCoinsFragment extends BaseFragment {
         viewModel.freshReceiveAddress.observe(this, address -> log.info("request coins address: {}", address));
         viewModel.qrCode.observe(this, bitmap -> showQrBmp(bitmap));
         viewModel.paymentRequest.observe(this, bytes -> {
-            // todo test nfc
+            final NfcAdapter nfcAdapter = RequestCoinsFragment.this.nfcAdapter;
+
             SpannableStringBuilder initiateText = new SpannableStringBuilder(
                     getString(R.string.request_coins_fragment_initiate_request_qr));
-            initiateText.append(' ').append(getString(R.string.request_coins_fragment_initiate_request_nfc));
+            if (null!=nfcAdapter && nfcAdapter.isEnabled()) {
+                initiateText.append(' ').append(getString(R.string.request_coins_fragment_initiate_request_nfc));
+
+                nfcAdapter.setNdefPushMessage(NfcTools.createNdefMessage(bytes), getActivity());
+            }
             initNfcTv.setText(initiateText);
         });
 
@@ -201,8 +287,11 @@ public class RequestCoinsFragment extends BaseFragment {
         viewModel.showBitmapDialog.observe(this, bitmapEvent ->
                         BitmapFragment.show(getFragmentManager(), bitmapEvent.getContentIfNotHandled()));
 
+        if (Constants.ENABLE_EXCHANGE_RATES) {
+            viewModel.exchangeRate.observe(this,
+                    bean -> amountCalculatorLink.setExchangeRate(bean.rate));
+        }
 
-        // todo exchangeRate
     }
 
     private void showQrBmp(Bitmap bitmap) {

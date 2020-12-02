@@ -188,7 +188,8 @@ public class MyCoolBlockChainManager {
     }
 
     private void startupPeerGroup() {
-        mWakeLock.acquire();
+        mWakeLock.acquire(DateUtils.MINUTE_IN_MILLIS*15);
+//        mWakeLock.acquire();
         final Wallet wallet = walletLiveData.getValue();
         //  检查一致性
         // wallet.getLastBlockSeenHeight(): Can be 0 if a wallet is brand new or -1 if the wallet is old and doesn't have that data.
@@ -245,7 +246,9 @@ public class MyCoolBlockChainManager {
             Wallet wallet = walletLiveData.getValue();
             peerGroup.removeConnectedEventListener(peerConnectivityListener);
             peerGroup.removeDisconnectedEventListener(peerConnectivityListener);
-            peerGroup.removeWallet(wallet);
+            if (null!=wallet) {
+                peerGroup.removeWallet(wallet);
+            }
             log.info("stopping {} asynchronously", peerGroup);
             peerGroup.stopAsync();
         }
@@ -416,10 +419,10 @@ public class MyCoolBlockChainManager {
             if (!TextUtils.isEmpty(trustedPeerHost)) {
                 final InetSocketAddress address =
                         new InetSocketAddress(trustedPeerHost, Constants.NETWORK_PARAMETERS.getPort());
-                if (null!=address) {
+
                     peers.add(address);
                     needTrimPeers = true;
-                }
+
                 log.info( "trusted peer : " + trustedPeerHost );
             }
 

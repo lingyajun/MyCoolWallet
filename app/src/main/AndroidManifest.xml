@@ -10,7 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.AddressBookActivity"/>
+        <activity android:name=".activity.AddressBookActivity" />
+
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
         <activity android:name=".activity.ExchangeRatesActivity" />
         <activity android:name=".activity.WebActivity" />
@@ -82,8 +83,12 @@
             android:configChanges="screenSize|keyboardHidden|orientation|keyboard"
             android:screenOrientation="portrait"
             android:theme="@style/XQRCodeTheme"
-            android:windowSoftInputMode="stateAlwaysHidden" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
-        <activity android:name=".activity.SettingsActivity" /> <!-- open camera scan qr -->
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".activity.SettingsActivity" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
+        <service
+            android:name=".service.AcceptBluetoothService"
+            android:enabled="true"
+            android:exported="false"></service> <!-- open camera scan qr -->
         <service
             android:name=".service.MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -91,8 +96,8 @@
             android:name=".service.BlockChainService"
             android:enabled="true"
             android:exported="false" />
-    </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- dangerous permissions -->
+    </application> <!-- dangerous permissions -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
