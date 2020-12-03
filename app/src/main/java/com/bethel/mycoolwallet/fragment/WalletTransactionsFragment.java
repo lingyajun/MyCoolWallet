@@ -36,7 +36,16 @@ import butterknife.BindView;
 import static com.bethel.mycoolwallet.adapter.TestTransactionsAdapter.WarningType.CHAIN_FORKING;
 
 /**
- * A simple {@link Fragment} subclass.
+ * 交易{Transaction}列表.
+ *-----------------------------------
+ *数据「live data, view model」
+ *  * ui展示 「列表」
+ *  *
+ *  * 区块链浏览器
+ *  * 列表：交易记录
+ *  *  数据库address标签存储
+ *  *
+ *  * 空页面
  */
 public class WalletTransactionsFragment extends BaseFragment {
     @BindView(R.id.wallet_transactions_group)

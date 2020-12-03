@@ -19,14 +19,13 @@ import com.bethel.mycoolwallet.data.Impediment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.mvvm.live_data.ImpedimentLiveData;
-import com.bethel.mycoolwallet.mvvm.live_data.NewTransactionLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.transation.NewTransactionLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.TimeLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.WalletUtils;
 import com.google.common.base.Stopwatch;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Block;

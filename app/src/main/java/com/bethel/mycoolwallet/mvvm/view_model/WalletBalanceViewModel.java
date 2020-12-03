@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.bethel.mycoolwallet.mvvm.live_data.BlockChainStateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletBalanceLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.exchange_rate.ExchangeRateSelectedLiveData;
 
 public class WalletBalanceViewModel extends BaseViewModel {
     public final WalletBalanceLiveData balanceLiveData;
@@ -17,6 +18,6 @@ public class WalletBalanceViewModel extends BaseViewModel {
         super(app);
         balanceLiveData = new WalletBalanceLiveData(getApplication());
         chainStateLiveData = new BlockChainStateLiveData();
-        rateLiveData = new ExchangeRateLiveData(null);
+        rateLiveData = new ExchangeRateSelectedLiveData();
     }
 }

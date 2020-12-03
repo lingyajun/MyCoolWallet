@@ -9,13 +9,13 @@ import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.mvvm.live_data.BlocksLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.TimeLiveData;
-import com.bethel.mycoolwallet.mvvm.live_data.TransactionsLiveData;
+import com.bethel.mycoolwallet.mvvm.live_data.transation.TransactionsFilteredLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.WalletLiveData;
 
 import java.util.List;
 
 public class BlocksNetworkMonitorViewModel extends BaseViewModel {
-    public final TransactionsLiveData transactions;
+    public final TransactionsFilteredLiveData transactions;
     public final BlocksLiveData blocks;
     public final WalletLiveData wallet;
     public final TimeLiveData timeTick;
@@ -24,7 +24,7 @@ public class BlocksNetworkMonitorViewModel extends BaseViewModel {
 
     public BlocksNetworkMonitorViewModel(@NonNull Application app) {
         super(app);
-        transactions = new TransactionsLiveData(getApplication());
+        transactions = new TransactionsFilteredLiveData(getApplication());
         blocks = new BlocksLiveData(app);
         wallet = new WalletLiveData(getApplication());
         timeTick = new TimeLiveData(app);

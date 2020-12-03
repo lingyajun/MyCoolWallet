@@ -1,7 +1,8 @@
-package com.bethel.mycoolwallet.mvvm.live_data;
+package com.bethel.mycoolwallet.mvvm.live_data.transation;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
+import com.bethel.mycoolwallet.mvvm.live_data.AbstractWalletLiveData;
 import com.bethel.mycoolwallet.utils.Utils;
 
 import org.bitcoinj.core.Sha256Hash;
@@ -13,8 +14,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class TransactionsLiveData extends AbstractWalletLiveData<Set<Transaction>>  {
-    public TransactionsLiveData(CoolApplication application) {
+public class TransactionsFilteredLiveData extends AbstractWalletLiveData<Set<Transaction>> {
+    public TransactionsFilteredLiveData(CoolApplication application) {
         super(application);
     }
 

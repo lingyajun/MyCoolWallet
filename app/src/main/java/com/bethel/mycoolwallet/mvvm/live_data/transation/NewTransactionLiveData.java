@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.mvvm.live_data;
+package com.bethel.mycoolwallet.mvvm.live_data.transation;
 
 import androidx.lifecycle.LiveData;
 

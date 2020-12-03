@@ -332,4 +332,8 @@ public class WalletUtils {
            throw new Error("cannot read backup", e);
         }
     }
+
+    public static boolean isPayToManyTransaction(final Transaction transaction) {
+        return transaction.getOutputs().size() > 20;
+    }
 }
