@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.data.tx;
+package com.bethel.mycoolwallet.data.tx_list;
 
 import android.content.Context;
 

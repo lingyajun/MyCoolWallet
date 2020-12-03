@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.data.tx;
+package com.bethel.mycoolwallet.data.tx_list;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -18,6 +18,7 @@ import com.bethel.mycoolwallet.utils.WalletUtils;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionConfidence;
 import org.bitcoinj.utils.ExchangeRate;
@@ -31,7 +32,9 @@ import java.util.Map;
 
 /**
  * 交易记录列表项
-
+---------------------
+ 参数较多，代码量大，故单独提出来写，使得adapter类简洁一些
+ ----------------------
  // confidence
  // time
  // address
@@ -41,7 +44,7 @@ import java.util.Map;
  // message
 
  */
-public class TransactionListItem {
+public class TransactionListItem implements IListItem {
     private static final String CONFIDENCE_SYMBOL_IN_CONFLICT = "\u26A0"; // warning sign ⚠ ⚠️
     private static final String CONFIDENCE_SYMBOL_DEAD = "\u271D"; // latin cross ✝️
     private static final String CONFIDENCE_SYMBOL_UNKNOWN = "?";
@@ -53,6 +56,7 @@ public class TransactionListItem {
     private final boolean isSelected;
     private  final Map<String, AddressBook> addressBook;
     private final MonetaryFormat monetaryFormat;
+    private final Sha256Hash transactionHash;
 
     private final int baseTextColor, baseLessSignificantColor, baseValueColor;
 
@@ -66,9 +70,7 @@ public class TransactionListItem {
         this.isSelected = isSelected;
         this.addressBook = addressBook;
         this.monetaryFormat = format;
-
-        final Transaction.Purpose purpose = tx.getPurpose();
-        final String[] memo = Commons.Formats.sanitizeMemo(tx.getMemo());
+        this.transactionHash = tx.getTxId();
 
         if (getConfidenceType() == TransactionConfidence.ConfidenceType.DEAD) {
             // all : colorError
@@ -78,7 +80,8 @@ public class TransactionListItem {
         } else if (DefaultCoinSelector.isSelectable(tx)) {
             baseTextColor = ColorType.Significant.getColor(context);
             baseLessSignificantColor = ColorType.LessSignificant.getColor(context);
-            baseValueColor = isTxSent() ? ColorType.ValueNegative.getColor(context) : ColorType.ValuePositve.getColor(context);
+            baseValueColor = isTxSent() ?
+                    ColorType.ValueNegative.getColor(context) : ColorType.ValuePositve.getColor(context);
         } else {
             // all: colorInsignificant
             baseTextColor = ColorType.Insignificant.getColor(context);
@@ -527,13 +530,20 @@ public class TransactionListItem {
     }
 
     private String[] getTxMemo() {
-        final String[] memo = Commons.Formats.sanitizeMemo(tx.getMemo());
-
-        return memo;
+        return Commons.Formats.sanitizeMemo(tx.getMemo());
     }
+
     //////////////////////////////////////////////////
     /////////////////  getter //////////////////////
     //////////////////////////////////////////////////
+
+    public Sha256Hash getTransactionHash() {
+        return transactionHash;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
 
     @Nullable
     public Fiat getFiat() {

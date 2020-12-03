@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.data.tx.TransactionDirection;
+import com.bethel.mycoolwallet.data.tx_list.TransactionDirection;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.mvvm.live_data.ConfigFormatLiveData;

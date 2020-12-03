@@ -7,24 +7,21 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.TestTransactionsAdapter;
-import com.bethel.mycoolwallet.adapter.TransactionsAdapter;
+import com.bethel.mycoolwallet.data.tx_list.TransactionListItemAnimator;
 import com.bethel.mycoolwallet.view.StickToTopLinearLayoutManager;
 import com.xuexiang.xui.widget.toast.XToast;
 
@@ -86,7 +83,8 @@ public class WalletTransactionsFragment extends BaseFragment {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new StickToTopLinearLayoutManager(getActivity()));
-        recyclerView.setItemAnimator(new TransactionsAdapter.ItemAnimator());
+        recyclerView.setItemAnimator(new TransactionListItemAnimator());
+//        recyclerView.setItemAnimator(new TransactionsAdapter.ItemAnimator());
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             private final int PADDING = 2
