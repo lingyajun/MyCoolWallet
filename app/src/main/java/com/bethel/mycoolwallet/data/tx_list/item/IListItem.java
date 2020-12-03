@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.data.tx_list;
+package com.bethel.mycoolwallet.data.tx_list.item;
 
 /**
  * 用来做类型判断

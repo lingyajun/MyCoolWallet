@@ -1,13 +1,9 @@
 package com.bethel.mycoolwallet.fragment;
 
-
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.SpannableStringBuilder;
@@ -19,18 +15,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.adapter.TestTransactionsAdapter;
+import com.bethel.mycoolwallet.adapter.TransactionListAdapter;
+import com.bethel.mycoolwallet.data.tx_list.OnTxItemClickListener;
 import com.bethel.mycoolwallet.data.tx_list.TransactionListItemAnimator;
+import com.bethel.mycoolwallet.mvvm.view_model.WalletTransactionsViewModel;
 import com.bethel.mycoolwallet.view.StickToTopLinearLayoutManager;
+import com.bethel.mycoolwallet.view.TransactionsItemDecoration;
 import com.xuexiang.xui.widget.toast.XToast;
 
-import java.util.LinkedList;
-import java.util.List;
+import org.bitcoinj.core.Sha256Hash;
 
 import butterknife.BindView;
-
-import static com.bethel.mycoolwallet.adapter.TestTransactionsAdapter.WarningType.CHAIN_FORKING;
 
 /**
  * 交易{Transaction}列表.
@@ -54,74 +51,38 @@ public class WalletTransactionsFragment extends BaseFragment {
     @BindView(R.id.wallet_transactions_list)
     RecyclerView recyclerView;
 
-    private ListAdapter mAdapter;
+    private TransactionListAdapter mAdapter;
     private MenuItem filterMenuItem;
+    private WalletTransactionsViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        viewModel = getViewModel(WalletTransactionsViewModel.class);
+        mAdapter = new TransactionListAdapter(getContext(),
+                CoolApplication.getApplication().maxConnectedPeers(), itemClickListener);
+
+        observeData();
+    }
+
+    private void observeData() {
+        viewModel.list.observe(this, iListItems -> {
+            viewAnimator.setDisplayedChild(1);
+            mAdapter.submitList(iListItems);
+//     todo       activityViewModel.transactionsLoadingFinished();
+        });
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // test ui
-        final SpannableStringBuilder emptyText = new SpannableStringBuilder(
-                getString( R.string.wallet_transactions_fragment_empty_text_received));
-        emptyText.setSpan(new StyleSpan(Typeface.BOLD), 0, emptyText.length(),
-                SpannableStringBuilder.SPAN_POINT_MARK);
-        emptyText.append("\n\n")
-                .append(getString(R.string.wallet_transactions_fragment_empty_text_howto));
-        emptyTv.setText(emptyText);
-        viewAnimator.setDisplayedChild(0);
-
-        emptyTv.postDelayed(() -> {viewAnimator.setDisplayedChild(1);}, 1200);
-
-        mAdapter = generateTestAdapter();
-
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new StickToTopLinearLayoutManager(getActivity()));
         recyclerView.setItemAnimator(new TransactionListItemAnimator());
-//        recyclerView.setItemAnimator(new TransactionsAdapter.ItemAnimator());
         recyclerView.setAdapter(mAdapter);
-        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
-            private final int PADDING = 2
-                    * getResources().getDimensionPixelOffset(R.dimen.card_padding_vertical);
+        recyclerView.addItemDecoration(new TransactionsItemDecoration(getContext()));
 
-            @Override
-            public void getItemOffsets(final Rect outRect, final View view, final RecyclerView parent,
-                                       final RecyclerView.State state) {
-                super.getItemOffsets(outRect, view, parent, state);
-
-                final int position = parent.getChildAdapterPosition(view);
-                if (position == 0)
-                    outRect.top += PADDING;
-                else if (position == parent.getAdapter().getItemCount() - 1)
-                    outRect.bottom += PADDING;
-            }
-        });
-
-        mAdapter.submitList(generateTestData());
-    }
-
-    private List generateTestData() {
-        List<TestTransactionsAdapter.ListItem> list = new LinkedList<>();
-        for(int i=0; i<10; i++){
-            TestTransactionsAdapter.ListItem item = null;
-            if ( i>7) {
-              item = new  TestTransactionsAdapter.ListItem.WarningItem(CHAIN_FORKING);
-            } else {
-                item = new TestTransactionsAdapter.ListItem.TransactionItem();
-            }
-            list.add(item);
-        }
-        return list;
-    }
-
-    private ListAdapter generateTestAdapter() {
-        return new TestTransactionsAdapter(getActivity());
     }
 
     @Override
@@ -160,4 +121,20 @@ public class WalletTransactionsFragment extends BaseFragment {
         return R.layout.fragment_wallet_transactions;
     }
 
+    private OnTxItemClickListener itemClickListener = new OnTxItemClickListener() {
+        @Override
+        public void onTransactionClick(View view, Sha256Hash transactionHash) {
+            // todo
+        }
+
+        @Override
+        public void onTransactionMenuClick(View view, Sha256Hash transactionHash) {
+
+        }
+
+        @Override
+        public void onWarningClick(View view) {
+
+        }
+    };
 }

@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.data.tx_list;
+package com.bethel.mycoolwallet.data.tx_list.item;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -11,6 +11,7 @@ import android.text.format.DateUtils;
 import androidx.annotation.Nullable;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.data.tx_list.ColorType;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.utils.Commons;
 import com.bethel.mycoolwallet.utils.Constants;

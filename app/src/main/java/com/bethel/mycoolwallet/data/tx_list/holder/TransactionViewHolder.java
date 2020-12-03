@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.data.tx_list.TransactionListItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionListItem;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
 import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.bethel.mycoolwallet.view.CircularProgressView;

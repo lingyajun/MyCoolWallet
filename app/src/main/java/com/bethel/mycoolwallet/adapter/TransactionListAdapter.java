@@ -10,12 +10,12 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.data.tx_list.IListItem;
+import com.bethel.mycoolwallet.data.tx_list.item.IListItem;
 import com.bethel.mycoolwallet.data.tx_list.OnTxItemClickListener;
 import com.bethel.mycoolwallet.data.tx_list.TransactionChangeType;
 import com.bethel.mycoolwallet.data.tx_list.TransactionDiffItem;
-import com.bethel.mycoolwallet.data.tx_list.TransactionListItem;
-import com.bethel.mycoolwallet.data.tx_list.TransactionWarningItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionListItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionWarningItem;
 import com.bethel.mycoolwallet.data.tx_list.holder.TransactionViewHolder;
 import com.bethel.mycoolwallet.data.tx_list.holder.WarningViewHolder;
 
@@ -30,7 +30,7 @@ public class TransactionListAdapter extends ListAdapter<IListItem, RecyclerView.
     private final LayoutInflater inflater;
     private OnTxItemClickListener itemClickListener;
 
-    protected TransactionListAdapter(final Context context, final int maxConnectedPeers,
+    public TransactionListAdapter(final Context context, final int maxConnectedPeers,
                                      final OnTxItemClickListener itemClickListener) {
         super(new TransactionDiffItem());
         this.context = context;

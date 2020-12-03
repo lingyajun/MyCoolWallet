@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.data.tx_list.TransactionWarningItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionWarningItem;
 
 public class WarningViewHolder extends RecyclerView.ViewHolder {
     private final TextView messageView;

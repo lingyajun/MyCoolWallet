@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.bethel.mycoolwallet.data.tx_list.item.IListItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionListItem;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionWarningItem;
 import com.bethel.mycoolwallet.utils.Utils;
 
 import org.bitcoinj.core.Coin;
@@ -20,14 +23,14 @@ import java.util.EnumSet;
 public class TransactionDiffItem extends DiffUtil.ItemCallback<IListItem> {
     @Override
     public boolean areItemsTheSame(@NonNull IListItem oldItem, @NonNull IListItem newItem) {
-        if (oldItem instanceof TransactionListItem ) {
+        if (oldItem instanceof TransactionListItem) {
             if (!( newItem instanceof TransactionListItem)) {
                 return false;
             }
             return Utils.equals(((TransactionListItem) oldItem).getTransactionHash(),
                     ((TransactionListItem) newItem).getTransactionHash());
         }
-        if (oldItem instanceof TransactionWarningItem ) {
+        if (oldItem instanceof TransactionWarningItem) {
             if (!( newItem instanceof TransactionWarningItem)) {
                 return false;
             }
