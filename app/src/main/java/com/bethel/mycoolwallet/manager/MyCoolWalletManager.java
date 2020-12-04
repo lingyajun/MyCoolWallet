@@ -1,6 +1,7 @@
 package com.bethel.mycoolwallet.manager;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.MainThread;
@@ -45,12 +46,15 @@ public class MyCoolWalletManager {
     private WalletFiles walletFiles;
     private Configuration mConfig;
 
+    private Handler mHandler;
+
     private static final Logger log = LoggerFactory.getLogger(MyCoolWalletManager.class);
 
     public void init(CoolApplication app) {
         application = app;
         mConfig = app.getConfiguration();
         walletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
+        mHandler = new Handler(Looper.getMainLooper());
         cleanupFiles();
     }
     private void cleanupFiles() {
@@ -102,6 +106,7 @@ public class MyCoolWalletManager {
                         loadWalletFromProtobuf();
                 }
                 listener.onWalletLoaded(walletFiles.getWallet());
+//                showThreadToast(R.string.wallet_low_storage_dialog_button_apps); // test
             }
 
             @WorkerThread
@@ -122,14 +127,15 @@ public class MyCoolWalletManager {
                         log.warn("problem loading wallet, auto-restoring: " + walletFile, x);
                         wallet = restoreWalletFromAutoBackup();
                         if (wallet != null) {
-                            XToast.info(application, R.string.toast_wallet_reset);
+                            showToast(R.string.toast_wallet_reset);
+//                            XToast.info(application, R.string.toast_wallet_reset);
                         }
                     }
                     if (!wallet.isConsistent()) {
                         log.warn("inconsistent wallet, auto-restoring: " + walletFile);
                         wallet = restoreWalletFromAutoBackup();
                         if (wallet != null) {
-                            XToast.info(application, R.string.toast_wallet_reset);
+                            showToast(R.string.toast_wallet_reset);
                         }
                     }
 
@@ -166,7 +172,12 @@ public class MyCoolWalletManager {
                     }
                 }
             }
+
         });
+    }
+
+    private void showToast(final int msgId) {
+        mHandler.post(()->  XToast.info(application, msgId).show());
     }
 
     private void armBackupReminder() {
