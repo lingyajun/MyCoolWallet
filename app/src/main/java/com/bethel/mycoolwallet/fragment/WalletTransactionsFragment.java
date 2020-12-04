@@ -2,7 +2,10 @@ package com.bethel.mycoolwallet.fragment;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.Menu;
@@ -21,10 +25,12 @@ import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.adapter.TransactionListAdapter;
+import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.data.tx_list.OnTxItemClickListener;
 import com.bethel.mycoolwallet.data.tx_list.TransactionDirection;
 import com.bethel.mycoolwallet.data.tx_list.TransactionListItemAnimator;
 import com.bethel.mycoolwallet.data.tx_list.TransactionWarningType;
+import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletTransactionsViewModel;
@@ -34,6 +40,7 @@ import com.bethel.mycoolwallet.view.TransactionsItemDecoration;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
 
 import butterknife.BindView;
@@ -46,7 +53,7 @@ import butterknife.BindView;
  *  * l列表点击事件  itemClickListener
  *  * 列表：交易记录  ?
  *
- *      menu
+ *      menu /
  *  *
  *  * 空页面 /
  */
@@ -75,7 +82,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
         CoolApplication application = CoolApplication.getApplication();
         viewModel = getViewModel(WalletTransactionsViewModel.class);
         activityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
-        mAdapter = new TransactionListAdapter(getContext(), application.maxConnectedPeers(), itemClickListener);
+        mAdapter = new TransactionListAdapter(getContext());
         emptyStatus = new CommonEmptyStatusViewAdapter(R.string.wallet_transactions_fragment_empty_text_howto);
 
         mConfig = application.getConfiguration();
@@ -120,7 +127,28 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
 
         viewModel.direction.observe(this, transactionDirection -> getActivity().invalidateOptionsMenu());
 
- // todo observe
+        viewModel.showBitmapDialog.observe(this, new Event.Observer<Bitmap>(){
+            @Override
+            public void onEvent( Bitmap content) {
+                if (null == content) return;
+                BitmapFragment.show(getFragmentManager(), content);
+            }
+        });
+
+        viewModel.showEditAddressBookDialog.observe(this, new Event.Observer<Address>(){
+            @Override
+            public void onEvent(Address content) {
+                if (null == content) return;
+                EditAddressBookFragment.edit(getFragmentManager(), content.toString());
+            }
+        });
+        viewModel.showReportIssueDialog.observe(this, new Event.Observer<String>(){
+            @Override
+            public void onEvent(String content) {
+                // todo Report Issue
+                XToast.warning(getContext(), "report: "+ content).show();
+            }
+        });
     }
 
     @Override
@@ -131,6 +159,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
         recyclerView.setItemAnimator(new TransactionListItemAnimator());
         recyclerView.setAdapter(mAdapter);
         recyclerView.addItemDecoration(new TransactionsItemDecoration(getContext()));
+        mAdapter.setOnItemClickListener(itemClickListener);
     }
 
     @Override
@@ -162,44 +191,80 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
 
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
-        // todo
+        TransactionDirection txDirection = viewModel.direction.getValue();
+        if (null== txDirection) txDirection = TransactionDirection.ALL;
+        switch (txDirection) {
+            case ALL:
+                menu.findItem(R.id.wallet_transactions_options_filter_all).setChecked(true);
+                break;
+            case SENT:
+                menu.findItem(R.id.wallet_transactions_options_filter_sent).setChecked(true);
+                break;
+            case RECEIVED:
+                menu.findItem(R.id.wallet_transactions_options_filter_received).setChecked(true);
+                break;
+        }
+        maybeSetFilterMenuItemIcon(txDirection.getIconId());
         super.onPrepareOptionsMenu(menu);
+    }
+
+    private void maybeSetFilterMenuItemIcon(int iconId) {
+        // Older Android versions can't deal with width and height in XML layer-list items.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            filterMenuItem.setIcon(iconId);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // todo
         final int id = item.getItemId();
+        TransactionDirection direction;
         switch (id) {
             case R.id.wallet_transactions_options_filter_all:
+                direction = TransactionDirection.ALL;
                 break;
             case R.id.wallet_transactions_options_filter_received:
-                XToast.info(getContext(), "received tx").show();
+                direction = TransactionDirection.RECEIVED;
                 break;
             case R.id.wallet_transactions_options_filter_sent:
-                XToast.info(getContext(), "sent tx").show();
+                direction = TransactionDirection.SENT;
                 break;
                 default: return super.onOptionsItemSelected(item);
         }
+        maybeSetFilterMenuItemIcon(direction.getIconId());
+        viewModel.direction.setValue(direction);
         return true;
     }
 
     private OnTxItemClickListener itemClickListener = new OnTxItemClickListener() {
         @Override
         public void onTransactionClick(View view, Sha256Hash transactionHash) {
-            // todo
+            viewModel.selectedTransaction.setValue(transactionHash);
         }
 
         @Override
         public void onTransactionMenuClick(View view, Sha256Hash transactionHash) {
-
+// todo popup  menu
         }
 
         @Override
         public void onWarningClick(View view) {
-
+            TransactionWarningType type = getWarning();
+            if (TransactionWarningType.BACKUP == type) {
+                // 提醒备份钱包文件
+                activityViewModel.showBackupWalletDialog.setValue(Event.simple());
+                return;
+            }
+            if (TransactionWarningType.STORAGE_ENCRYPTION == type) {
+                go2SecuritySettings();
+            }
         }
     };
+
+    private void go2SecuritySettings() {
+        Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+        startActivity(intent);
+    }
 
     private void showEmpty(String msg) {
         showEmpty();

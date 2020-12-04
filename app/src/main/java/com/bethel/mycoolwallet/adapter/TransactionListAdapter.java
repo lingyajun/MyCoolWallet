@@ -26,14 +26,13 @@ public class TransactionListAdapter extends ListAdapter<IListItem, RecyclerView.
     private static final int VIEW_TYPE_TRANSACTION = 0;
     private static final int VIEW_TYPE_WARNING = 1;
 
-    private final Context context;
+//    private final Context context;
     private final LayoutInflater inflater;
     private OnTxItemClickListener itemClickListener;
 
-    public TransactionListAdapter(final Context context, final int maxConnectedPeers,
-                                     final OnTxItemClickListener itemClickListener) {
+    public TransactionListAdapter(final Context context) {
         super(new TransactionDiffItem());
-        this.context = context;
+//        this.context = context;
         inflater = LayoutInflater.from(context);
     }
 

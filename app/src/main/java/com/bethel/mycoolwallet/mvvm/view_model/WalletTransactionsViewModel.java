@@ -13,8 +13,6 @@ import com.bethel.mycoolwallet.data.tx_list.TransactionDirection;
 import com.bethel.mycoolwallet.data.tx_list.TransactionWarningType;
 import com.bethel.mycoolwallet.data.tx_list.item.IListItem;
 import com.bethel.mycoolwallet.data.tx_list.item.TransactionListHelper;
-import com.bethel.mycoolwallet.data.tx_list.item.TransactionListItem;
-import com.bethel.mycoolwallet.data.tx_list.item.TransactionWarningItem;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
@@ -44,10 +42,10 @@ public class WalletTransactionsViewModel extends BaseViewModel {
     private final LiveData<List<AddressBook>> addressBook;
 
     public final MutableLiveData<TransactionDirection> direction = new MutableLiveData<>();
-    private final MutableLiveData<Sha256Hash> selectedTransaction = new MutableLiveData<>();
+    public final MutableLiveData<Sha256Hash> selectedTransaction = new MutableLiveData<>();
 
     public final MutableLiveData<Event<Bitmap>> showBitmapDialog = new MutableLiveData<>();
-    public final MutableLiveData<Event<Address>> showEditAddressBookEntryDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<Address>> showEditAddressBookDialog = new MutableLiveData<>();
     public final MutableLiveData<Event<String>> showReportIssueDialog = new MutableLiveData<>();
 
     public final MutableLiveData<TransactionWarningType> warning = new MutableLiveData<>();
@@ -87,8 +85,9 @@ public class WalletTransactionsViewModel extends BaseViewModel {
                 final boolean sent = tx.getValue(wallet).signum() < 0;
                 final boolean isInternal = tx.getPurpose() == Transaction.Purpose.KEY_ROTATION;
 
-                if (null==txDirection || (!sent && !isInternal && TransactionDirection.RECEIVED==txDirection)
-                                     || (sent && !isInternal && TransactionDirection.SENT==txDirection) ) {
+                if (null==txDirection || TransactionDirection.ALL == txDirection
+                        || (!sent && !isInternal && TransactionDirection.RECEIVED==txDirection)
+                        || (sent && !isInternal && TransactionDirection.SENT==txDirection) ) {
                     // 交易不是发送coin && 不是钱包内资金流转 && 交易方向为接收
                     // 交易是发送coin && 不是钱包内资金流转 && 交易方向为发送
                     filteredList.add(tx);
