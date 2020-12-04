@@ -51,7 +51,7 @@ public class ExchangeRatesViewModel extends BaseViewModel {
         boolean contains = isExist(bean, list);
 
         if (!contains) {
-            list.add(bean);
+            list.add(0, bean);
         }
         return list;
     }

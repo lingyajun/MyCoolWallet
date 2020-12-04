@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.bethel.mycoolwallet.CoolApplication;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 
 public class BaseViewModel extends AndroidViewModel {
     protected final CoolApplication application;
@@ -19,6 +20,7 @@ public class BaseViewModel extends AndroidViewModel {
      * 基础方法，异步任务
      * */
     protected void executeAsyncTask(Runnable task) {
-        AsyncTask.execute(task);
+        CoolThreadPool.execute(task);
+//        AsyncTask.execute(task);
     }
 }

@@ -27,6 +27,7 @@ import android.os.Handler;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bethel.mycoolwallet.CoolApplication;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.interfaces.OnWalletLoadedListener;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 
@@ -101,6 +102,7 @@ public abstract class AbstractWalletLiveData<T> extends ThrottlingLiveData<T> {
      * 基础方法，异步任务
      * */
     protected void executeAsyncTask(Runnable task) {
-        AsyncTask.execute(task);
+        CoolThreadPool.execute(task);
+//        AsyncTask.execute(task);
     }
 }

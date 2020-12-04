@@ -83,6 +83,10 @@ public class MyCoolWalletManager {
         }
     }
 
+    /* Executors.newSingleThreadExecutor() :
+        只有一个核心线程，并没有超时机制.
+        统一所有任务到一个线程中， 这使得在这些任务之间不需要处理线程同步的问题.
+     */
     private final Executor getWalletExecutor = Executors.newSingleThreadExecutor();
     private final Object getWalletLock = new Object();
 

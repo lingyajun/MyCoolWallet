@@ -27,6 +27,7 @@ import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.data.payment.PaymentUtil;
 import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.interfaces.IToolbar;
 import com.bethel.mycoolwallet.mvvm.view_model.SendingAddressesViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -249,7 +250,8 @@ public class SendingAddressesFragment extends BaseStatusLoaderFragment {
 
                     final String uri = BitcoinURI.convertToBitcoinURI(Constants.NETWORK_PARAMETERS,
                             address,null, label, null);
-                    AsyncTask.execute(()->{
+//                    AsyncTask.execute(()->{
+                    CoolThreadPool.execute(()->{
                         Bitmap bitmap = Qr.bitmap(uri);
                         viewModel.showBitmapDialog.postValue(new Event<>(bitmap));
                     });

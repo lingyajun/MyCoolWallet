@@ -179,7 +179,8 @@ public class ReceivingAddressesFragment extends BaseStatusLoaderFragment {
                     final String label = viewModel.ownName.getValue();
                     final String uri = BitcoinURI.convertToBitcoinURI(Constants.NETWORK_PARAMETERS,
                             address,null, label, null);
-                    AsyncTask.execute(()->{
+                    executeAsyncTask(()->{
+//                    AsyncTask.execute(()->{
                         Bitmap bitmap = Qr.bitmap(uri);
                         viewModel.showBitmapDialog.postValue(new Event<>(bitmap));
                     });

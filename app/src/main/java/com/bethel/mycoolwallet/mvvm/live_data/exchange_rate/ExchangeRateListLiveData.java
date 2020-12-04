@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.request.HttpUtil;
 import com.bethel.mycoolwallet.request.IRequestCallback;
 
@@ -28,7 +29,8 @@ public class ExchangeRateListLiveData extends LiveData<List<ExchangeRateBean>> {
     }
 
     public void load() {
-        AsyncTask.execute(()-> HttpUtil.requestExchangeRateList(callback));
+        CoolThreadPool.execute(()-> HttpUtil.requestExchangeRateList(callback));
+//        AsyncTask.execute(()-> HttpUtil.requestExchangeRateList(callback));
     }
 
     private final IRequestCallback callback = new IRequestCallback() {

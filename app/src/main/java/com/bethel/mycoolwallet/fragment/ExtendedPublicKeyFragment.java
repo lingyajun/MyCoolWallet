@@ -17,6 +17,7 @@ import androidx.core.app.ShareCompat;
 //import androidx.fragment.app.FragmentManager;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.utils.Qr;
 import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
@@ -75,7 +76,8 @@ public class ExtendedPublicKeyFragment extends DialogFragment {
     }
 
     private void showQrImage(String base58) {
-        AsyncTask.execute(()->{
+//        AsyncTask.execute(()->{
+        CoolThreadPool.execute(()->{
             final BitmapDrawable bitmap = new BitmapDrawable(getResources(), Qr.bitmap(base58));
             bitmap.setFilterBitmap(false);
             imageView.post(() -> {

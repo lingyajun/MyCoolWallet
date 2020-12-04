@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProviders;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.PasswordStrength;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.interfaces.IWalletBackupCallback;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletBackupViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
@@ -174,7 +175,8 @@ public class WalletBackupDialogFragment extends BaseDialogFragment {
                 final Uri targetUri = checkNotNull(data.getData());
                 final String password = passwordView.getText().toString().trim();
                 checkState(!password.isEmpty());
-                AsyncTask.execute(() -> {
+//                AsyncTask.execute(() -> {
+                CoolThreadPool.execute(() -> {
                     WalletUtils.backupWallet2FileSystem(getActivity().getContentResolver(),
                             viewModel.walletLiveData.getValue(),password, targetUri,
                             new IWalletBackupCallback() {

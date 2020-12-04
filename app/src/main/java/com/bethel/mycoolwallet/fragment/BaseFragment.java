@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -71,7 +73,8 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected final void executeAsyncTask(Runnable task) {
-        AsyncTask.execute(task);
+        CoolThreadPool.execute(task);
+//        AsyncTask.execute(task);
     }
 
     protected  <T extends ViewModel> T getViewModel(@NonNull Class<T> modelClass) {

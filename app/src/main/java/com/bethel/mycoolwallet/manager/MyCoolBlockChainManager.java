@@ -17,6 +17,7 @@ import com.bethel.mycoolwallet.data.BlockChainActiveHistoryEntry;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.Impediment;
 import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.interfaces.IBlockChainEventsCallback;
 import com.bethel.mycoolwallet.mvvm.live_data.ImpedimentLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.transation.NewTransactionLiveData;
@@ -135,7 +136,8 @@ public class MyCoolBlockChainManager {
         }
 
         // blockStore
-        AsyncTask.execute(()->{
+//        AsyncTask.execute(()->{
+        CoolThreadPool.execute(()->{
             try {
                 blockStore = new SPVBlockStore(Constants.NETWORK_PARAMETERS, blockChainFile, Constants.Files.BLOCKCHAIN_STORE_CAPACITY, true);
                 blockStore.getChainHead();  // detect corruptions as early as possible

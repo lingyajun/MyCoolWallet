@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.utils.Commons;
 import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.Iso8601Format;
@@ -38,7 +39,8 @@ public class DebugActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
         textView = findViewById(R.id.textView);
-        AsyncTask.execute(() -> {
+//        AsyncTask.execute(() -> {
+        CoolThreadPool.execute(() -> {
             File crashFile = CrashReporter.getCrashTraceFile();// getBackgroundTracesFile();
            final String data = readCrashReporter(crashFile);
            runOnUiThread(()-> textView.setText(data));

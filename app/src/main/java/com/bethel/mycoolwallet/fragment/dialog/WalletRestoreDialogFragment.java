@@ -21,6 +21,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.WalletFilePickerActivity;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.helper.CoolThreadPool;
 import com.bethel.mycoolwallet.interfaces.IWalletRestoreCallback;
 import com.bethel.mycoolwallet.manager.RequestPermissionsManager;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletRestoreViewModel;
@@ -163,13 +164,14 @@ public class WalletRestoreDialogFragment extends BaseDialogFragment {
     }
 
     private void restoreWalletFromEncrypted(File file, String password) {
-        AsyncTask.execute(()->
+//        AsyncTask.execute(()->
+        CoolThreadPool.execute(()->
                 WalletUtils.restoreWalletFromEncrypted(file, password, mWalletRestoreCallback)
                 );
     }
 
     private void restoreWalletFromProtobuf(File file) {
-        AsyncTask.execute(()->
+        CoolThreadPool.execute(()->
                 WalletUtils.restoreWalletFromProtobuf(file, mWalletRestoreCallback));
     }
 
