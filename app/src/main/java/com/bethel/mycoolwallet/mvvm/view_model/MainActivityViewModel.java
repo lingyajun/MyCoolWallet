@@ -21,4 +21,9 @@ public class MainActivityViewModel extends BaseViewModel {
         super(app);
         walletEncrypted = new WalletEncryptedLiveData(application);
     }
+
+    public void transactionsLoadingFinished() {
+// todo
+    }
+
 }
