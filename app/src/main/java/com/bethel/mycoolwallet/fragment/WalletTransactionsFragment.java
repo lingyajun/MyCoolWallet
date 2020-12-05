@@ -23,6 +23,7 @@ import android.view.View;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.activity.WebActivity;
 import com.bethel.mycoolwallet.adapter.CommonEmptyStatusViewAdapter;
 import com.bethel.mycoolwallet.adapter.TransactionListAdapter;
 import com.bethel.mycoolwallet.data.Event;
@@ -36,12 +37,15 @@ import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletTransactionsViewModel;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.view.StickToTopLinearLayoutManager;
+import com.bethel.mycoolwallet.view.TransactionPopupMenu;
 import com.bethel.mycoolwallet.view.TransactionsItemDecoration;
 import com.xuexiang.xui.widget.statelayout.StatusLoader;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.wallet.Wallet;
 
 import butterknife.BindView;
 
@@ -244,7 +248,38 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
 
         @Override
         public void onTransactionMenuClick(View view, Sha256Hash transactionHash) {
-// todo popup  menu
+            final Wallet wallet = viewModel.wallet.getValue();
+            if (null==wallet || null == transactionHash) return;
+//  popup  menu
+            TransactionPopupMenu menu = new TransactionPopupMenu(getActivity(), view,
+                    wallet, transactionHash, viewModel.addressBookDao);
+            menu.setOnMenuItemClickListener(new TransactionPopupMenu.OnTxMenuItemClickListener(){
+                @Override
+                public void onEditAddress(Address address) {
+                    viewModel.showEditAddressBookDialog.setValue(new Event<>(address));
+                }
+
+                @Override
+                public void onShowQr(Bitmap bitmap) {
+                    viewModel.showBitmapDialog.setValue(new Event<>(bitmap));
+                }
+
+                @Override
+                public void onRaiseFee(Transaction tx) {
+// todo                     RaiseFeeDialogFragment.show(getFragmentManager(), tx);
+                }
+
+                @Override
+                public void onReportIssue(String issue) {
+                    viewModel.showReportIssueDialog.setValue(new Event<>(issue));
+                }
+
+                @Override
+                public void onTxExplorer(String url) {
+                    WebActivity.start(getContext(), url);
+                }
+            });
+            menu.show();
         }
 
         @Override

@@ -14,6 +14,7 @@ import com.bethel.mycoolwallet.data.tx_list.TransactionWarningType;
 import com.bethel.mycoolwallet.data.tx_list.item.IListItem;
 import com.bethel.mycoolwallet.data.tx_list.item.TransactionListHelper;
 import com.bethel.mycoolwallet.db.AddressBook;
+import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
 import com.bethel.mycoolwallet.manager.MyCoolWalletManager;
 import com.bethel.mycoolwallet.mvvm.live_data.ConfigFormatLiveData;
@@ -51,13 +52,16 @@ public class WalletTransactionsViewModel extends BaseViewModel {
     public final MutableLiveData<TransactionWarningType> warning = new MutableLiveData<>();
     public final MediatorLiveData<List<IListItem>> list = new MediatorLiveData<>();
 
+    public final AddressBookDao addressBookDao;
+
     public WalletTransactionsViewModel(@NonNull Application app) {
         super(app);
         wallet = new WalletLiveData(getApplication());
         transactions = new TransactionsSetLiveData(getApplication());
         transactionsConfidence = new TransactionsConfidenceLiveData(getApplication());
         configFormat = new ConfigFormatLiveData();
-        addressBook = AppDatabase.getInstance(app).addressBookDao().getAll();
+        addressBookDao = AppDatabase.getInstance(app).addressBookDao();
+        addressBook = addressBookDao.getAll();
 
         list.addSource(wallet, wallet1 ->  maybePostList());
         list.addSource(transactions, transactions1 -> maybePostList());
