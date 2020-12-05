@@ -46,6 +46,9 @@ import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.data.payment.PaymentStandard;
 import com.bethel.mycoolwallet.data.payment.PaymentUtil;
+import com.bethel.mycoolwallet.data.tx_list.ColorType;
+import com.bethel.mycoolwallet.data.tx_list.holder.TransactionViewHolder;
+import com.bethel.mycoolwallet.data.tx_list.item.TransactionListItem;
 import com.bethel.mycoolwallet.db.AddressBook;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
@@ -95,6 +98,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -141,6 +145,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     private AddressBookDao addressBookDao;
     private AddressLabelListAdapter addressLabelListAdapter;
 
+    private TransactionViewHolder sentTransactionViewHolder;
 
     @BindView(R.id.send_coins_payee_group)
      View payeeGroup;
@@ -595,17 +600,13 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     }
 
     private void  updateView() {
+        log.info("updateView, paymentData {}", viewModel.paymentData);
         if (null==viewModel.paymentData) {
             ViewUtil.showView(getView(), false);
             return;
         }
 
         ViewUtil.showView(getView(), true);
-
-//        final Coin fee = feeSeekBar.getFee();
-//        final BlockChainState chainState = viewModel.blockChain.getValue();
-//        final Map<String, AddressBook> addressBookMap = AddressBook.asMap(viewModel.addressBook.getValue());
-//        final MonetaryFormat btcFormat = mConfig.getFormat();
 
         if (viewModel.paymentData.hasPayee()) {
             payeeNameView.setText(viewModel.paymentData.payeeName);
@@ -659,9 +660,12 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             }
             receivingStaticLabelView.setText(staticLabel);
 
-            int colorResId = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
-                    R.color.fg_significant : R.color.fg_insignificant;
-            receivingStaticLabelView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+            ColorType colorType = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
+                    ColorType.Significant : ColorType.Insignificant;
+            receivingStaticLabelView.setTextColor(colorType.getColor(getContext()));
+//            int colorResId = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
+//                    R.color.fg_significant : R.color.fg_insignificant;
+//            receivingStaticLabelView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
         } else if (null==viewModel.paymentData.standard) {
             ViewUtil.showView(payeeGroup, true);
             ViewUtil.showView(receivingAddressView, true);
@@ -783,13 +787,28 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     }
 
     private void updateTransactionView() {
-        // todo  TransactionsAdapter.ListItem.TransactionItem()
-        //  if (viewModel.sentTransaction != null && wallet != null) {
-        ViewUtil.showView(sentTransactionViewGroup, false);
+        final Wallet wallet = viewModel.wallet.getValue();
+        // bind view  TransactionListItem
+          if (viewModel.sentTransaction != null && wallet != null) {
+              if (null == sentTransactionViewHolder) {
+                  sentTransactionViewHolder = new TransactionViewHolder(sentTransactionViewGroup);
+              }
+              final Map<String, AddressBook> addressBook = AddressBook.asMap(viewModel.addressBook.getValue());
+              final MonetaryFormat btcFormat = mConfig.getFormat();
+              final TransactionListItem item = new TransactionListItem(getContext(), viewModel.sentTransaction,
+                      wallet, addressBook, btcFormat, application.maxConnectedPeers(), false);
+
+              sentTransactionViewHolder.bind(item);
+              ViewUtil.showView(sentTransactionViewGroup, true);
+          } else {
+              ViewUtil.showView(sentTransactionViewGroup, false);
+          }
     }
 
+    // todo status bar
     private void updateHintView() {
         ViewUtil.showView(hintView, false);
+//        log.info("updateHintView   {}", viewModel.state);
         if (SendCoinsViewModel.State.INPUT == viewModel.state) {
             final   BlockChainState blockChainState = viewModel.blockChain.getValue();
             final MonetaryFormat btcFormat = mConfig.getFormat();
@@ -797,17 +816,21 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
 
             if (null!=blockChainState && blockChainState.replaying) {
                 ViewUtil.showView(hintView, true);
-                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+                hintView.setTextColor(ColorType.Error.getColor(getContext()));
+//                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
                 hintView.setText(R.string.send_coins_fragment_hint_replaying);
+                log.info("updateHintView , blockChainState replaying");
             } else if (null==viewModel.validatedAddress
                     && PaymentUtil.mayEditAmount(viewModel.paymentData)
                     && !TextUtils.isEmpty(receivingAddressView.getText())) {
                 ViewUtil.showView(hintView, true);
-                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+                hintView.setTextColor(ColorType.Error.getColor(getContext()));
+//                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
                 hintView.setText(R.string.send_coins_fragment_receiving_address_error);
             } else if (null!=viewModel.dryrunException) {
                 ViewUtil.showView(hintView, true);
-                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
+                hintView.setTextColor(ColorType.Error.getColor(getContext()));
+//                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_error));
 
                 final String hintText;
                 Exception e = viewModel.dryrunException;
@@ -826,14 +849,16 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                     null!=viewModel.dryrunTransaction.getFee()) {
                 ViewUtil.showView(hintView, true);
                 final int hintResId= R.string.send_coins_fragment_hint_fee;
-                final int colorResId = R.color.fg_insignificant;
-                hintView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+//                final int colorResId = R.color.fg_insignificant;
+//                hintView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+                hintView.setTextColor(ColorType.Insignificant.getColor(getContext()));
                 hintView.setText(getString(hintResId,
                         btcFormat.format(viewModel.dryrunTransaction.getFee())));
             } else if (null!= viewModel.validatedAddress && null!= wallet
                     && PaymentUtil.mayEditAmount(viewModel.paymentData)
                     && wallet.isAddressMine(viewModel.validatedAddress.address)) {
-                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_insignificant));
+                hintView.setTextColor(ColorType.Insignificant.getColor(getContext()));
+//                hintView.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_insignificant));
                 ViewUtil.showView(hintView, true);
                 hintView.setText(R.string.send_coins_fragment_receiving_address_own);
             }
@@ -1154,8 +1179,8 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
     private final Filter mAddressLabelListFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
-            final String trimmedConstraint = charSequence.toString().trim();
             final FilterResults results = new FilterResults();
+            final String trimmedConstraint = null!=charSequence? charSequence.toString().trim(): "";
             if (null==viewModel.validatedAddress && !trimmedConstraint.isEmpty()) {
                 List<AddressBook> list = addressBookDao.get(trimmedConstraint);
                 results.count = Utils.size(list);

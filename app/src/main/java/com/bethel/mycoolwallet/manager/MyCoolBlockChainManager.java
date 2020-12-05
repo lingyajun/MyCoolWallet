@@ -466,7 +466,8 @@ public class MyCoolBlockChainManager {
 
         Runnable task = () ->{
             lastTime.set(System.currentTimeMillis());
-            mConfig.maybeIncrementBestChainHeightEver(blockChain.getChainHead().getHeight());
+            final int bestHeight = blockChain.getChainHead().getHeight();
+            mConfig.maybeIncrementBestChainHeightEver(bestHeight);
 //            broadcastBlockChainState();
             if (null!= mEventsCallback) mEventsCallback.onBlocksDownloaded();
         };
@@ -483,6 +484,7 @@ public class MyCoolBlockChainManager {
         Date time = head.getHeader().getTime();
         int height = head.getHeight();
         boolean isReplay = head.getHeight() < mConfig.getBestChainHeightEver();
+        log.info("getBlockChainState: isReplay? {} < {}", head.getHeight(), mConfig.getBestChainHeightEver());
         Set<Impediment> impediments = null!= impedimentLiveData?
                 impedimentLiveData.getValue() : EnumSet.noneOf(Impediment.class);
         return new BlockChainState(time, height ,isReplay, impediments);

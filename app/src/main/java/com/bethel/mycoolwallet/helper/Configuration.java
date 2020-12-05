@@ -56,8 +56,9 @@ public class Configuration {
     }
 
     public void maybeIncrementBestChainHeightEver(final int bestChainHeightEver) {
-        if (bestChainHeightEver > getBestChainHeightEver())
+        if (bestChainHeightEver > getBestChainHeightEver()) {
             mPreference.putInt(PREFS_KEY_BEST_CHAIN_HEIGHT_EVER, bestChainHeightEver);
+        }
     }
 
     public String getMyCurrencyCode() {
