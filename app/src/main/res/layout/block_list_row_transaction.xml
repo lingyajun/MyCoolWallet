@@ -5,8 +5,9 @@
     android:background="@color/bg_level1"
     android:baselineAligned="true"
     android:orientation="horizontal"
-    android:paddingBottom="2dp"
-    android:paddingTop="2dp" >
+    android:padding="2dp">
+<!--    android:paddingBottom="2dp"-->
+<!--    android:paddingTop="2dp" >-->
 
     <TextView
         android:id="@+id/block_row_transaction_fromto"

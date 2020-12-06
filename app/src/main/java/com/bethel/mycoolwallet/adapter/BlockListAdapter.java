@@ -85,8 +85,9 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
                     itemClickListener.onBlockMenuClick(view, item.blockHash));
         }
 
-        //  transactions ui
-        holder.transactionsViewGroup.removeAllViewsInLayout();
+        // todo transactions ui
+        holder.transactionsViewGroup.removeAllViews();
+//        holder.transactionsViewGroup.removeAllViewsInLayout();
         for (ListItem.ListTransaction tx: item.transactions ) {
             View  view = inflater.inflate(R.layout.block_list_row_transaction, null);
             holder.transactionsViewGroup.addView(view);
@@ -102,7 +103,7 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
         fromToTv.setText(tx.fromTo);
         addressTv.setText(tx.label != null ? tx.label : tx.address.toString());
         addressTv.setTypeface(tx.label != null ? Typeface.DEFAULT : Typeface.MONOSPACE);
-        CurrencyTools.setText(valueTv, format, tx.value);
+        CurrencyTools.setText(valueTv, format, tx.isTxSent(), tx.value);
     }
 
     public interface OnItemClickListener {
@@ -186,7 +187,7 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
                                final @Nullable Map<String, AddressBook> addressBook)
             {
                 this.value = tx.getValue(wallet);
-                final boolean sent = value.signum() < 0;
+                final boolean sent = isTxSent();//value.signum() < 0;
                 if (sent) {
                     address = WalletUtils.getToAddressOfSent(tx, wallet);
                 } else {
@@ -219,6 +220,15 @@ public class BlockListAdapter extends ListAdapter<BlockListAdapter.ListItem, Blo
                 else {
                     label = "?";
                 }
+            }
+
+
+            /**
+             * 该交易是否是(本钱包)发送coin
+             * @return
+             */
+            public boolean isTxSent() {
+                return value.signum() < 0;
             }
 
         }

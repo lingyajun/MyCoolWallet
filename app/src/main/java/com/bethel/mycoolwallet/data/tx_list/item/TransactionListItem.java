@@ -510,7 +510,7 @@ public class TransactionListItem implements IListItem {
      * 该交易是否是(本钱包)发送coin
      * @return
      */
-    private boolean isTxSent() {
+    public boolean isTxSent() {
         final Coin value = tx.getValue(wallet);
 //        final boolean sent = value.signum() < 0;
         return value.signum() < 0;

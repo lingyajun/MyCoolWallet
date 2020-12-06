@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 //public class MyCoolWalletManager {
-public enum  MyCoolWalletManager {
+public enum MyCoolWalletManager {
     /**
      * 枚举方法 --  单例模式
      * (1)自由序列化。
@@ -54,7 +54,7 @@ public enum  MyCoolWalletManager {
     private static final String BIP39_WORDLIST_FILENAME = "bip39-wordlist.txt";
 
     private CoolApplication application;
-    private File walletFile;
+    private File mWalletFile; // walletFile
     private WalletFiles walletFiles;
 //    private Configuration mConfig;
 
@@ -68,14 +68,14 @@ public enum  MyCoolWalletManager {
         propagate();
 //        org.bitcoinj.core.Context.propagate(Constants.CONTEXT);
 
-        log.info("=== starting wallet  network: {}",  Constants.NETWORK_PARAMETERS.getId());
+        log.info("=== starting wallet  network: {}", Constants.NETWORK_PARAMETERS.getId());
 
         application = app;
 
         initWalletExceptionHandler();
 
 //        mConfig = app.getConfiguration();
-        walletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
+        mWalletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
         mHandler = new Handler(Looper.getMainLooper());
         cleanupFiles();
     }
@@ -141,9 +141,10 @@ public enum  MyCoolWalletManager {
 
             @WorkerThread
             private void loadWalletFromProtobuf() {
-                Wallet wallet;
-                if (walletFile.exists()) {
-                    try (final FileInputStream walletStream = new FileInputStream(walletFile)) {
+                if (mWalletFile.exists()) {
+                    Wallet wallet;
+                    try {
+                        final FileInputStream walletStream = new FileInputStream(mWalletFile);
                         final Stopwatch watch = Stopwatch.createStarted();
                         wallet = new WalletProtobufSerializer().readWallet(walletStream);
                         watch.stop();
@@ -152,17 +153,18 @@ public enum  MyCoolWalletManager {
                             throw new UnreadableWalletException(
                                     "bad wallet network parameters: " + wallet.getParams().getId());
 
-                        log.info("wallet loaded from: '{}', took {}", walletFile, watch);
+                        log.info("wallet loaded from: '{}', took {}", mWalletFile, watch);
                     } catch (final IOException | UnreadableWalletException x) {
-                        log.warn("problem loading wallet, auto-restoring: " + walletFile, x);
+                        log.warn("problem loading wallet, auto-restoring: " + mWalletFile, x);
                         wallet = restoreWalletFromAutoBackup();
                         if (wallet != null) {
                             showToast(R.string.toast_wallet_reset);
 //                            XToast.info(application, R.string.toast_wallet_reset);
                         }
-                    }
-                    if (!wallet.isConsistent()) {
-                        log.warn("inconsistent wallet, auto-restoring: " + walletFile);
+                    } // end  try-catch
+
+                    if (null == wallet || !wallet.isConsistent()) {
+                        log.warn("inconsistent wallet, auto-restoring: {}" , mWalletFile);
                         wallet = restoreWalletFromAutoBackup();
                         if (wallet != null) {
                             showToast(R.string.toast_wallet_reset);
@@ -173,21 +175,24 @@ public enum  MyCoolWalletManager {
                         throw new Error("bad wallet network parameters: " + wallet.getParams().getId());
 
                     wallet.cleanup();
-                    walletFiles = wallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
+                    walletFiles = wallet.autosaveToFile(mWalletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
                             TimeUnit.MILLISECONDS, null);
-                } else {
-                    final Stopwatch watch = Stopwatch.createStarted();
-                    wallet = Wallet.createDeterministic(Constants.NETWORK_PARAMETERS,
-                            Constants.DEFAULT_OUTPUT_SCRIPT_TYPE);
-                    walletFiles = wallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
-                            TimeUnit.MILLISECONDS, null);
-                    autoSaveWalletNow(); // persist...
-                    WalletUtils.autoBackupWallet(application, wallet); // ...and backup asap
-                    watch.stop();
-                    log.info("fresh {} wallet created, took {}", Constants.DEFAULT_OUTPUT_SCRIPT_TYPE, watch);
 
-                    armBackupReminder();
+                    return;
                 }
+//                else { // !walletFile.exists()
+                final Stopwatch watch = Stopwatch.createStarted();
+                final Wallet wallet = Wallet.createDeterministic(Constants.NETWORK_PARAMETERS,
+                        Constants.DEFAULT_OUTPUT_SCRIPT_TYPE);
+                walletFiles = wallet.autosaveToFile(mWalletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
+                        TimeUnit.MILLISECONDS, null);
+                autoSaveWalletNow(); // persist...
+                WalletUtils.autoBackupWallet(application, wallet); // ...and backup asap
+                watch.stop();
+                log.info("fresh {} wallet created, took {}", Constants.DEFAULT_OUTPUT_SCRIPT_TYPE, watch);
+
+                armBackupReminder();
+//                }
             }
 
             private void initMnemonicCode() {
@@ -207,7 +212,7 @@ public enum  MyCoolWalletManager {
     }
 
     private void showToast(final int msgId) {
-        mHandler.post(()->  XToast.info(application, msgId).show());
+        mHandler.post(() -> XToast.info(application, msgId).show());
     }
 
     private void armBackupReminder() {
@@ -231,7 +236,7 @@ public enum  MyCoolWalletManager {
         synchronized (getWalletLock) {
             if (walletFiles != null) {
                 watch.stop();
-                log.info("wallet saved to: '{}', took {}", walletFile, watch);
+                log.info("wallet saved to: '{}', took {}", mWalletFile, watch);
                 try {
                     walletFiles.saveNow();
                 } catch (final IOException x) {
@@ -251,7 +256,7 @@ public enum  MyCoolWalletManager {
         final Wallet oldWallet = getWallet();
         synchronized (getWalletLock) {
             oldWallet.shutdownAutosaveAndWait(); // this will also prevent BlockchainService to save
-            walletFiles = newWallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
+            walletFiles = newWallet.autosaveToFile(mWalletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
                     TimeUnit.MILLISECONDS, null);
         }
         Configuration.INSTANCE.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());

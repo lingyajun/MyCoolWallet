@@ -122,7 +122,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
 //        fiatView.setAmount(item.fiat);
 //        fiatView.setFormat(item.fiatFormat);
 //        fiatView.setPrefixColor(item.fiatPrefixColor);
-        CurrencyTools.setText(fiatView, item.getFiatFormat(), item.getFiat());
+        CurrencyTools.setText(fiatView, item.getFiatFormat(), item.isTxSent(), item.getFiat());
     }
 
     public void bindValue(final TransactionListItem item) {
@@ -132,7 +132,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
 //        valueView.setAmount(item.value);
 //        valueView.setFormat(item.valueFormat);
         valueView.setTextColor(item.getValueColor());
-        CurrencyTools.setText(valueView, item.getValueFormat(), item.getValue());
+        CurrencyTools.setText(valueView, item.getValueFormat(), item.isTxSent(), item.getValue());
     }
 
     public void bindFee(final TransactionListItem item) {
@@ -141,7 +141,7 @@ public class TransactionViewHolder extends RecyclerView.ViewHolder {
 //        feeView.setAlwaysSigned(true);
 //        feeView.setFormat(item.feeFormat);
 //        feeView.setAmount(item.fee);
-        CurrencyTools.setText(feeView, item.getFeeFormat(), item.getFee());
+        CurrencyTools.setText(feeView, item.getFeeFormat(), item.isTxSent(), item.getFee());
     }
 
     public void bindAddress(final TransactionListItem item) {
