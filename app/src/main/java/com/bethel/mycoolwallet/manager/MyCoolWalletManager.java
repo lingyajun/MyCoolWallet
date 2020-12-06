@@ -23,6 +23,7 @@ import com.xuexiang.xui.widget.toast.XToast;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
 import org.bitcoinj.wallet.WalletFiles;
@@ -62,12 +63,30 @@ public enum  MyCoolWalletManager {
     private static final Logger log = LoggerFactory.getLogger(MyCoolWalletManager.class);
 
     public void init(CoolApplication app) {
+        Threading.throwOnLockCycles();
+        org.bitcoinj.core.Context.enableStrictMode();
+        propagate();
+//        org.bitcoinj.core.Context.propagate(Constants.CONTEXT);
+
+        log.info("=== starting wallet  network: {}",  Constants.NETWORK_PARAMETERS.getId());
+
         application = app;
+
+        initWalletExceptionHandler();
+
         mConfig = app.getConfiguration();
         walletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
         mHandler = new Handler(Looper.getMainLooper());
         cleanupFiles();
     }
+
+    private void initWalletExceptionHandler() {
+        Threading.uncaughtExceptionHandler = (thread, throwable) -> {
+            log.info("bitcoinj uncaught exception", throwable);
+            CrashReporter.saveBackgroundTrace(throwable, application.packageInfo());
+        };
+    }
+
     private void cleanupFiles() {
         String[] fileList = application.fileList();
         for (final String filename : fileList) {

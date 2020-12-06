@@ -22,7 +22,6 @@ import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.core.VersionMessage;
 import org.bitcoinj.crypto.LinuxSecureRandom;
-import org.bitcoinj.utils.Threading;
 import org.bitcoinj.wallet.Wallet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,26 +43,17 @@ public class CoolApplication extends Application {
 
     @Override
     public void onCreate() {
-        new LinuxSecureRandom(); // init proper random number generator
+        new LinuxSecureRandom(); // init proper random number generator: org.bitcoinj.crypto.LinuxSecureRandom;
         Logging.init(getFilesDir());
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().permitDiskReads()
                 .permitDiskWrites().penaltyLog().build());
 
-        Threading.throwOnLockCycles();
-        org.bitcoinj.core.Context.enableStrictMode();
-        org.bitcoinj.core.Context.propagate(Constants.CONTEXT);
-
-        log.info("=== starting app using flavor: {}, build type: {}, network: {}", BuildConfig.FLAVOR,
-                BuildConfig.BUILD_TYPE, Constants.NETWORK_PARAMETERS.getId());
+        log.info("=== starting app using flavor: {}, build type: {}", BuildConfig.FLAVOR, BuildConfig.BUILD_TYPE );
 
         super.onCreate();
         application = this;
 
         CrashReporter.init(getCacheDir());
-        Threading.uncaughtExceptionHandler = (thread, throwable) -> {
-            log.info("bitcoinj uncaught exception", throwable);
-            CrashReporter.saveBackgroundTrace(throwable, packageInfo());
-        };
 
         MyCoolWalletManager.INSTANCE.init(this);
 

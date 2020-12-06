@@ -82,7 +82,7 @@ public class BlocksNetworkMonitorFragment extends BaseStatusLoaderFragment {
         adapter.setOnItemClickListener((v, blockHash) -> {
             mPopupMenu.setOnPopupItemClickListener((adapter, item, position) -> {
                 final String url = Commons.BLOCK_CHAIN_VIEW + "block/" + blockHash;
-                WebActivity.start(getActivity(),url);
+                WebActivity.start(getActivity(),url, getString(R.string.network_monitor_block_list_title));
                 log.info(url);
             });
             mPopupMenu.showDown(v);
