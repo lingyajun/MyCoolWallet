@@ -70,7 +70,7 @@ public class TransactionPopupMenu{
           //  return;
         } else {
             editAddressMenuItem.setVisible(true);
-            final boolean isAdd = null != addressBookDao && !TextUtils.isEmpty(addressBookDao.resolveLabel(txAddress.toString()));
+            final boolean isAdd = null == addressBookDao || TextUtils.isEmpty(addressBookDao.resolveLabel(txAddress.toString()));
             final boolean isOwn = wallet.isAddressMine(txAddress);
             if (isOwn) {
                 editAddressMenuItem.setTitle(isAdd ? R.string.edit_address_book_entry_dialog_title_add_receive
