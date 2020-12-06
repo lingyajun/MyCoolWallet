@@ -1039,26 +1039,26 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                             WebActivity.start(getContext(), link);
                         }
 
-                        @Override
-                        protected void requestBIP38PrivateKeyPassphrase() {
-                            // todo need test
-                            View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_bip38_password_layout, null);
-                            TextView passwordTv = view.findViewById(R.id.dialog_password_bip38_et);
-                            MaterialDialog dialog = new MaterialDialog.Builder(getContext())
-                                    .title(R.string.sweep_wallet_fragment_password)
-                                    .customView(view, true)
-                                    .positiveText(R.string.button_ok)
-                                    .negativeText(R.string.button_cancel)
-                                    .show();
-                            dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view1 -> {
-                                String password = passwordTv.getText().toString().trim();
-                                if (!password.isEmpty()) {
-                                    responseBIP38PrivateKeyPassphrase(password);
-                                    dialog.dismiss();
-                                }
-                            });
-
-                        }
+//                        @Override
+//                        protected void requestBIP38PrivateKeyPassphrase() {
+//                            //  need test
+//                            View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_bip38_password_layout, null);
+//                            TextView passwordTv = view.findViewById(R.id.dialog_password_bip38_et);
+//                            MaterialDialog dialog = new MaterialDialog.Builder(getContext())
+//                                    .title(R.string.sweep_wallet_fragment_password)
+//                                    .customView(view, true)
+//                                    .positiveText(R.string.button_ok)
+//                                    .negativeText(R.string.button_cancel)
+//                                    .show();
+//                            dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view1 -> {
+//                                String password = passwordTv.getText().toString().trim();
+//                                if (!password.isEmpty()) {
+//                                    responseBIP38PrivateKeyPassphrase(password);
+//                                    dialog.dismiss();
+//                                }
+//                            });
+//
+//                        }
 
                         @Override
                         public void handleDirectTransaction(Transaction transaction) throws VerificationException {

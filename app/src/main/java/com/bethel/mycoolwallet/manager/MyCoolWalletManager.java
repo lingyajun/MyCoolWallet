@@ -20,6 +20,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.SettableFuture;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.wallet.UnreadableWalletException;
 import org.bitcoinj.wallet.Wallet;
@@ -228,6 +230,14 @@ public class MyCoolWalletManager {
 
         final Intent broadcast = new Intent(ACTION_WALLET_REFERENCE_CHANGED);
         LocalBroadcastManager.getInstance(application).sendBroadcast(broadcast);
+    }
+
+    public void processDirectTransaction(final Transaction tx) throws VerificationException {
+        final Wallet wallet = getWallet();
+        if (wallet.isTransactionRelevant(tx)) {
+            wallet.receivePending(tx, null);
+            BlockChainService.broadcastTransaction(application, tx);
+        }
     }
 
     /**

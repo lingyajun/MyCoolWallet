@@ -15,6 +15,7 @@ import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.DumpedPrivateKey;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.core.PrefixedChecksummedBytes;
 import org.bitcoinj.core.ProtocolException;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.VerificationException;
@@ -75,23 +76,29 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
     private void parseAndHandleAddress() {
         try {
             final DumpedPrivateKey dumpedPrivateKey = DumpedPrivateKey.fromBase58(Constants.NETWORK_PARAMETERS, input);
-            final Address address = LegacyAddress.fromKey(Constants.NETWORK_PARAMETERS, dumpedPrivateKey.getKey());
-            handlePaymentData(PaymentUtil.fromAddress(address, null));
+            handlePrivateKey(dumpedPrivateKey);
         } catch (AddressFormatException e) {
             log.info(" DumpedPrivateKey ", e);
             try {
                 final BIP38PrivateKey bip38PrivateKey = BIP38PrivateKey.fromBase58(Constants.NETWORK_PARAMETERS, input);
 //            bip38PrivateKey.decrypt(String passphrase); // todo need a passphrase
-                requestBIP38PrivateKeyPassphrase();
+//                requestBIP38PrivateKeyPassphrase(bip38PrivateKey);
 //                responseBIP38PrivateKeyPassphrase( String passphrase);
-            } catch (AddressFormatException ex) {
-                log.info(" BIP38PrivateKey ", ex);
+                handlePrivateKey(bip38PrivateKey);
+            } catch ( Exception ex) {
+                log.warn(" BIP38PrivateKey ", ex);
                 parseAndHandleNormalAddress();
             }
         }
     }
 
-    protected abstract void requestBIP38PrivateKeyPassphrase();
+    protected void handlePrivateKey(final PrefixedChecksummedBytes key) {
+        final Address address = LegacyAddress.fromKey(Constants.NETWORK_PARAMETERS,
+                ((DumpedPrivateKey) key).getKey());
+        handlePaymentData(PaymentUtil.fromAddress(address, null));
+    }
+
+//    protected abstract void requestBIP38PrivateKeyPassphrase( final BIP38PrivateKey key);
 
     /**
      * 将 {input} 解析成 Address

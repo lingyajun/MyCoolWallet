@@ -9,16 +9,21 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
+import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
+import com.bethel.mycoolwallet.helper.SendCoinsHelper;
+import com.bethel.mycoolwallet.helper.parser.StringInputParser;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
 import com.bethel.mycoolwallet.interfaces.ISendCoins;
@@ -28,6 +33,9 @@ import com.bethel.mycoolwallet.utils.Constants;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
+import org.bitcoinj.core.PrefixedChecksummedBytes;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.script.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +95,6 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        MenuBuilder m;
         final Resources res = getResources();
 
         final boolean showExchangeRatesOption = Constants.ENABLE_EXCHANGE_RATES
@@ -166,6 +173,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 viewModel.showHelpDialog.setValue(new Event<>(R.string.help_technical_notes));
                 break;
             case R.id.wallet_options_report_issue :
+                // todo
                 XToast.info(this, "report issue").show();
                 break;
             case R.id.wallet_options_help :
@@ -182,12 +190,10 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
     private void   handleRequestCoins() {
         requestCoins();
-       // XToast.info(this, "handleRequestCoins").show();
     }
 
     private void handleSendCoins() {
         sendCoins();
-//        XToast.info(this, "handleSendCoins").show();
     }
 
     private void handleScan(View o) {
@@ -242,9 +248,42 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             Bundle bundle = data.getExtras();
             if (bundle != null) {
                 if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
-                    String result = bundle.getString(XQRCode.RESULT_DATA);
-                    // todo handle bitcoin pay
-                    XToast.success(this, "解析结果: " + result, Toast.LENGTH_LONG).show();
+                    final  String result = bundle.getString(XQRCode.RESULT_DATA);
+                    if (TextUtils.isEmpty(result)) return;
+                    //  handle bitcoin pay
+                    final StringInputParser parser = new StringInputParser(result) {
+                        @Override
+                        protected void handleWebUrl(String link) {
+                            WebActivity.start(MainActivity.this, link);
+                        }
+
+                        @Override
+                        protected void handlePrivateKey(PrefixedChecksummedBytes key) {
+//                            if (Constants.ENABLE_SWEEP_WALLET)
+//    todo                            SweepWalletActivity.start(MainActivity.this, key);
+//                            else
+                            super.handlePrivateKey(key);
+                        }
+
+                        @Override
+                        public void handleDirectTransaction(Transaction transaction) throws VerificationException {
+                            CoolApplication.getApplication().processDirectTransaction(transaction);
+                        }
+
+                        @Override
+                        public void error(int messageResId, Object... messageArgs) {
+                            SendCoinsHelper.dialog(MainActivity.this, null,
+                                    R.string.button_scan, messageResId, messageArgs);
+                            log.error("IntentDataParser {}", getString(messageResId, messageArgs));
+                        }
+
+                        @Override
+                        public void handlePaymentData(PaymentData data) {
+                            SendCoinsActivity.start(MainActivity.this, data);
+                        }
+                    };
+                    parser.parse();
+                    log.info("解析结果: " + result );
                 } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
                     XToast.error(this,R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
                 }
@@ -257,7 +296,6 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
      * */
     @Override
     public void requestCoins() {
-//         XToast.info(this, "requestCoins").show();
         RequestCoinsActivity.start(this);
     }
 

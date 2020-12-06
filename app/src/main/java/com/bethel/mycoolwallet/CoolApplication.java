@@ -18,6 +18,8 @@ import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.bethel.mycoolwallet.utils.Logging;
 import com.xuexiang.xui.XUI;
 
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.core.VerificationException;
 import org.bitcoinj.core.VersionMessage;
 import org.bitcoinj.crypto.LinuxSecureRandom;
 import org.bitcoinj.utils.Threading;
@@ -85,6 +87,10 @@ public class CoolApplication extends Application {
 
     public void replaceWallet(final Wallet newWallet) {
         myWalletManager.replaceWallet(newWallet);
+    }
+
+    public void processDirectTransaction(final Transaction tx) throws VerificationException {
+        myWalletManager.processDirectTransaction(tx);
     }
 
     public Configuration getConfiguration() {
