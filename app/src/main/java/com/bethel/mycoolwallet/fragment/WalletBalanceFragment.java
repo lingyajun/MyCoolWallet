@@ -23,10 +23,13 @@ import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
+import com.bethel.mycoolwallet.data.tx_list.ColorType;
 import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletBalanceViewModel;
 import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.CurrencyTools;
+import com.bethel.mycoolwallet.utils.ViewUtil;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.core.Coin;
@@ -66,6 +69,7 @@ public class WalletBalanceFragment extends BaseFragment {
     ProgressBar progressBar;
 
     private WalletBalanceViewModel viewModel;
+    private MainActivityViewModel activityViewModel;
     private Configuration mConfig;
     private boolean showLocalBalance;
 
@@ -83,11 +87,13 @@ public class WalletBalanceFragment extends BaseFragment {
         mConfig = CoolApplication.getApplication().getConfiguration();
         showLocalBalance = getResources().getBoolean(R.bool.show_local_balance);
 
+        activityViewModel = getActivityViewModel(MainActivityViewModel.class);
         viewModel = getViewModel(WalletBalanceViewModel.class);
         viewModel.balanceLiveData.observe(this, coin -> {
             getActivity().invalidateOptionsMenu();
             updateView();
-            // todo 通知外部事件
+            //  通知外部事件
+            activityViewModel.balanceLoadingFinished();
         });
 
         viewModel.chainStateLiveData.observe(this, blockChainState -> updateView());
@@ -120,8 +126,7 @@ public class WalletBalanceFragment extends BaseFragment {
     }
 
     private void updateView() {
-        log.info(".updateView()");
-        // todo ExchangeRate
+        log.debug(".updateView()");
         BlockChainState chainState = viewModel.chainStateLiveData.getValue();
         Coin balance = viewModel.balanceLiveData.getValue();
         ExchangeRateBean rateBean = viewModel.rateLiveData.getValue();
@@ -158,49 +163,51 @@ public class WalletBalanceFragment extends BaseFragment {
                     progressTv.setText(getString(R.string.blockchain_state_progress_months, downloading, months));
                 }
 
-                progressBar.setVisibility(noImpediments ? View.VISIBLE: View.INVISIBLE);
+                ViewUtil.setVisibility(progressBar, noImpediments ? View.VISIBLE: View.INVISIBLE);
             }
         }
 
         if (!showProgress) {
 //            balanceLayout.setVisibility(View.VISIBLE);
-            balanceLocalTv.setVisibility(View.VISIBLE);
+//            balanceLocalTv.setVisibility(View.VISIBLE);
+            ViewUtil.setVisibility(balanceLocalTv, View.VISIBLE);
             if (null != balance) {
                 CurrencyTools.setText(balanceBtcTv, mConfig.getFormat(), balance);
-                balanceBtcTv.setVisibility(View.VISIBLE);
                 if (showLocalBalance) {
                     if (rateBean != null) {
                         final Fiat localValue = rateBean.rate.coinToFiat(balance);
                         MonetaryFormat format = Constants.LOCAL_FORMAT.code(0,
                                 Constants.PREFIX_ALMOST_EQUAL_TO + rateBean.getCurrencyCode());
                         CurrencyTools.setText(balanceLocalTv, format, localValue);
-                        balanceLocalTv.setTextColor(ContextCompat.getColor(getContext(), R.color.fg_less_significant));
+                        balanceLocalTv.setTextColor(ColorType.LessSignificant.getColor(getContext()));
                     } else {
-                        balanceLocalTv.setVisibility(View.INVISIBLE);
+                        ViewUtil.setVisibility(balanceLocalTv, View.INVISIBLE);
                     }
                 }
-            } else {
-                balanceBtcTv.setVisibility(View.INVISIBLE);
+//            } else {
+//                ViewUtil.setVisibility(balanceBtcTv, View.INVISIBLE);
             }
             //  viewBalance
 
             if (balance != null && balance.isGreaterThan(Constants.TOO_MUCH_BALANCE_THRESHOLD)) {
-                warningTv.setVisibility(View.VISIBLE);
+                ViewUtil.setVisibility(warningTv, View.VISIBLE);
                 warningTv.setText(R.string.wallet_balance_fragment_too_much);
             } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                     Build.VERSION.SECURITY_PATCH.compareToIgnoreCase(Constants.SECURITY_PATCH_INSECURE_BELOW) < 0) {
-                warningTv.setVisibility(View.VISIBLE);
+                ViewUtil.setVisibility(warningTv, View.VISIBLE);
                 warningTv.setText(R.string.wallet_balance_fragment_insecure_device);
+                log.warn("security  {}", Build.VERSION.SDK_INT>=23 ? Build.VERSION.SECURITY_PATCH : Build.VERSION.CODENAME);
             } else {
-                warningTv.setVisibility(View.GONE);
+                ViewUtil.setVisibility(warningTv, View.GONE);
             }
 
-            progressLayout.setVisibility(View.GONE);
+            ViewUtil.setVisibility(progressLayout, View.GONE);
         } else {
 //            balanceLayout.setVisibility(View.INVISIBLE);
-            balanceLocalTv.setVisibility(View.INVISIBLE);
-            progressLayout.setVisibility(View.VISIBLE);
+                ViewUtil.setVisibility(balanceLocalTv, View.INVISIBLE);
+                ViewUtil.setVisibility(progressLayout, View.VISIBLE);
         }
+        ViewUtil.setVisibility(balanceBtcTv, null != balance? View.VISIBLE:View.INVISIBLE);
 
         log.info("updateView : showProgress {},  balance {}", showProgress, balance);
     }

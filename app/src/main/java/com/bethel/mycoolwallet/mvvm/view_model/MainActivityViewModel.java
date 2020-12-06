@@ -25,5 +25,8 @@ public class MainActivityViewModel extends BaseViewModel {
     public void transactionsLoadingFinished() {
 // todo
     }
+    public void balanceLoadingFinished() {
+        // todo
+    }
 
 }

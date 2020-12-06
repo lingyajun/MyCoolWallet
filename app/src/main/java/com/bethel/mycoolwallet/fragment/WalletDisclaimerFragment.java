@@ -37,7 +37,7 @@ public class WalletDisclaimerFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        activityViewModel = getActivityViewModel(MainActivityViewModel.class);
         viewModel = getViewModel(WalletDisclaimerViewModel.class);
 
         viewModel.blockChainState.observe(this, blockChainState -> updateUI());

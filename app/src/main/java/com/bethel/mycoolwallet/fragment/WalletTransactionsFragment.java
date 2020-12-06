@@ -85,7 +85,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
         setHasOptionsMenu(true);
         CoolApplication application = CoolApplication.getApplication();
         viewModel = getViewModel(WalletTransactionsViewModel.class);
-        activityViewModel = ViewModelProviders.of(getActivity()).get(MainActivityViewModel.class);
+        activityViewModel = getActivityViewModel(MainActivityViewModel.class);
         mAdapter = new TransactionListAdapter(getContext());
         emptyStatus = new CommonEmptyStatusViewAdapter(R.string.wallet_transactions_fragment_empty_text_howto);
 

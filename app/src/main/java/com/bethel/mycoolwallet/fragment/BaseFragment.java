@@ -81,6 +81,10 @@ public abstract class BaseFragment extends Fragment {
         return ViewModelProviders.of(this).get(modelClass);
     }
 
+    protected  <T extends ViewModel> T getActivityViewModel(@NonNull Class<T> modelClass) {
+        return ViewModelProviders.of(getActivity()).get(modelClass);
+    }
+
     /**
      * 关闭当前fragment所在的activity,请谨慎使用！！！
      */
