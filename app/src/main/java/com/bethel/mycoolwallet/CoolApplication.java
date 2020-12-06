@@ -32,7 +32,7 @@ public class CoolApplication extends Application {
 //    private final MyCoolWalletManager myWalletManager =  new MyCoolWalletManager();
 
     private ActivityManager activityManager;
-    private Configuration mConfig;
+//    private Configuration mConfig;
 
     private static final Logger log = LoggerFactory.getLogger(CoolApplication.class);
     @Override
@@ -52,6 +52,7 @@ public class CoolApplication extends Application {
 
         super.onCreate();
         application = this;
+        Configuration.INSTANCE.init(this);
 
         CrashReporter.init(getCacheDir());
 
@@ -84,8 +85,8 @@ public class CoolApplication extends Application {
     }
 
     public Configuration getConfiguration() {
-        if (null== mConfig) mConfig = Configuration.instance(this);
-        return mConfig;
+//        if (null== mConfig) mConfig = Configuration.instance(this);
+        return Configuration.INSTANCE;
     }
 
     public static CoolApplication getApplication() {

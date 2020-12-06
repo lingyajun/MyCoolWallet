@@ -56,7 +56,7 @@ public enum  MyCoolWalletManager {
     private CoolApplication application;
     private File walletFile;
     private WalletFiles walletFiles;
-    private Configuration mConfig;
+//    private Configuration mConfig;
 
     private Handler mHandler;
 
@@ -74,7 +74,7 @@ public enum  MyCoolWalletManager {
 
         initWalletExceptionHandler();
 
-        mConfig = app.getConfiguration();
+//        mConfig = app.getConfiguration();
         walletFile = application.getFileStreamPath(Constants.Files.WALLET_FILENAME_PROTOBUF);
         mHandler = new Handler(Looper.getMainLooper());
         cleanupFiles();
@@ -211,7 +211,8 @@ public enum  MyCoolWalletManager {
     }
 
     private void armBackupReminder() {
-              mConfig.armBackupReminder();
+        Configuration.INSTANCE.armBackupReminder();
+//              mConfig.armBackupReminder();
         // SharedPreferences 存储变量
 //        XToast.info(application, " armBackupReminder").show();
         log.info("armBackupReminder");
@@ -253,7 +254,8 @@ public enum  MyCoolWalletManager {
             walletFiles = newWallet.autosaveToFile(walletFile, Constants.Files.WALLET_AUTOSAVE_DELAY_MS,
                     TimeUnit.MILLISECONDS, null);
         }
-        mConfig.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());
+        Configuration.INSTANCE.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());
+//        mConfig.maybeIncrementBestChainHeightEver(newWallet.getLastBlockSeenHeight());
         WalletUtils.autoBackupWallet(application, newWallet);
 
         final Intent broadcast = new Intent(ACTION_WALLET_REFERENCE_CHANGED);

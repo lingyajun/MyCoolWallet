@@ -65,7 +65,8 @@ public class BlocksNetworkMonitorFragment extends BaseStatusLoaderFragment {
         super.onCreate(savedInstanceState);
         viewModel = getViewModel(BlocksNetworkMonitorViewModel.class);
         adapter = new BlockListAdapter(getContext());
-        mConfig = CoolApplication.getApplication().getConfiguration();
+        mConfig = Configuration.INSTANCE;
+//        mConfig = CoolApplication.getApplication().getConfiguration();
     }
 
     @Override

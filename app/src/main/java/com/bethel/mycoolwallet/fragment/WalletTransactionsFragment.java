@@ -276,7 +276,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
 
                 @Override
                 public void onTxExplorer(String url) {
-                    WebActivity.start(getContext(), url);
+                    WebActivity.start(getContext(), url, getString(R.string.transaction_record));
                 }
             });
             menu.show();

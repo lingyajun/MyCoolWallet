@@ -11,8 +11,16 @@ import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Configuration {
-    private  static  Configuration config;
+public enum  Configuration {
+    /**
+     * 枚举方法 --  单例模式
+     * (1)自由序列化。
+     * (2)保证只有一个实例。
+     * (3)线程安全。
+     */
+    INSTANCE;
+//public class Configuration {
+//    private  static  Configuration config;
 
     private PreferenceWraper mPreference;
 
@@ -40,15 +48,18 @@ public class Configuration {
 
     private static final Logger log = LoggerFactory.getLogger(Configuration.class);
 
-    private Configuration(Context context) {
-        mPreference = PreferenceWraper.getInstance(context);
-    }
+//    private Configuration(Context context) {
+//        mPreference = PreferenceWraper.getInstance(context);
+//    }
 
-    public static Configuration instance(Context context) {
-        if (null == config) {
-            config = new Configuration(context);
-        }
-        return config;
+//    public static Configuration instance(Context context) {
+//        if (null == config) {
+//            config = new Configuration(context);
+//        }
+//        return config;
+//    }
+    public void init(Context context) {
+        if (null == mPreference)   mPreference = PreferenceWraper.getInstance(context);
     }
 
     public int getBestChainHeightEver() {
