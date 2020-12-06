@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class CoolApplication extends Application {
 
     private static CoolApplication application = null;
-    private final MyCoolWalletManager myWalletManager =  new MyCoolWalletManager();
+//    private final MyCoolWalletManager myWalletManager =  new MyCoolWalletManager();
 
     private ActivityManager activityManager;
     private Configuration mConfig;
@@ -65,7 +65,7 @@ public class CoolApplication extends Application {
             CrashReporter.saveBackgroundTrace(throwable, packageInfo());
         };
 
-        myWalletManager.init(this);
+        MyCoolWalletManager.INSTANCE.init(this);
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 
@@ -74,23 +74,23 @@ public class CoolApplication extends Application {
     }
 
     public Wallet getWallet() {
-        return myWalletManager.getWallet();
+        return MyCoolWalletManager.INSTANCE.getWallet();
     }
 
     public void getWalletAsync(OnWalletLoadedListener listener) {
-         myWalletManager.getWalletAsync(listener);
+        MyCoolWalletManager.INSTANCE.getWalletAsync(listener);
     }
 
     public void autoSaveWalletNow() {
-        myWalletManager.autoSaveWalletNow();
+        MyCoolWalletManager.INSTANCE.autoSaveWalletNow();
     }
 
     public void replaceWallet(final Wallet newWallet) {
-        myWalletManager.replaceWallet(newWallet);
+        MyCoolWalletManager.INSTANCE.replaceWallet(newWallet);
     }
 
     public void processDirectTransaction(final Transaction tx) throws VerificationException {
-        myWalletManager.processDirectTransaction(tx);
+        MyCoolWalletManager.INSTANCE.processDirectTransaction(tx);
     }
 
     public Configuration getConfiguration() {

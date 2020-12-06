@@ -127,9 +127,9 @@ public class WalletBalanceFragment extends BaseFragment {
 
     private void updateView() {
         log.debug(".updateView()");
-        BlockChainState chainState = viewModel.chainStateLiveData.getValue();
-        Coin balance = viewModel.balanceLiveData.getValue();
-        ExchangeRateBean rateBean = viewModel.rateLiveData.getValue();
+        final BlockChainState chainState = viewModel.chainStateLiveData.getValue();
+        final Coin balance = viewModel.balanceLiveData.getValue();
+        final ExchangeRateBean rateBean = viewModel.rateLiveData.getValue();
 
         boolean showProgress =false;
         if (null!= chainState && null!= chainState.bestChainDate) {
@@ -139,8 +139,8 @@ public class WalletBalanceFragment extends BaseFragment {
 
 //            log.info("updateView : currentTimeMillis {},  bestChainDate {}",
 //                    System.currentTimeMillis(), chainState.bestChainDate.getTime());
-            showProgress = (!noNeedUptodate|| chainState.replaying); // 时间间隔长，或者重放
-//            showProgress = !(noNeedUptodate || !chainState.replaying); // 时间间隔长，并且重放
+//            showProgress = (!noNeedUptodate|| chainState.replaying); // 时间间隔长，或者重放
+            showProgress = !(noNeedUptodate || !chainState.replaying); // 时间间隔长，并且重放
             log.info("updateView : chainDuration {}, UPTODATE__MS {}, noNeedUptodate {},  replaying {}",
                     chainDuration, BLOCKCHAIN_UPTODATE_THRESHOLD_MS, noNeedUptodate, chainState.replaying);
 //            log.info("updateView (chainDuration - UPTODATE__MS) = {}",
@@ -173,6 +173,7 @@ public class WalletBalanceFragment extends BaseFragment {
             ViewUtil.setVisibility(balanceLocalTv, View.VISIBLE);
             if (null != balance) {
                 CurrencyTools.setText(balanceBtcTv, mConfig.getFormat(), balance);
+//                log.info("balance: '{}',  '{}'",mConfig.getFormat(), balance);
                 if (showLocalBalance) {
                     if (rateBean != null) {
                         final Fiat localValue = rateBean.rate.coinToFiat(balance);
@@ -209,7 +210,8 @@ public class WalletBalanceFragment extends BaseFragment {
         }
         ViewUtil.setVisibility(balanceBtcTv, null != balance? View.VISIBLE:View.INVISIBLE);
 
-        log.info("updateView : showProgress {},  balance {}", showProgress, balance);
+        log.info("updateView : showProgress {},  balance {}，balanceBtcTv {}, '{}'", showProgress, balance,
+                balanceBtcTv.getVisibility()==  View.VISIBLE, balanceBtcTv.getText());
     }
 
     @Override

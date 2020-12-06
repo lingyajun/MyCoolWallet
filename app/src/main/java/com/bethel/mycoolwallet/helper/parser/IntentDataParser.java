@@ -158,11 +158,11 @@ public abstract class IntentDataParser implements IInputParser {
                 throw new UnsupportedOperationException();
             }
 
-            @Override
-            protected void requestBIP38PrivateKeyPassphrase() {
-                log.info("UnsupportedOperationException: request passphrase");
-                throw new UnsupportedOperationException();
-            }
+//            @Override
+//            protected void requestBIP38PrivateKeyPassphrase() {
+//                log.info("UnsupportedOperationException: request passphrase");
+//                throw new UnsupportedOperationException();
+//            }
 
             @Override
             public void handleDirectTransaction(Transaction transaction) throws VerificationException {

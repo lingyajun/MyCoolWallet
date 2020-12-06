@@ -84,6 +84,9 @@ import java.util.concurrent.atomic.AtomicLong;
  *  broadcastPeerState(..)
  */
 public class MyCoolBlockChainManager {
+//public enum  MyCoolBlockChainManager {
+//    INSTANCE;
+
     private static final int MIN_COLLECT_HISTORY = 2;
     private static final int IDLE_BLOCK_TIMEOUT_MIN = 1;
     private static final int IDLE_TRANSACTION_TIMEOUT_MIN = 5;

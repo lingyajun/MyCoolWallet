@@ -38,7 +38,16 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class MyCoolWalletManager {
+//public class MyCoolWalletManager {
+public enum  MyCoolWalletManager {
+    /**
+     * 枚举方法 --  单例模式
+     * (1)自由序列化。
+     * (2)保证只有一个实例。
+     * (3)线程安全。
+     */
+    INSTANCE;
+
     public static final String ACTION_WALLET_REFERENCE_CHANGED =
             MyCoolWalletManager.class.getPackage().getName() + ".wallet_reference_changed";
     private static final String BIP39_WORDLIST_FILENAME = "bip39-wordlist.txt";
