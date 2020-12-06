@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.db.AddressBookDao;
 import com.bethel.mycoolwallet.db.AppDatabase;
+import com.bethel.mycoolwallet.mvvm.live_data.ConfigOwnNameLiveData;
 import com.bethel.mycoolwallet.mvvm.live_data.address.CurrentAddressLiveData;
 import com.bethel.mycoolwallet.utils.Qr;
 
@@ -23,7 +24,8 @@ public class WalletAddressViewModel extends BaseViewModel {
     public final MediatorLiveData<Uri> bitcoinUri = new MediatorLiveData<>(); // NFC
     public final MutableLiveData<Event<Void>> showWalletAddressDialog = new MutableLiveData<>();
 
-    public final AddressBookDao addressBookDao;
+//    public final AddressBookDao addressBookDao;
+    public final ConfigOwnNameLiveData ownName;
 
     public WalletAddressViewModel(@NonNull Application app) {
         super(app);
@@ -31,14 +33,15 @@ public class WalletAddressViewModel extends BaseViewModel {
         qrCode.addSource(currentAddress, (address)-> maybeGenerateQrCode());
         bitcoinUri.addSource(currentAddress, (address)-> maybeGenerateBitcoinUri());
 
-        addressBookDao = AppDatabase.getInstance(app).addressBookDao();
+        ownName = new ConfigOwnNameLiveData();
+//        addressBookDao = AppDatabase.getInstance(app).addressBookDao();
     }
 
     private void maybeGenerateQrCode() {
         final Address address = currentAddress.getValue();
         if (address != null) {
             executeAsyncTask(()->{
-                Bitmap bitmap = Qr.bitmap(uri(address, addressBookDao.resolveLabel(address.toString())));
+                Bitmap bitmap = Qr.bitmap(uri(address, getLabel()));
                 qrCode.postValue(bitmap);
             });
         }
@@ -48,7 +51,7 @@ public class WalletAddressViewModel extends BaseViewModel {
     private void maybeGenerateBitcoinUri() {
         final Address address = currentAddress.getValue();
         if (address != null) {
-            Uri uri = Uri.parse(uri(address, addressBookDao.resolveLabel(address.toString())));
+            Uri uri = Uri.parse(uri(address, getLabel()));
             bitcoinUri.setValue(uri);
         }
     }
@@ -57,4 +60,7 @@ public class WalletAddressViewModel extends BaseViewModel {
         return BitcoinURI.convertToBitcoinURI(address, null, label, null);
     }
 
+    public String getLabel() {
+        return ownName.getValue();
+    }
 }

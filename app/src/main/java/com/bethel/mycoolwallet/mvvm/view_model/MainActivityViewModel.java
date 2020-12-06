@@ -29,4 +29,7 @@ public class MainActivityViewModel extends BaseViewModel {
         // todo
     }
 
+    public void addressLoadingFinished() {
+        // todo
+    }
 }

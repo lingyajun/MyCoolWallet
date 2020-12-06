@@ -28,9 +28,15 @@ public final class NfcTools {
             return null;
     }
 
-    public static NdefRecord createMime(final String mimeType, final byte[] payload) {
+    private static NdefRecord createMime(final String mimeType, final byte[] payload) {
         final byte[] mimeBytes = mimeType.getBytes(Commons.US_ASCII);
         return new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
     }
 
+    public static NdefMessage createNdefMessage(final String uri) {
+        if (uri != null)
+            return new NdefMessage(new NdefRecord[] { NdefRecord.createUri(uri) });
+        else
+            return null;
+    }
 }
