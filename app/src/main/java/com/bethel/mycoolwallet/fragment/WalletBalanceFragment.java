@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.activity.ExchangeRatesActivity;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.tx_list.ColorType;
@@ -39,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,9 +70,16 @@ public class WalletBalanceFragment extends BaseFragment {
     @BindView(R.id.wallet_balance_progress_bar)
     ProgressBar progressBar;
 
+    @OnClick(R.id.wallet_balance_local)
+    void onExchangeRateClick() {
+        if (View.VISIBLE == balanceLocalTv.getVisibility()) {
+            ExchangeRatesActivity.start(getContext());
+        }
+    }
+
     private WalletBalanceViewModel viewModel;
     private MainActivityViewModel activityViewModel;
-    private Configuration mConfig;
+//    private Configuration mConfig;
     private boolean showLocalBalance;
 
     private static final Logger log = LoggerFactory.getLogger(WalletBalanceFragment.class);
@@ -84,7 +93,7 @@ public class WalletBalanceFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mConfig = CoolApplication.getApplication().getConfiguration();
+//        mConfig = CoolApplication.getApplication().getConfiguration();
         showLocalBalance = getResources().getBoolean(R.bool.show_local_balance);
 
         activityViewModel = getActivityViewModel(MainActivityViewModel.class);
@@ -172,7 +181,7 @@ public class WalletBalanceFragment extends BaseFragment {
 //            balanceLocalTv.setVisibility(View.VISIBLE);
             ViewUtil.setVisibility(balanceLocalTv, View.VISIBLE);
             if (null != balance) {
-                CurrencyTools.setText(balanceBtcTv, mConfig.getFormat(), balance);
+                CurrencyTools.setText(balanceBtcTv, Configuration.INSTANCE.getFormat(), balance);
 //                log.info("balance: '{}',  '{}'",mConfig.getFormat(), balance);
                 if (showLocalBalance) {
                     if (rateBean != null) {
