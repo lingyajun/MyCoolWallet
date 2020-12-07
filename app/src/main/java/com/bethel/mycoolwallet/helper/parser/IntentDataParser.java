@@ -79,7 +79,7 @@ public abstract class IntentDataParser implements IInputParser {
             // PaymentData
             final PaymentData payment = intent.getParcelableExtra(SendCoinsActivity.INTENT_EXTRA_PAYMENT_INTENT);
             handlePaymentData(payment);
-            log.debug("PaymentData: {}", payment);
+            log.info("PaymentData: {}", payment);
             return;
         }
 
@@ -109,6 +109,7 @@ public abstract class IntentDataParser implements IInputParser {
 
 //    protected abstract InputStream openInputStream(Uri bitcoinUri);
     protected abstract Context getContext();
+
 
     private void parseAndHandleNfcPaymentRequestData() {
         Parcelable[]  datas = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);

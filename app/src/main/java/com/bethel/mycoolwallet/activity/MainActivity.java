@@ -6,6 +6,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -22,7 +23,9 @@ import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.helper.SendCoinsHelper;
+import com.bethel.mycoolwallet.helper.parser.NfcIntentDataParser;
 import com.bethel.mycoolwallet.helper.parser.StringInputParser;
 import com.bethel.mycoolwallet.interfaces.IQrScan;
 import com.bethel.mycoolwallet.interfaces.IRequestCoins;
@@ -30,6 +33,7 @@ import com.bethel.mycoolwallet.interfaces.ISendCoins;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.bethel.mycoolwallet.utils.CrashReporter;
 import com.xuexiang.xqrcode.XQRCode;
 import com.xuexiang.xui.widget.toast.XToast;
 
@@ -59,6 +63,47 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         initTitleBar(R.string.app_name);
 
         viewModel = getViewModel(MainActivityViewModel.class);
+        observeData();
+
+        if (null==savedInstanceState && CrashReporter.hasSavedCrashTrace()) {
+            viewModel.showReportCrashDialog.setValue(Event.simple());
+        }
+
+        Configuration.INSTANCE.touchLastUsed();
+        parseIntentData(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        parseIntentData(intent);
+    }
+
+    private void parseIntentData(final Intent intent) {
+        final String action = null != intent ? intent.getAction() : null;
+        if (!NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            log.warn("not Nfc action  {}", action);
+            return;
+        }
+
+        //  parse
+        new NfcIntentDataParser(intent){
+            @Override
+            public void error(int messageResId, Object... messageArgs) {
+                SendCoinsHelper.dialog(MainActivity.this, null,
+                        0, messageResId, messageArgs);
+                log.warn("NfcIntentDataParser {}", getString(messageResId, messageArgs));
+            }
+
+            @Override
+            public void handlePaymentData(PaymentData data) {
+                cannotClassify(intent.getType());
+                log.info("NfcIntentDataParser {}", data);
+            }
+        }.parse();
+    }
+
+    private void observeData() {
         viewModel.walletEncrypted.observe(this, result -> invalidateOptionsMenu());
         viewModel.showEncryptKeysDialog.observe(this,
                 (v) -> EncryptKeysDialogFragment.show(getSupportFragmentManager()));
@@ -71,6 +116,24 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             public void onEvent( Integer content) {
                 HelpDialogFragment.show(getSupportFragmentManager(), content);
             }
+        });
+
+        viewModel.showReportCrashDialog.observe(this, new Event.Observer<Void>(){
+            @Override
+            public void onEvent(Void content) {
+                //todo ReportIssueDialogFragment
+                XToast.warning(MainActivity.this, " crash").show();
+            }
+        });
+        viewModel.showReportIssueDialog.observe(this, new Event.Observer<Void>(){
+            @Override
+            public void onEvent(Void content) {
+                //todo ReportIssueDialogFragment
+                XToast.warning(MainActivity.this, " issue").show();
+            }
+        });
+        viewModel.legacyFallback.observe(this, bool -> {
+            invalidateOptionsMenu();
         });
     }
 
@@ -114,11 +177,11 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             encryptKeysOption.setVisible(true);
         }
 
-//   todo     final Boolean isLegacyFallback = viewModel.walletLegacyFallback.getValue();
-//        if (isLegacyFallback != null) {
-//            final MenuItem requestLegacyOption = menu.findItem(R.id.wallet_options_request_legacy);
-//            requestLegacyOption.setVisible(isLegacyFallback);
-//        }
+        final Boolean isLegacyFallback = viewModel.legacyFallback.getValue();
+        if (isLegacyFallback != null) {
+            final MenuItem requestLegacyOption = menu.findItem(R.id.wallet_options_request_legacy);
+            requestLegacyOption.setVisible(isLegacyFallback);
+        }
 
         boolean debug = res.getBoolean(R.bool.show_debug_option);
         menu.findItem(R.id.wallet_options_debug).setEnabled(debug);
@@ -150,6 +213,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 ExchangeRatesActivity.start(this);
                 break;
             case R.id.wallet_options_sweep_wallet :
+                // todo SweepWalletActivity
                 break;
             case R.id.wallet_options_network_monitor :
                 BlockChainNetworkMonitorActivity.start(this);
@@ -173,8 +237,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 viewModel.showHelpDialog.setValue(new Event<>(R.string.help_technical_notes));
                 break;
             case R.id.wallet_options_report_issue :
-                // todo
-                XToast.info(this, "report issue").show();
+                viewModel.showReportIssueDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_help :
                 viewModel.showHelpDialog.setValue(new Event<>(R.string.help_wallet));
@@ -283,7 +346,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                         }
                     };
                     parser.parse();
-                    log.info("解析结果: " + result );
+                    log.info(" 解析结果: {} " , result );
                 } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
                     XToast.error(this,R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
                 }
