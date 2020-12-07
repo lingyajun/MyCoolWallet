@@ -219,7 +219,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 ExchangeRatesActivity.start(this);
                 break;
             case R.id.wallet_options_sweep_wallet :
-                // todo SweepWalletActivity
+                  SweepWalletActivity.start(this);
                 break;
             case R.id.wallet_options_network_monitor :
                 BlockChainNetworkMonitorActivity.start(this);
@@ -329,10 +329,11 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
                         @Override
                         protected void handlePrivateKey(PrefixedChecksummedBytes key) {
-//                            if (Constants.ENABLE_SWEEP_WALLET)
-//    todo                            SweepWalletActivity.start(MainActivity.this, key);
-//                            else
-                            super.handlePrivateKey(key);
+                            if (Constants.ENABLE_SWEEP_WALLET) {
+                                SweepWalletActivity.start(MainActivity.this, key);
+                            } else {
+                                super.handlePrivateKey(key);
+                            }
                         }
 
                         @Override

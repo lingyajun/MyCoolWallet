@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bethel.mycoolwallet">
-
+    <!-- dangerous permissions -->
     <application
         android:name=".CoolApplication"
         android:allowBackup="false"
@@ -10,8 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.SweepWalletActivity"/>
         <activity android:name=".activity.AddressBookActivity" />
-
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
         <activity android:name=".activity.ExchangeRatesActivity" />
         <activity android:name=".activity.WebActivity" />
@@ -88,7 +88,7 @@
         <service
             android:name=".service.AcceptBluetoothService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
         <service
             android:name=".service.MyJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -96,7 +96,7 @@
             android:name=".service.BlockChainService"
             android:enabled="true"
             android:exported="false" />
-    </application> <!-- dangerous permissions -->
+    </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

@@ -6,17 +6,22 @@
     android:orientation="vertical" >
 
     <include layout="@layout/view_titlebar_common"/>
-<!--    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+
+    <View
+        android:layout_width="match_parent"
+        android:background="@drawable/divider_dark"
+        android:layout_height="1px"/>
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimaryDark"
-        android:minHeight="?attr/actionBarSize"
-        app:titleTextAppearance="@style/Toolbar.TitleText"
-        app:popupTheme="@style/OverflowMenuStyle"
-        app:theme="@style/ToolbarTheme"/>-->
+        android:background="@color/colorPrimaryDark">
+        <fragment
+            android:id="@+id/wallet_actions_fragment"
+            android:name="com.bethel.mycoolwallet.fragment.WalletActionsFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
 
-<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0px"
@@ -55,11 +60,6 @@
                 android:tag="slide_in_right"/>
         </LinearLayout>
 
-<!--        <FrameLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            app:layout_constraintStart_toEndOf="@id/account_info_layout"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/account_info_layout">-->
             <fragment
                 android:id="@+id/wallet_transactions_fragment"
                 android:name="com.bethel.mycoolwallet.fragment.WalletTransactionsFragment"
@@ -68,10 +68,22 @@
                 app:layout_constraintStart_toEndOf="@id/account_info_layout"
                 app:layout_constraintTop_toBottomOf="@id/account_info_layout"
                 android:tag="slide_in_bottom"/>
-<!--        </FrameLayout>-->
-<!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
     </LinearLayout>
 
-    <include layout="@layout/wallet_activity_bottom_include" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark">
+        <fragment
+            android:id="@+id/wallet_disclaimer_fragment"
+            android:name="com.bethel.mycoolwallet.fragment.WalletDisclaimerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+
+<!--  WalletActionsFragment 移到顶部
+  <include layout="@layout/wallet_activity_bottom_include" />-->
 
 </LinearLayout>
