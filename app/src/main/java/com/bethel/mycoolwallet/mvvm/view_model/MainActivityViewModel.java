@@ -18,6 +18,7 @@ public class MainActivityViewModel extends BaseViewModel {
     public final MutableLiveData<Event<Void>> showRestoreWalletDialog = new MutableLiveData<>();
 
     public final MutableLiveData<Event<Integer>> showHelpDialog = new MutableLiveData<>();
+    public final MutableLiveData<Event<Void>> showGuidePage = new MutableLiveData<>();
 
     public final MutableLiveData<Event<Void>> showReportIssueDialog = new MutableLiveData<>();
     public final MutableLiveData<Event<Void>> showReportCrashDialog = new MutableLiveData<>();

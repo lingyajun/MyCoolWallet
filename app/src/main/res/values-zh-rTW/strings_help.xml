@@ -120,4 +120,27 @@
         </p>
     ]]>
     </string>
+
+    <string name="guide_wallet_1">
+			畫面的左上方是錢包餘額，分別以 Bitcoin 和選定的法定貨幣顯示。
+			點一下會看到所有法定貨幣的列表，然後可以點某個貨幣來把它設定為預設值。
+	</string>
+
+    <string name="guide_wallet_2">
+			畫面右邊的 QR 條碼是你目前的 bitcoin 位址，可以給要付款給你的人掃描。
+			點一下可以把它放大顯示。
+    </string>
+
+<!--    <string name="guide_wallet_3">
+			畫面的下方是交易列表。
+			剛開始的時候是一片空白，然後會隨著收款及付款而逐漸填滿。
+			收款交易以綠色顯示，付款交易則是以紅色顯示。
+    </string>-->
+    <string name="guide_wallet_3">
+			點一下動作欄上的按鈕來付款或是請款。
+    </string>
+    <string name="guide_wallet_4">
+			選單中有更多的選項。
+    </string>
+
 </resources>

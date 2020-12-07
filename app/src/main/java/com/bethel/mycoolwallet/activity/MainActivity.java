@@ -24,6 +24,7 @@ import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.helper.GuideHelper;
 import com.bethel.mycoolwallet.helper.SendCoinsHelper;
 import com.bethel.mycoolwallet.helper.parser.NfcIntentDataParser;
 import com.bethel.mycoolwallet.helper.parser.StringInputParser;
@@ -71,6 +72,10 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
         Configuration.INSTANCE.touchLastUsed();
         parseIntentData(getIntent());
+
+        if (!Configuration.INSTANCE.hasGuideUser()) {
+            mHandler.postDelayed(()-> viewModel.showGuidePage.setValue(Event.simple()),200);
+        }
     }
 
     @Override
@@ -122,7 +127,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             @Override
             public void onEvent(Void content) {
                 //todo ReportIssueDialogFragment
-                XToast.warning(MainActivity.this, " crash").show();
+              //  XToast.warning(MainActivity.this, " crash").show();
             }
         });
         viewModel.showReportIssueDialog.observe(this, new Event.Observer<Void>(){
@@ -135,6 +140,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel.legacyFallback.observe(this, bool -> {
             invalidateOptionsMenu();
         });
+        viewModel.showGuidePage.observe(this, voidEvent -> GuideHelper.showMain(this));
     }
 
     @Override
@@ -240,7 +246,8 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 viewModel.showReportIssueDialog.setValue(Event.simple());
                 break;
             case R.id.wallet_options_help :
-                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_wallet));
+                viewModel.showGuidePage.setValue(Event.simple());
+//                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_wallet));
                 break;
             case R.id.wallet_options_debug :
                 DebugActivity.start(this);

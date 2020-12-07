@@ -123,4 +123,27 @@
         </p>
     ]]>
     </string>
+
+	<string name="guide_wallet_1">
+			屏幕的左上部分显示您的比特币余额和一个选定的本国货币。
+			点击即可转到本国货币列表，然后点击其中一种货币将其选为默认货币。
+	</string>
+
+	<string name="guide_wallet_2">
+			右边的QR码包含您的比特币地址，可以用于另一方的扫描。
+			点击QR码以获得更大的版本。
+    </string>
+
+	<!--<string name="guide_wallet_3">
+			屏幕底部由您的事务列表覆盖，开始时为空。
+			待确认的交易将被清除，直到确认为止。
+			点击一个条目将发件人或接收者地址添加到地址簿。
+    </string>-->
+	<string name="guide_wallet_3">
+			您可以通过点击操作栏中的按钮发送或接受货币。
+	</string>
+	<string name="guide_wallet_4">
+			更多选项在选项菜单中可用。
+    </string>
+
 </resources>

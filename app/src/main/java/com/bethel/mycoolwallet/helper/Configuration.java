@@ -43,6 +43,8 @@ public enum  Configuration {
     private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
     public static final String PREFS_KEY_SEND_COINS_AUTOCLOSE = "send_coins_autoclose";
 
+    public static final String PREFS_KEY_GUIDE_USER = "guide_user_main";
+
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
 
@@ -212,6 +214,14 @@ public enum  Configuration {
 
     public void setLastExchangeDirection(final boolean exchangeDirection) {
         mPreference.putBoolean(PREFS_KEY_LAST_EXCHANGE_DIRECTION, exchangeDirection) ;
+    }
+
+    public boolean hasGuideUser() {
+        return mPreference.getBoolean(PREFS_KEY_GUIDE_USER, false);
+    }
+
+    public void guideUser() {
+        mPreference.putBoolean(PREFS_KEY_GUIDE_USER, true) ;
     }
 
     public boolean getSendCoinsAutoClose() {

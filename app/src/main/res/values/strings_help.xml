@@ -122,4 +122,26 @@
     ]]>
     </string>
 
+    <string name="guide_wallet_1">
+			The upper left part of the screen displays your balance in Bitcoins and one selected national currency.
+			Tap to go to the list of national currencies, and tap on one of the currencies to select it as default.
+    </string>
+
+    <string name="guide_wallet_2">
+			The QR code in the upper right contains your current bitcoin address and can be used for scanning by a payer.
+			Tap on the QR code to get a larger version of it.
+    </string>
+
+   <!-- <string name="guide_wallet_3">
+			The bottom of the screen is covered by your transactions list.
+			It is empty at the beginning and will fill up as you receive and send payments.
+			Received payments will be marked in green and sent payments in red.
+    </string>-->
+    <string name="guide_wallet_3">
+			You can send or request coins by tapping the buttons in the action bar.
+    </string>
+    <string name="guide_wallet_4">
+			More options are available in the options menu.
+    </string>
+
 </resources>
