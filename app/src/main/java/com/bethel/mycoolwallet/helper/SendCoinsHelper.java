@@ -101,7 +101,12 @@ public class SendCoinsHelper {
         builder.content(context.getString(messageResId, messageArgs));
         builder.neutralText(R.string.button_ok);
         MaterialDialog dialog = builder.show();
-        dialog.getActionButton(DialogAction.NEUTRAL).setOnClickListener(dismissListener);
+        dialog.getActionButton(DialogAction.NEUTRAL).setOnClickListener(view -> {
+            if (null!=dismissListener) {
+                dismissListener.onClick(view);
+            }
+            dialog.dismiss();
+        });
     }
 
     public static void dialogWarn(final Context context, final int titleResId, final int messageId ) {
