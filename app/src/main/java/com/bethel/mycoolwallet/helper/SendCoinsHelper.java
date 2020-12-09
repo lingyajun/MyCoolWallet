@@ -136,7 +136,7 @@ public class SendCoinsHelper {
         final String sound = String.format("send_coins_broadcast_%d", numPeers);
         final int soundId = context.getResources().getIdentifier(sound, "raw", context.getPackageName());
         if (soundId > 0) {
-            String uriString = String.format("android.resource://%s/", context.getPackageName(), soundId);
+            String uriString = String.format("android.resource://%s/%d", context.getPackageName(), soundId);
             RingtoneManager.getRingtone(context, Uri.parse(uriString)).play();
         }
     }

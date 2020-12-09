@@ -113,7 +113,8 @@
   <string name="send_coins_options_fee_category_economic">节省</string>
   <string name="send_coins_options_fee_category_normal">正常</string>
   <string name="send_coins_options_fee_category_priority">优先级</string>
-  <string name="send_coins_options_empty">清空钱包</string>
+<!--  <string name="send_coins_options_empty">清空钱包</string> -->
+  <string name="send_coins_options_empty">全部发送</string>
   <string name="raise_fee_dialog_title">提高网络费用</string>
   <string name="raise_fee_dialog_message">您要提高 %s 的此付款的网络费用吗？它将使支付更快地确认。</string>
   <string name="raise_fee_dialog_determining_fee">正在确定网络费用...</string>
