@@ -135,17 +135,17 @@ public final class Constants {
     public static final int MAX_NUM_CONFIRMATIONS = 7;
 
     /** User-agent to use for network access. */
-    public static final String USER_AGENT = "Bitcoin Wallet";
+    public static final String USER_AGENT = "My Cool Bitcoin Wallet";
 
     /** Default currency to use if all default mechanisms fail. */
     public static final String DEFAULT_EXCHANGE_CURRENCY = "USD";
 
-    /** todo: change address for me. Donation address for tip/donate action. */
+    /**  Donation address for tip/donate action. */
     public static final String DONATION_ADDRESS = NETWORK_PARAMETERS.getId().equals(NetworkParameters.ID_MAINNET)
-            ? "bc1qzug4shzgksqfqxuphgxluhnayqq3rmmh5v0dql" : null;
+            ? "3NNyLjfXbcyJrYAfyLs56yWPzcDeDCjUmg" : "tb1qvfakecheuc43umrj9ylsc0k2twvfqsh6rsvdkk";
 
     /** Recipient e-mail address for reports. */
-    public static final String REPORT_EMAIL = "bitcoin.wallet.developers@gmail.com";
+    public static final String REPORT_EMAIL = "lingyajun@tutanota.com";
 
     /** Subject line for manually reported issues. */
     public static final String REPORT_SUBJECT_ISSUE = "Reported issue";
