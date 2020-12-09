@@ -50,6 +50,9 @@ public class SweepWalletViewModel extends BaseViewModel {
 
 
     public void mergeUTXOsResponse(final Set<UTXO> utxos) {
+        if (utxos == null|| this.walletToSweep ==null) {
+            return;
+        }
         final Set<Transaction> txSet = application.getWallet().getTransactions(false);
         final Set<UTXO> sortedUtxos = new TreeSet<>(UTXO_COMPARATOR);
 
@@ -112,14 +115,14 @@ public class SweepWalletViewModel extends BaseViewModel {
     private static class FakeTransaction extends Transaction {
         private final Sha256Hash txId, wTxId;
 
-        public static FakeTransaction generateFakeTransaction(UTXO utxo) {
+        private static FakeTransaction generateFakeTransaction(UTXO utxo) {
             FakeTransaction fakeTx = new FakeTransaction(Constants.NETWORK_PARAMETERS,
                     utxo.getHash(), utxo.getHash());
             fakeTx.getConfidence().setConfidenceType(TransactionConfidence.ConfidenceType.BUILDING);
             return fakeTx;
         }
 
-        public FakeTransaction(final NetworkParameters params, final Sha256Hash txId, final Sha256Hash wTxId) {
+        private FakeTransaction(final NetworkParameters params, final Sha256Hash txId, final Sha256Hash wTxId) {
             super(params);
             this.txId = txId;
             this.wTxId = wTxId;

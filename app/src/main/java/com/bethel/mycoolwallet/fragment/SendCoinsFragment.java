@@ -663,9 +663,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
             ColorType colorType = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
                     ColorType.Significant : ColorType.Insignificant;
             receivingStaticLabelView.setTextColor(colorType.getColor(getContext()));
-//            int colorResId = !TextUtils.isEmpty(viewModel.validatedAddress.label)?
-//                    R.color.fg_significant : R.color.fg_insignificant;
-//            receivingStaticLabelView.setTextColor(ContextCompat.getColor(getContext(), colorResId));
+
         } else if (null==viewModel.paymentData.standard) {
             ViewUtil.showView(payeeGroup, true);
             ViewUtil.showView(receivingAddressView, true);
@@ -1233,12 +1231,7 @@ public class SendCoinsFragment extends BaseFragment implements IQrScan {
                     case PENDING:
                         if (reason == ChangeReason.SEEN_PEERS) {
                             // play sound
-                            final String sound = String.format("send_coins_broadcast_%d", numPeers);
-                            final int soundId = getResources().getIdentifier(sound, "raw", getContext().getPackageName());
-                            if (soundId > 0) {
-                                String uriString = String.format("android.resource://%s/", getContext().getPackageName(), soundId);
-                                RingtoneManager.getRingtone(getContext(), Uri.parse(uriString)).play();
-                            }
+                            SendCoinsHelper.playSoundEffect(getContext(), numPeers);
                         }
                         break;
                 }

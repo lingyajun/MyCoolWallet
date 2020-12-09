@@ -66,6 +66,13 @@
                 android:visibility="invisible" />
         </LinearLayout>
 
+        <com.bethel.mycoolwallet.view.FeeSeekBar
+            android:id="@+id/sweep_wallet_fragment_fee_seek_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"/>
+
         <TextView
             android:id="@+id/sweep_wallet_fragment_balance"
             android:layout_width="match_parent"

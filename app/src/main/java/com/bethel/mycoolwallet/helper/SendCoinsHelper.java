@@ -3,6 +3,7 @@ package com.bethel.mycoolwallet.helper;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
@@ -123,6 +124,15 @@ public class SendCoinsHelper {
         } else if (BluetoothTools.isBluetoothUrl(paymentUrl)
                 && null!=adapter && adapter.isEnabled()) {
             new BluetoothPaymentTask(adapter, paymentUrl, payment, callback).executeAsyncTask();
+        }
+    }
+
+    public static void playSoundEffect(final Context context, final int numPeers) {
+        final String sound = String.format("send_coins_broadcast_%d", numPeers);
+        final int soundId = context.getResources().getIdentifier(sound, "raw", context.getPackageName());
+        if (soundId > 0) {
+            String uriString = String.format("android.resource://%s/", context.getPackageName(), soundId);
+            RingtoneManager.getRingtone(context, Uri.parse(uriString)).play();
         }
     }
 
