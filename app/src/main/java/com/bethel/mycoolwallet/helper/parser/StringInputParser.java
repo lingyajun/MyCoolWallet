@@ -167,9 +167,11 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
      * 将 {input} 解析成 BitcoinURI
      */
     private void parseAndHandlePaymentUri() {
+        final String uri = input.startsWith(Prefix_BitcoinURI) ?
+                Prefix_BitcoinURI_2 + input.substring(Prefix_BitcoinURI.length()): input;
+        log.info("bitcoin uri: '{}' \n {}" , input , uri);
         try {
-            final BitcoinURI bitcoinURI =
-                    new BitcoinURI(null, input.substring(Prefix_BitcoinURI.length()));
+            final BitcoinURI bitcoinURI = new BitcoinURI(null, uri);
 
             final Address address = bitcoinURI.getAddress();
             if (null!= address && !Constants.NETWORK_PARAMETERS.equals(address.getParameters())) {
@@ -192,20 +194,10 @@ public abstract class StringInputParser  extends AbsInputParser { //implements I
         try {
             final byte[] payload = Qr.decodeBinary(input.substring(Prefix_PaymentRequest.length()));
             baseParseAndHandlePaymentRequestBytes(payload);
-//            final PaymentData paymentData = InputParserTool.parsePaymentRequest(payload);
-//            handlePaymentData(paymentData);
         } catch (IOException x) {
             log.info("i/o error while fetching payment request", x);
 
             error(R.string.input_parser_io_error, x.getMessage());
-//        } catch (PaymentProtocolException.PkiVerificationException x) {
-//            log.info("got unverifyable payment request", x);
-//
-//            error(R.string.input_parser_unverifyable_paymentrequest, x.getMessage());
-//        } catch (PaymentProtocolException x) {
-//            log.info("got invalid payment request", x);
-//
-//            error(R.string.input_parser_invalid_paymentrequest, x.getMessage());
         }
     }
 

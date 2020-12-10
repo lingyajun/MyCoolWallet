@@ -101,6 +101,7 @@ public  class WalletAddressDialogFragment extends DialogFragment {
         }
         final ImageView imageView = dialog.findViewById(R.id.wallet_address_dialog_image);
         showQrBmp(imageView, addressUri);
+        log.info("qr uri {}", addressUri);
 
         final View labelButtonView = dialog.findViewById(R.id.wallet_address_dialog_label_button);
         final TextView labelView =  dialog.findViewById(R.id.wallet_address_dialog_label);

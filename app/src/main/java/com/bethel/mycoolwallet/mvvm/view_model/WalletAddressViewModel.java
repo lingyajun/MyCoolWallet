@@ -34,7 +34,8 @@ public class WalletAddressViewModel extends BaseViewModel {
         bitcoinUri.addSource(currentAddress, (address)-> maybeGenerateBitcoinUri());
 
         ownName = new ConfigOwnNameLiveData();
-//        addressBookDao = AppDatabase.getInstance(app).addressBookDao();
+        qrCode.addSource(ownName, (address)-> maybeGenerateQrCode());
+        bitcoinUri.addSource(ownName, (address)-> maybeGenerateBitcoinUri());
     }
 
     private void maybeGenerateQrCode() {

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.fragment.dialog.WalletAddressDialogFragment;
+import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletAddressViewModel;
 import com.bethel.mycoolwallet.utils.NfcTools;
@@ -84,6 +85,7 @@ public class WalletAddressFragment extends BaseFragment {
             if (TextUtils.isEmpty(address)) return;
 
             final String label = viewModel.getLabel();
+            log.info("bitcoin qr {}, {}, {}", address, label, Configuration.INSTANCE.getOwnName());
             WalletAddressDialogFragment.show(getFragmentManager(), address, label);
         });
     }
