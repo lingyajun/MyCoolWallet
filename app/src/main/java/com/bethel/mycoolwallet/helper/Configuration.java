@@ -43,6 +43,7 @@ public enum  Configuration {
     private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
     public static final String PREFS_KEY_SEND_COINS_AUTOCLOSE = "send_coins_autoclose";
     private static final String PREFS_KEY_LAST_BLOCKCHAIN_RESET = "last_blockchain_reset";
+    public static final String PREFS_KEY_DATA_USAGE = "data_usage";
 
     public static final String PREFS_KEY_GUIDE_USER = "guide_user_main";
 
@@ -120,6 +121,14 @@ public enum  Configuration {
                 decimalRepetitions);
     }
 
+    /**
+     *         <item>8</item>
+     *         <item>6</item>
+     *         <item>4</item>
+     *         <item>2/3</item>
+     *         <item>0/6</item>
+     * @return
+     */
     public int getBtcShift() {
         final String precision = mPreference.getString(PREFS_KEY_BTC_PRECISION, null);
         if (precision != null)

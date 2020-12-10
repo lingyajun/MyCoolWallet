@@ -67,11 +67,11 @@ public class DiagnosticsFragment extends PreferenceFragment {
 
     /**
      * DeterministicKeyChain :
-     * 确定性钥匙链是{@link KeyChain}，它使用  BIP 32标准 ，
-     * 由{@link DeterministicHierarchy}，用于从主种子派生钥匙串中的所有钥匙。
+     * 确定性钥匙链是{ KeyChain}，它使用  BIP 32标准 ，
+     * 由{  DeterministicHierarchy}，用于从主种子派生钥匙串中的所有钥匙。
      *
      * DeterministicKey:
-     * 确定性键是{@link DeterministicHierarchy}中的一个节点。
+     * 确定性键是{ DeterministicHierarchy}中的一个节点。
      */
     private void handleExtendedPubkey() {
         DeterministicKeyChain keyChain = CoolApplication.getApplication().getWallet().getActiveKeyChain();

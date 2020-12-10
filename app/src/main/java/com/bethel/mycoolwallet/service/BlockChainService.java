@@ -70,9 +70,6 @@ public class BlockChainService extends LifecycleService {
        final Intent intent = new Intent(context, BlockChainService.class);
         if (cancelCoinsReceived) {
             intent.setAction(ACTION_CANCEL_COINS_RECEIVED);
-//            intent = new Intent(ACTION_CANCEL_COINS_RECEIVED, null, context, BlockChainService.class);
-//        } else {
-//            intent = new Intent(context, BlockChainService.class);
         }
         ContextCompat.startForegroundService(context, intent);
     }
@@ -88,6 +85,10 @@ public class BlockChainService extends LifecycleService {
         Intent intent = new Intent(context, BlockChainService.class);
         intent.setAction(ACTION_RESET_BLOCKCHAIN);
         ContextCompat.startForegroundService(context, intent);
+    }
+
+    public static void stop(final Context context) {
+        context.stopService(new Intent(context, BlockChainService.class));
     }
 
     @Nullable
