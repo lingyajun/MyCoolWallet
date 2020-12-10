@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <Preference
+        android:key="about_version"
+        android:title="@string/about_version_title" />
+<!--    <Preference
+        android:summary="© 2011-2019, the Bitcoin Wallet developers"
+        android:title="@string/about_copyright_title" />
+    <Preference
+        android:key="about_license"
+        android:summary="https://www.gnu.org/licenses/gpl-3.0.txt"
+        android:title="@string/about_license_title" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://www.gnu.org/licenses/gpl-3.0.txt" />
+    </Preference>-->
+    <Preference
+        android:key="about_source"
+        android:summary="https://github.com/lingyajun/MyCoolWallet"
+        android:title="@string/about_source_title" >
+        <intent
+            android:action="bethel.intent.action.VIEW"
+            android:data="https://github.com/lingyajun/MyCoolWallet" />
+    </Preference>
+<!--    <Preference
+        android:enabled="false"
+        android:key="about_market_app"
+        android:summary="@string/about_market_app_summary"
+        android:title="@string/about_market_app_title" />
+    <Preference
+        android:key="about_faq"
+        android:summary="@string/about_faq_summary"
+        android:title="@string/about_faq_title" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://bitcoin.stackexchange.com/questions/tagged/bitcoin-wallet-app" />
+    </Preference>-->
+<!--    <Preference
+        android:key="about_twitter"
+        android:summary="\@bitcoin_wallet"
+        android:title="Twitter" >
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://twitter.com/bitcoin_wallet" />
+    </Preference>-->
+
+<!--    <PreferenceCategory android:title="@string/about_category_credits" >-->
+    <PreferenceCategory android:title="@string/thanks">
+        <Preference
+            android:key="about_credits_bitcoin_wallet"
+            android:summary="https://github.com/bitcoin-wallet/bitcoin-wallet"
+            android:title="@string/about_credits_bitcoin_wallet"  >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/bitcoin-wallet/bitcoin-wallet" />
+        </Preference>
+        <Preference
+            android:key="about_credits_xui"
+            android:summary="https://github.com/xuexiangjys/XUI"
+            android:title="@string/about_credits_xui"  >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/xuexiangjys/XUI" />
+        </Preference>
+        <Preference
+            android:key="about_credits_material_file_picker"
+            android:summary="https://github.com/nbsp-team/MaterialFilePicker"
+            android:title="@string/about_credits_material_file_picker"  >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/nbsp-team/MaterialFilePicker" />
+        </Preference>
+
+        <Preference
+            android:key="about_credits_bitcoinj"
+            android:summary="https://bitcoinj.github.io" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://bitcoinj.github.io" />
+        </Preference>
+        <Preference
+            android:key="about_credits_zxing"
+            android:summary="https://github.com/zxing/zxing"
+            android:title="@string/about_credits_zxing_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/zxing/zxing" />
+        </Preference>
+        <Preference
+            android:key="about_credits_bouncycastle"
+            android:summary="https://bouncycastle.org"
+            android:title="@string/about_credits_bouncycastle_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://bouncycastle.org" />
+        </Preference>
+        <Preference
+            android:key="about_credits_okhttp"
+            android:summary="https://github.com/square/okhttp"
+            android:title="@string/about_credits_okhttp_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/square/okhttp" />
+        </Preference>
+        <Preference
+            android:key="about_credits_moshi"
+            android:summary="https://github.com/square/moshi"
+            android:title="@string/about_credits_moshi_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/square/moshi" />
+        </Preference>
+        <Preference
+            android:key="about_credits_guava"
+            android:summary="https://github.com/google/guava"
+            android:title="@string/about_credits_guava_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/google/guava" />
+        </Preference>
+        <Preference
+            android:key="about_credits_slf4j"
+            android:summary="https://github.com/qos-ch/slf4j"
+            android:title="@string/about_credits_slf4j_title" >
+            <intent
+                android:action="bethel.intent.action.VIEW"
+                android:data="https://github.com/qos-ch/slf4j" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

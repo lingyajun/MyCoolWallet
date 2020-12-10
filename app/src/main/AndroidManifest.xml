@@ -14,7 +14,14 @@
         <activity android:name=".activity.AddressBookActivity" />
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
         <activity android:name=".activity.ExchangeRatesActivity" />
-        <activity android:name=".activity.WebActivity" />
+        <activity android:name=".activity.WebActivity" >
+            <intent-filter>
+                　　<action android:name="bethel.intent.action.VIEW" />
+                　　<category android:name="android.intent.category.DEFAULT" />
+                　　<data android:scheme="http" />       <!--响应所有的http协议的Intent-->
+                　　<data android:scheme="https" />       <!--响应所有的https协议的Intent-->
+            </intent-filter>
+        </activity>
         <activity android:name=".activity.DebugActivity" />
         <activity
             android:name=".activity.WalletFilePickerActivity"

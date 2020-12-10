@@ -1,6 +1,7 @@
 package com.bethel.mycoolwallet.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,10 +10,18 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.bethel.mycoolwallet.BuildConfig;
 import com.bethel.mycoolwallet.data.PasswordStrength;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Collection;
 
 public final class Utils {
@@ -103,4 +112,21 @@ public final class Utils {
     public static int size(Collection  collection) {
         return null!=collection ? collection.size() : 0;
     }
+
+    public static  HashCode apkHash(Context context) throws IOException {
+        final Hasher hasher = Hashing.sha256().newHasher();
+        final FileInputStream is = new FileInputStream(context.getPackageCodePath());
+        final byte[] buf = new byte[4096];
+        int read;
+        while (-1 != (read = is.read(buf)))
+            hasher.putBytes(buf, 0, read);
+        is.close();
+        return hasher.hash();
+    }
+
+    public static String versionLine(final PackageInfo packageInfo) {
+        return ImmutableList.copyOf(Splitter.on('.').splitToList(packageInfo.packageName)).reverse().get(0) + ' '
+                + packageInfo.versionName + (BuildConfig.DEBUG ? " (debuggable)" : "");
+    }
+
 }

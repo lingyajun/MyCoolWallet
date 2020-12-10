@@ -8,6 +8,10 @@
   <string name="pls_select_wallet_file">请选择你的钱包文件</string>
   <string name="bad_password">密码不正确</string>
   <string name="transaction_record">交易记录</string>
+  <string name="thanks">感谢</string>
+  <string name="about_credits_bitcoin_wallet">Bitcoin Wallet, 一个比特币钱包应用程序。</string>
+  <string name="about_credits_xui">XUI，一个简洁而优雅的Android原生UI框架</string>
+  <string name="about_credits_material_file_picker">Material File Picker, 一个文件选取库</string>
 
   <!--    Andreas Schildbach -->
   <string name="toast_wallet_reset">钱包已重置，\n 需要一些时间才能恢复</string>

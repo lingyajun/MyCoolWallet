@@ -6,7 +6,11 @@
     <string name="wrong_wallet_file_alarm">This is not a wallet file, please select the correct wallet file</string>
     <string name="pls_select_wallet_file">please select your wallet file</string>
     <string name="bad_password">bad password!</string>
-    <string name="transaction_record">交易记录</string>
+    <string name="transaction_record">transactions</string>
+    <string name="thanks">Thanks</string>
+    <string name="about_credits_bitcoin_wallet">Bitcoin Wallet, an app for your Android device. </string>
+    <string name="about_credits_xui">XUI, a simple and elegant Android native UI framework </string>
+    <string name="about_credits_material_file_picker">Material File Picker, a file picker library</string>
 
     <!--    Andreas Schildbach -->
     <string name="toast_wallet_reset">Your wallet was reset!\nIt will take some time to recover.</string>

@@ -12,8 +12,6 @@ import android.webkit.DownloadListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-//import androidx.appcompat.widget.ViewUtil;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -21,7 +19,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.utils.ViewUtil;
-//import com.xuexiang.xui.utils.ViewUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +57,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             if (msg.what == MSG_SHOW_LOADING) {
-                mVLoading.setVisibility(View.VISIBLE);
+                ViewUtil.setVisibility(mVLoading, View.VISIBLE);
             }
         };
     };
@@ -91,7 +88,6 @@ public class WebFragment extends BaseFragment implements DownloadListener {
         mWebView.getSettings().setBuiltInZoomControls(true);
 
         // 解决 has leaked window
-//        if (Build.VERSION.SDK_INT >= 16)
         mWebView.getSettings().setDisplayZoomControls(false);
         mWebView.setDownloadListener(this);
 
@@ -117,7 +113,7 @@ public class WebFragment extends BaseFragment implements DownloadListener {
         public void onReceivedError(WebView view, int errorCode, String description,
                                     String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
-            log.debug( "onReceivedError url: {}, errorCode: {}", failingUrl, errorCode);
+            log.info( "onReceivedError url: {}, errorCode: {}", failingUrl, errorCode);
             ViewUtil.showView(mVLoadFailed, true);
         }
 
@@ -148,11 +144,11 @@ public class WebFragment extends BaseFragment implements DownloadListener {
             mHandler.sendEmptyMessageDelayed(MSG_SHOW_LOADING, 500);
         }
         ViewUtil.showView(mVLoadFailed, false);
-        log.debug( "onPageStarted url: {}", url);
+        log.info( "onPageStarted url: {}", url);
     }
 
     protected void onWebPageFinished(WebView view, String url) {
-        log.debug(  "onWebPageFinished url: {}", url);
+        log.info(  "onWebPageFinished url: {}", url);
         if (mHandler.hasMessages(MSG_SHOW_LOADING)) {
             mHandler.removeMessages(MSG_SHOW_LOADING);
         }
