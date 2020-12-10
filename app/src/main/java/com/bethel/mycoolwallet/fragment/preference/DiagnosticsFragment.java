@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.preference;
 
 import android.os.Bundle;
 import android.preference.Preference;
@@ -9,7 +9,11 @@ import androidx.annotation.Nullable;
 
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
+import com.bethel.mycoolwallet.helper.Configuration;
+import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
+import com.xuexiang.xui.widget.dialog.materialdialog.DialogAction;
+import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.crypto.DeterministicKey;
@@ -36,13 +40,30 @@ public class DiagnosticsFragment extends PreferenceFragment {
             handleExtendedPubkey();
             return true;
         } else if (PREFS_KEY_INITIATE_RESET.equals(key)) {
-            // todo
-            XToast.info(getActivity(), PREFS_KEY_INITIATE_RESET).show();
+            handleInitiateReset();
+//            XToast.info(getActivity(), PREFS_KEY_INITIATE_RESET).show();
             return true;
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
+    private void handleInitiateReset() {
+        final MaterialDialog dialog = new MaterialDialog.Builder(getActivity())
+                .title(R.string.preferences_initiate_reset_title)
+                .content(R.string.preferences_initiate_reset_dialog_message)
+                .positiveText(R.string.preferences_initiate_reset_dialog_positive)
+                .negativeText(R.string.button_dismiss)
+                .show();
+        dialog.getActionButton(DialogAction.POSITIVE).setOnClickListener(view -> {
+            resetBlockChain();
+            getActivity().finish();
+        });
+    }
+
+    private void resetBlockChain() {
+        BlockChainService.resetBlockChain(getActivity());
+        Configuration.INSTANCE.updateLastBlockchainResetTime();
+    }
 
     /**
      * DeterministicKeyChain :

@@ -1,10 +1,9 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.preference;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.graphics.drawable.BitmapDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

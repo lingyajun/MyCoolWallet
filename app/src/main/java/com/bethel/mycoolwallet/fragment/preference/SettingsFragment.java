@@ -1,4 +1,4 @@
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.preference;
 
 import android.preference.PreferenceFragment;
 

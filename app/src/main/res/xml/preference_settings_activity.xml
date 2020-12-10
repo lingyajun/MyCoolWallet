@@ -2,12 +2,12 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:fragment="com.bethel.mycoolwallet.fragment.SettingsFragment"
+        android:fragment="com.bethel.mycoolwallet.fragment.preference.SettingsFragment"
         android:title="@string/preferences_activity_title" />
     <header
-        android:fragment="com.bethel.mycoolwallet.fragment.DiagnosticsFragment"
+        android:fragment="com.bethel.mycoolwallet.fragment.preference.DiagnosticsFragment"
         android:title="@string/preferences_category_diagnostics" />
     <header
-        android:fragment="com.bethel.mycoolwallet.fragment.AboutFragment"
+        android:fragment="com.bethel.mycoolwallet.fragment.preference.AboutFragment"
         android:title="@string/about_title" />
 </preference-headers>

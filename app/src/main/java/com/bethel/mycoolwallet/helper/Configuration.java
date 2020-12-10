@@ -42,6 +42,7 @@ public enum  Configuration {
     public static final String PREFS_KEY_DISCLAIMER = "disclaimer";
     private static final String PREFS_KEY_LAST_EXCHANGE_DIRECTION = "last_exchange_direction";
     public static final String PREFS_KEY_SEND_COINS_AUTOCLOSE = "send_coins_autoclose";
+    private static final String PREFS_KEY_LAST_BLOCKCHAIN_RESET = "last_blockchain_reset";
 
     public static final String PREFS_KEY_GUIDE_USER = "guide_user_main";
 
@@ -226,6 +227,14 @@ public enum  Configuration {
 
     public boolean getSendCoinsAutoClose() {
         return mPreference.getBoolean(PREFS_KEY_SEND_COINS_AUTOCLOSE, true);
+    }
+
+    public long getLastBlockchainResetTime() {
+        return mPreference.getLong(PREFS_KEY_LAST_BLOCKCHAIN_RESET, 0);
+    }
+
+    public void updateLastBlockchainResetTime() {
+        mPreference.putLong(PREFS_KEY_LAST_BLOCKCHAIN_RESET, System.currentTimeMillis());
     }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {
