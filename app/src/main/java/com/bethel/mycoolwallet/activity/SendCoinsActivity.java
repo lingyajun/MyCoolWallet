@@ -41,9 +41,7 @@ public class SendCoinsActivity extends BaseActivity {
         start(context, null,  0);
     }
 
-    public static void startDonate(final Context context, final Coin amount,
-                                   final int intentFlags) {
-        // todo: change donation address for me.
+    public static void startDonate(final Context context, final Coin amount, final int intentFlags) {
         start(context, PaymentUtil.from(Constants.DONATION_ADDRESS,
                 context.getString(R.string.wallet_donate_address_label), amount),  intentFlags);
     }

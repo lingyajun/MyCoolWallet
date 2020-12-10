@@ -13,6 +13,8 @@ import org.bitcoinj.protocols.payments.PaymentProtocolException;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptException;
 import org.bitcoinj.script.ScriptPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * PaymentIntent.Output
@@ -22,6 +24,8 @@ public class PaymentOutput implements Parcelable {
     public final Coin amount;
     public final Script script;
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentOutput.class);
+
     public PaymentOutput(Coin amount, Script script) {
         this.amount = amount;
         this.script = script;
@@ -30,8 +34,10 @@ public class PaymentOutput implements Parcelable {
     protected PaymentOutput(Parcel in) {
         amount =(Coin) in.readSerializable();
 
-        int length = in.readInt();
+        final int length = in.readInt();
+//        log.info("read,length {}", length);
         final byte[] program = new byte[length];
+//        log.info("read ,program.length {}", program.length);
         in.readByteArray(program);
         script = new Script(program);
     }
@@ -75,8 +81,9 @@ public class PaymentOutput implements Parcelable {
 
         //  serialized program as a newly created byte array.
         final byte[] program = script.getProgram();
-        parcel.writeByteArray(program);
         parcel.writeInt(program.length);
+//        log.info("writeToParcel,length {}", program.length);
+        parcel.writeByteArray(program);
     }
 
     @NonNull

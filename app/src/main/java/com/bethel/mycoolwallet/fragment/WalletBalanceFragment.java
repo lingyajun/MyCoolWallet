@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.bethel.mycoolwallet.CoolApplication;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.activity.ExchangeRatesActivity;
+import com.bethel.mycoolwallet.activity.SendCoinsActivity;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.bethel.mycoolwallet.data.tx_list.ColorType;
@@ -235,7 +236,7 @@ public class WalletBalanceFragment extends BaseFragment {
         boolean hasSomeBalance =  balance != null && !balance.isLessThan(Constants.SOME_BALANCE_THRESHOLD);
         menu.findItem(R.id.wallet_balance_options_donate)
                 .setVisible(Constants.DONATION_ADDRESS != null && hasSomeBalance);
-                super.onPrepareOptionsMenu(menu);
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -247,7 +248,8 @@ public class WalletBalanceFragment extends BaseFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void donateBtc() { // todo donate
-        XToast.info(getContext(), "donate some bitcoin").show();
+    private void donateBtc() {
+        SendCoinsActivity.startDonate(getContext(), null ,0);
+//        XToast.info(getContext(), "donate some bitcoin").show();
     }
 }
