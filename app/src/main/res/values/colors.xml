@@ -40,5 +40,6 @@
 
 <!--    <color name="guide_bg">#a3c06000</color>-->
     <color name="guide_bg">#83008577</color>
+    <color name="disclaimer_bg">#aa666666</color>
 <!--    <color name="guide_bg">#83008000</color>-->
 </resources>

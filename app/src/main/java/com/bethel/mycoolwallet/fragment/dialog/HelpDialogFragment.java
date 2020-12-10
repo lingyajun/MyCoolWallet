@@ -15,9 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.bethel.mycoolwallet.fragment;
+package com.bethel.mycoolwallet.fragment.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -27,7 +26,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bethel.mycoolwallet.R;
-import com.bethel.mycoolwallet.view.DialogBuilder;
 import com.xuexiang.xui.widget.dialog.materialdialog.MaterialDialog;
 
 import org.slf4j.Logger;

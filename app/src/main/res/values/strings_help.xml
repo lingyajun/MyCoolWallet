@@ -144,4 +144,66 @@
 			More options are available in the options menu.
     </string>
 
+    <string name="help_safety1">
+		<![CDATA[
+         <p>
+			<b>Important safety notes:</b>（1/5）
+		</p>
+		<p>
+			Bitcoins are stored on the device.
+			<b>If you lose it, you\'ll lose your Bitcoins.</b>
+		</p>
+		<p>
+			This means you need to <b>back up your wallet</b>!
+			Use the in-app backup facility for this, rather than a third party backup app.
+			Keep your backup safe and remember the password.
+		</p>
+		  ]]>
+	</string>
+    <string name="help_safety2">
+		<![CDATA[
+		<p>
+			<b>Important safety notes:</b>（2/5）
+		</p>
+		<p>
+			<b>Before uninstalling</b> (or clearing app data/wiping your device), <b>transfer your Bitcoins to another wallet</b>.
+			Remaining Bitcoins will be lost.
+		</p>
+		  ]]>
+	</string>
+    <string name="help_safety3">
+		<![CDATA[
+		<p>
+			<b>Important safety notes:</b>（3/5）
+		</p>
+		<p>
+			<b>Payments are irreversible</b>.
+			If you send your Bitcoins into the void, there is almost no way to get them back.
+		</p>
+		  ]]>
+	</string>
+    <string name="help_safety4">
+		<![CDATA[
+		<p>
+			<b>Important safety notes:</b>（4/5）
+		</p>
+		<p>
+			<b>Keep your mobile device safe!</b>
+			Do not root your device.
+			Do only install apps you fully trust.
+			Malicious apps could be trying to steal your wallet.
+		</p>
+		  ]]>
+	</string>
+    <string name="help_safety5">
+		<![CDATA[
+		<p>
+			<b>Important safety notes:</b>（5/5）
+		</p>
+		<p>
+			Keep the risk low!
+			<b>Store only a reasonable amount</b> for day use.
+		</p>
+		  ]]>
+	</string>
 </resources>

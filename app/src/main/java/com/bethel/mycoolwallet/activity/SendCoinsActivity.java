@@ -11,7 +11,7 @@ import androidx.core.app.ActivityCompat;
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.data.payment.PaymentUtil;
-import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.HelpDialogFragment;
 import com.bethel.mycoolwallet.service.BlockChainService;
 import com.bethel.mycoolwallet.utils.Constants;
 

@@ -21,6 +21,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.BlockChainState;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.data.Impediment;
+import com.bethel.mycoolwallet.helper.DisclaimerHelper;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletDisclaimerViewModel;
 import com.bethel.mycoolwallet.utils.ViewUtil;
@@ -49,8 +50,10 @@ public class WalletDisclaimerFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         msgTv =(TextView) view;
-        msgTv.setOnClickListener(view1 ->
-                activityViewModel.showHelpDialog.setValue(new Event<>(R.string.help_safety)));
+        msgTv.setOnClickListener(view1 ->{
+//            DisclaimerHelper.show(getActivity());
+                activityViewModel.showHelpDialog.setValue(new Event<>(R.string.help_safety));
+        });
     }
 
     private void updateUI() {

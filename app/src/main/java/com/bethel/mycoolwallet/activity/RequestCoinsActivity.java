@@ -3,21 +3,16 @@ package com.bethel.mycoolwallet.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 
 import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
-import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.HelpDialogFragment;
 import com.bethel.mycoolwallet.mvvm.view_model.RequestCoinsActivityViewModel;
-import com.xuexiang.xui.widget.toast.XToast;
 
 import org.bitcoinj.script.Script;
 

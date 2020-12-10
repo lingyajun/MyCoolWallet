@@ -2,7 +2,6 @@ package com.bethel.mycoolwallet.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.menu.MenuBuilder;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -21,7 +20,7 @@ import com.bethel.mycoolwallet.R;
 import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
-import com.bethel.mycoolwallet.fragment.HelpDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.HelpDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.helper.GuideHelper;
