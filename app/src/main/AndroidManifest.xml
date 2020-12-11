@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bethel.mycoolwallet">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:name=".CoolApplication"
         android:allowBackup="false"
@@ -15,11 +27,11 @@
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
         <activity android:name=".activity.ExchangeRatesActivity" />
         <activity android:name=".activity.WebActivity" >
-            <intent-filter>
+           <intent-filter>
                 　　<action android:name="bethel.intent.action.VIEW" />
                 　　<category android:name="android.intent.category.DEFAULT" />
-                　　<data android:scheme="http" />       <!--响应所有的http协议的Intent-->
-                　　<data android:scheme="https" />       <!--响应所有的https协议的Intent-->
+                　　<data android:scheme="http" />       <!-- 响应所有的http协议的Intent -->
+                　　<data android:scheme="https" />       <!-- 响应所有的https协议的Intent -->
             </intent-filter>
         </activity>
         <activity android:name=".activity.DebugActivity" />
@@ -104,16 +116,4 @@
             android:enabled="true"
             android:exported="false" />
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-
 </manifest>
