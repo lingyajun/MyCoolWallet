@@ -218,13 +218,13 @@ public class RaiseFeeDialogFragment extends BaseDialogFragment {
         if (null==mDialog || !mDialog.isShowing()) return;
         final Coin feeRaise = getFeeRaise();
 
-        final TransactionOutput outputToSpend = null!=feeRaise ?
-                findSpendableOutput(wallet, transaction, feeRaise) : null;
+        final TransactionOutput outputToSpend = findSpendableOutput(wallet, transaction, feeRaise);
 
-        if (null==feeRaise) {
-            messageView.setText(R.string.raise_fee_dialog_determining_fee);
-            ViewUtil.showView(passwordGroup, false);
-        } else if (null == outputToSpend) {
+//        if (null==feeRaise) {
+//            messageView.setText(R.string.raise_fee_dialog_determining_fee);
+//            ViewUtil.showView(passwordGroup, false);
+//        } else
+        if (null == outputToSpend) {
             messageView.setText(R.string.raise_fee_dialog_cant_raise);
             ViewUtil.showView(passwordGroup, false);
         } else {
