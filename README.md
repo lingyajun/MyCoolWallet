@@ -1,9 +1,10 @@
 # 麦酷钱包（MyCoolWallet）
-
-![img](media/photo-0.jpg)
-![img](media/photo-2.jpg)
-![img](media/photo-3.jpg)
-![img](media/photo-7.jpg)
+<div align="center">
+    <img src="media/photo-0.jpg" width="360" height="700">
+    <img src="media/photo-2.jpg" width="360" height="700" style="margin-left:5px">
+    <img src="media/photo-3.jpg" width="360" height="700" style="margin-left:5px">
+    <img src="media/photo-7.jpg" width="360" height="700" style="margin-left:5px">
+</div>
 
 
 感谢
