@@ -32,6 +32,7 @@ import com.bethel.mycoolwallet.data.tx_list.TransactionDirection;
 import com.bethel.mycoolwallet.data.tx_list.TransactionListItemAnimator;
 import com.bethel.mycoolwallet.data.tx_list.TransactionWarningType;
 import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
+import com.bethel.mycoolwallet.fragment.dialog.RaiseFeeDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletTransactionsViewModel;
@@ -266,7 +267,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
 
                 @Override
                 public void onRaiseFee(Transaction tx) {
-// todo                     RaiseFeeDialogFragment.show(getFragmentManager(), tx);
+                      RaiseFeeDialogFragment.show(getFragmentManager(), tx);
                 }
 
                 @Override
