@@ -45,6 +45,7 @@ public class ReportIssueDialogFragment extends BaseDialogFragment {
     private static final String KEY_SUBJECT = "subject";
     private static final String KEY_CONTEXTUAL_DATA = "contextual_data";
 
+    private boolean sent = false;
 
     public static void show(final FragmentManager fm, final int titleResId, final int messageResId,
                             final String subject, final String contextualData) {
@@ -161,6 +162,7 @@ public class ReportIssueDialogFragment extends BaseDialogFragment {
                     }
                 };
                 reporter.run();
+                sent = true;
             }); // end  ClickListener
         }); // end  ShowListener
         return dialog;
@@ -168,7 +170,9 @@ public class ReportIssueDialogFragment extends BaseDialogFragment {
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
+//        if (sent)
         CrashReporter.deleteSaveCrashTrace();
+
         super.onDismiss(dialog);
     }
 }

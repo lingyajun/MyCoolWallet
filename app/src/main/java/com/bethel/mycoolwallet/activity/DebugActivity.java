@@ -42,6 +42,8 @@ public class DebugActivity extends BaseActivity {
 //        AsyncTask.execute(() -> {
         CoolThreadPool.execute(() -> {
             File crashFile = CrashReporter.getCrashTraceFile();// getBackgroundTracesFile();
+            if (null == crashFile || !crashFile.exists()) return;
+
            final String data = readCrashReporter(crashFile);
            runOnUiThread(()-> textView.setText(data));
         });
