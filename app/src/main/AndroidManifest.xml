@@ -10,7 +10,11 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SendCoinsQrActivity"></activity>
+
+        <activity android:name=".activity.SendCoinsQrActivity"
+            android:configChanges="keyboard|keyboardHidden"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+
         <activity android:name=".activity.SweepWalletActivity" />
         <activity android:name=".activity.AddressBookActivity" />
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
