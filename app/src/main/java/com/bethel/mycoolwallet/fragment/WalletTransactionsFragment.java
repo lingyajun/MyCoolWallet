@@ -33,9 +33,11 @@ import com.bethel.mycoolwallet.data.tx_list.TransactionListItemAnimator;
 import com.bethel.mycoolwallet.data.tx_list.TransactionWarningType;
 import com.bethel.mycoolwallet.fragment.dialog.EditAddressBookFragment;
 import com.bethel.mycoolwallet.fragment.dialog.RaiseFeeDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.ReportIssueDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.mvvm.view_model.MainActivityViewModel;
 import com.bethel.mycoolwallet.mvvm.view_model.WalletTransactionsViewModel;
+import com.bethel.mycoolwallet.utils.Constants;
 import com.bethel.mycoolwallet.utils.Utils;
 import com.bethel.mycoolwallet.view.StickToTopLinearLayoutManager;
 import com.bethel.mycoolwallet.view.TransactionPopupMenu;
@@ -150,8 +152,8 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
         viewModel.showReportIssueDialog.observe(this, new Event.Observer<String>(){
             @Override
             public void onEvent(String content) {
-                // todo Report Issue
-                XToast.warning(getContext(), "report: "+ content).show();
+                ReportIssueDialogFragment.show(getFragmentManager(), R.string.report_issue_dialog_title_transaction,
+                        R.string.report_issue_dialog_message_issue, Constants.REPORT_SUBJECT_ISSUE, content);
             }
         });
     }
@@ -251,7 +253,7 @@ public class WalletTransactionsFragment extends BaseStatusLoaderFragment {
         public void onTransactionMenuClick(View view, Sha256Hash transactionHash) {
             final Wallet wallet = viewModel.wallet.getValue();
             if (null==wallet || null == transactionHash) return;
-//  popup  menu
+
             TransactionPopupMenu menu = new TransactionPopupMenu(getActivity(), view,
                     wallet, transactionHash, viewModel.addressBookDao);
             menu.setOnMenuItemClickListener(new TransactionPopupMenu.OnTxMenuItemClickListener(){

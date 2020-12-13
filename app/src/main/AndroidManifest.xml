@@ -30,8 +30,8 @@
            <intent-filter>
                 　　<action android:name="bethel.intent.action.VIEW" />
                 　　<category android:name="android.intent.category.DEFAULT" />
-                　　<data android:scheme="http" />       <!-- 响应所有的http协议的Intent -->
-                　　<data android:scheme="https" />       <!-- 响应所有的https协议的Intent -->
+                　　<data android:scheme="http" />
+                　　<data android:scheme="https" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.DebugActivity" />
@@ -96,6 +96,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+           <!-- <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />-->
         </activity>
         <activity
             android:name=".activity.CustomCaptureActivity"
@@ -115,5 +119,20 @@
             android:name=".service.BlockChainService"
             android:enabled="true"
             android:exported="false" />
+
+        <meta-data
+            android:name="android.nfc.disable_beam_default"
+            android:value="true" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.file_attachment"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider" />
+        </provider>
+
     </application>
 </manifest>

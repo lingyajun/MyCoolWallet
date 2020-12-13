@@ -34,6 +34,7 @@ public class CoolApplication extends Application {
     private ActivityManager activityManager;
 //    private Configuration mConfig;
 
+    public static final long TIME_CREATE_APPLICATION = System.currentTimeMillis();
     private static final Logger log = LoggerFactory.getLogger(CoolApplication.class);
     @Override
     protected void attachBaseContext(Context base) {

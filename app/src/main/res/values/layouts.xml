@@ -4,7 +4,7 @@
     <item name="wallet_actions_top" type="bool">false</item>
     <item name="show_exchange_rates_option" type="bool">true</item>
     <bool name="show_wallet_address_dialog_hint">false</bool>
-    <item name="show_debug_option" type="bool">true</item>
+    <item name="show_debug_option" type="bool">false</item>
     <item name="show_local_balance" type="bool">true</item>
     <item name="network_monitor_content" type="layout">@layout/activity_block_chain_network_monitor_onepane</item>
     <item name="address_book_content" type="layout">@layout/activity_address_book_onepane</item>

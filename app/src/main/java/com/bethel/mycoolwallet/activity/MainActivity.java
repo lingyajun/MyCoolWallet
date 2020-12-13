@@ -21,6 +21,7 @@ import com.bethel.mycoolwallet.data.Event;
 import com.bethel.mycoolwallet.data.payment.PaymentData;
 import com.bethel.mycoolwallet.fragment.dialog.EncryptKeysDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.HelpDialogFragment;
+import com.bethel.mycoolwallet.fragment.dialog.ReportIssueDialogFragment;
 import com.bethel.mycoolwallet.fragment.dialog.WalletRestoreDialogFragment;
 import com.bethel.mycoolwallet.helper.Configuration;
 import com.bethel.mycoolwallet.helper.GuideHelper;
@@ -125,15 +126,15 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel.showReportCrashDialog.observe(this, new Event.Observer<Void>(){
             @Override
             public void onEvent(Void content) {
-                //todo ReportIssueDialogFragment
-              //  XToast.warning(MainActivity.this, " crash").show();
+                ReportIssueDialogFragment.show(getSupportFragmentManager(), R.string.report_issue_dialog_title_crash,
+                        R.string.report_issue_dialog_message_crash, Constants.REPORT_SUBJECT_CRASH, null);
             }
         });
         viewModel.showReportIssueDialog.observe(this, new Event.Observer<Void>(){
             @Override
             public void onEvent(Void content) {
-                //todo ReportIssueDialogFragment
-                XToast.warning(MainActivity.this, " issue").show();
+                ReportIssueDialogFragment.show(getSupportFragmentManager(), R.string.report_issue_dialog_title_issue,
+                        R.string.report_issue_dialog_message_issue, Constants.REPORT_SUBJECT_ISSUE, null);
             }
         });
         viewModel.legacyFallback.observe(this, bool -> {
