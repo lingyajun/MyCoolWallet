@@ -96,6 +96,8 @@ public class ExchangeRateLiveData extends LiveData<ExchangeRateBean> {
             if (null!=rateBean) {
                 requestTime.put(currencyCode, System.currentTimeMillis());
                 cacheRequest(currencyCode, result);
+
+                Configuration.INSTANCE.setCachedExchangeRate(rateBean);
             }
         }
 

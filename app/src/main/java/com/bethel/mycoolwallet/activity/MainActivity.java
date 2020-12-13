@@ -51,11 +51,12 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
      */
     public static final int REQUEST_QR_SCAN_CODE = 111;
 
-    private  MainActivityViewModel viewModel;
+    private MainActivityViewModel viewModel;
 
     private final Handler mHandler = new Handler();
 
     private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +67,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         viewModel = getViewModel(MainActivityViewModel.class);
         observeData();
 
-        if (null==savedInstanceState && CrashReporter.hasSavedCrashTrace()) {
+        if (null == savedInstanceState && CrashReporter.hasSavedCrashTrace()) {
             viewModel.showReportCrashDialog.setValue(Event.simple());
         }
 
@@ -74,7 +75,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         parseIntentData(getIntent());
 
         if (!Configuration.INSTANCE.hasGuideUser()) {
-            mHandler.postDelayed(()-> viewModel.showGuidePage.setValue(Event.simple()),200);
+            mHandler.postDelayed(() -> viewModel.showGuidePage.setValue(Event.simple()), 200);
         }
     }
 
@@ -92,7 +93,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         }
 
         //  parse
-        new NfcIntentDataParser(intent){
+        new NfcIntentDataParser(intent) {
             @Override
             public void error(int messageResId, Object... messageArgs) {
                 SendCoinsHelper.dialog(MainActivity.this, null,
@@ -116,21 +117,21 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
             WalletRestoreDialogFragment.show(getSupportFragmentManager());
         });
         viewModel.showBackupWalletDialog.observe(this, e -> WalletBackupActivity.start(this));
-        viewModel.showHelpDialog.observe(this, new Event.Observer< Integer >(){
+        viewModel.showHelpDialog.observe(this, new Event.Observer<Integer>() {
             @Override
-            public void onEvent( Integer content) {
+            public void onEvent(Integer content) {
                 HelpDialogFragment.show(getSupportFragmentManager(), content);
             }
         });
 
-        viewModel.showReportCrashDialog.observe(this, new Event.Observer<Void>(){
+        viewModel.showReportCrashDialog.observe(this, new Event.Observer<Void>() {
             @Override
             public void onEvent(Void content) {
                 ReportIssueDialogFragment.show(getSupportFragmentManager(), R.string.report_issue_dialog_title_crash,
                         R.string.report_issue_dialog_message_crash, Constants.REPORT_SUBJECT_CRASH, null);
             }
         });
-        viewModel.showReportIssueDialog.observe(this, new Event.Observer<Void>(){
+        viewModel.showReportIssueDialog.observe(this, new Event.Observer<Void>() {
             @Override
             public void onEvent(Void content) {
                 ReportIssueDialogFragment.show(getSupportFragmentManager(), R.string.report_issue_dialog_title_issue,
@@ -146,7 +147,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
     @Override
     protected void onResume() {
         super.onResume();
-        mHandler.postDelayed(()-> BlockChainService.start(this, true),1000);
+        mHandler.postDelayed(() -> BlockChainService.start(this, true), 1000);
     }
 
     @Override
@@ -206,59 +207,60 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 // 用旧式地址索取比特币 (pay to pubkey hash)
                 RequestCoinsActivity.start(this, Script.ScriptType.P2PKH);
                 break;
-            case R.id.wallet_options_send :
+            case R.id.wallet_options_send:
                 handleSendCoins();
                 break;
-            case R.id.wallet_options_scan :
+            case R.id.wallet_options_scan:
                 handleScan(null);
                 break;
-            case R.id.wallet_options_address_book :
+            case R.id.wallet_options_address_book:
                 AddressBookActivity.start(this);
                 break;
-            case R.id.wallet_options_exchange_rates :
+            case R.id.wallet_options_exchange_rates:
                 ExchangeRatesActivity.start(this);
                 break;
-            case R.id.wallet_options_sweep_wallet :
-                  SweepWalletActivity.start(this);
+            case R.id.wallet_options_sweep_wallet:
+                SweepWalletActivity.start(this);
                 break;
-            case R.id.wallet_options_network_monitor :
+            case R.id.wallet_options_network_monitor:
                 BlockChainNetworkMonitorActivity.start(this);
                 break;
-            case R.id.wallet_options_restore_wallet :
+            case R.id.wallet_options_restore_wallet:
                 viewModel.showRestoreWalletDialog.setValue(Event.simple());
                 break;
-            case R.id.wallet_options_backup_wallet :
+            case R.id.wallet_options_backup_wallet:
                 viewModel.showBackupWalletDialog.setValue(Event.simple());
                 break;
-            case R.id.wallet_options_encrypt_keys :
+            case R.id.wallet_options_encrypt_keys:
                 viewModel.showEncryptKeysDialog.setValue(Event.simple());
                 break;
-            case R.id.wallet_options_preferences :
+            case R.id.wallet_options_preferences:
                 SettingsActivity.start(this);
                 break;
-            case R.id.wallet_options_safety :
+            case R.id.wallet_options_safety:
                 viewModel.showHelpDialog.setValue(new Event<>(R.string.help_safety));
                 break;
-            case R.id.wallet_options_technical_notes :
+            case R.id.wallet_options_technical_notes:
                 viewModel.showHelpDialog.setValue(new Event<>(R.string.help_technical_notes));
                 break;
-            case R.id.wallet_options_report_issue :
+            case R.id.wallet_options_report_issue:
                 viewModel.showReportIssueDialog.setValue(Event.simple());
                 break;
-            case R.id.wallet_options_help :
+            case R.id.wallet_options_help:
                 viewModel.showGuidePage.setValue(Event.simple());
 //                viewModel.showHelpDialog.setValue(new Event<>(R.string.help_wallet));
                 break;
-            case R.id.wallet_options_debug :
+            case R.id.wallet_options_debug:
                 DebugActivity.start(this);
                 break;
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
         return true;
 //        return super.onOptionsItemSelected(item);
     }
 
-    private void   handleRequestCoins() {
+    private void handleRequestCoins() {
         requestCoins();
     }
 
@@ -272,14 +274,14 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
     /**
      * 打开扫码页面
-     * */
+     */
     @Override
     public void startScan(View o) {
 //        maybeOpenCamera();
 //        requestCameraPermissionsIfNotGranted();
         if (!maybeOpenCamera(o)) {
             requestCameraPermissions();
-       }
+        }
     }
 
     @Override
@@ -314,57 +316,57 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
      * @param data
      */
     private void handleScanResult(Intent data) {
-        if (data != null) {
-            Bundle bundle = data.getExtras();
-            if (bundle != null) {
-                if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
-                    final  String result = bundle.getString(XQRCode.RESULT_DATA);
-                    if (TextUtils.isEmpty(result)) return;
-                    //  handle bitcoin pay
-                    final StringInputParser parser = new StringInputParser(result) {
-                        @Override
-                        protected void handleWebUrl(String link) {
-                            WebActivity.start(MainActivity.this, link);
-                        }
+        Bundle bundle = null != data ? data.getExtras() : null;
+        if (bundle == null) {
+            return;
+        }
 
-                        @Override
-                        protected void handlePrivateKey(PrefixedChecksummedBytes key) {
-                            if (Constants.ENABLE_SWEEP_WALLET) {
-                                SweepWalletActivity.start(MainActivity.this, key);
-                            } else {
-                                super.handlePrivateKey(key);
-                            }
-                        }
-
-                        @Override
-                        public void handleDirectTransaction(Transaction transaction) throws VerificationException {
-                            CoolApplication.getApplication().processDirectTransaction(transaction);
-                        }
-
-                        @Override
-                        public void error(int messageResId, Object... messageArgs) {
-                            SendCoinsHelper.dialog(MainActivity.this, null,
-                                    R.string.button_scan, messageResId, messageArgs);
-                            log.error("IntentDataParser {}", getString(messageResId, messageArgs));
-                        }
-
-                        @Override
-                        public void handlePaymentData(PaymentData data) {
-                            SendCoinsActivity.start(MainActivity.this, data);
-                        }
-                    };
-                    parser.parse();
-                    log.info(" 解析结果: {} " , result );
-                } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
-                    XToast.error(this,R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+        if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
+            final String result = bundle.getString(XQRCode.RESULT_DATA);
+            if (TextUtils.isEmpty(result)) return;
+            //  handle bitcoin pay
+            final StringInputParser parser = new StringInputParser(result) {
+                @Override
+                protected void handleWebUrl(String link) {
+                    WebActivity.start(MainActivity.this, link);
                 }
-            }
+
+                @Override
+                protected void handlePrivateKey(PrefixedChecksummedBytes key) {
+                    if (Constants.ENABLE_SWEEP_WALLET) {
+                        SweepWalletActivity.start(MainActivity.this, key);
+                    } else {
+                        super.handlePrivateKey(key);
+                    }
+                }
+
+                @Override
+                public void handleDirectTransaction(Transaction transaction) throws VerificationException {
+                    CoolApplication.getApplication().processDirectTransaction(transaction);
+                }
+
+                @Override
+                public void error(int messageResId, Object... messageArgs) {
+                    SendCoinsHelper.dialog(MainActivity.this, null,
+                            R.string.button_scan, messageResId, messageArgs);
+                    log.error("IntentDataParser {}", getString(messageResId, messageArgs));
+                }
+
+                @Override
+                public void handlePaymentData(PaymentData data) {
+                    SendCoinsActivity.start(MainActivity.this, data);
+                }
+            };
+            parser.parse();
+            log.info(" 解析结果: {} ", result);
+        } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
+            XToast.error(this, R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
         }
     }
 
     /**
      * 打开收钱页面
-     * */
+     */
     @Override
     public void requestCoins() {
         RequestCoinsActivity.start(this);
@@ -372,7 +374,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
 
     /**
      * 打开支付页面
-     * */
+     */
     @Override
     public void sendCoins() {
         SendCoinsActivity.start(this);

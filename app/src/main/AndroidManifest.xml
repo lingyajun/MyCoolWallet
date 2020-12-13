@@ -2,18 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.bethel.mycoolwallet">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-
     <application
         android:name=".CoolApplication"
         android:allowBackup="false"
@@ -22,16 +10,19 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SweepWalletActivity"/>
+        <activity android:name=".activity.SendCoinsQrActivity"></activity>
+        <activity android:name=".activity.SweepWalletActivity" />
         <activity android:name=".activity.AddressBookActivity" />
         <activity android:name=".activity.BlockChainNetworkMonitorActivity" />
         <activity android:name=".activity.ExchangeRatesActivity" />
-        <activity android:name=".activity.WebActivity" >
-           <intent-filter>
-                　　<action android:name="bethel.intent.action.VIEW" />
-                　　<category android:name="android.intent.category.DEFAULT" />
-                　　<data android:scheme="http" />
-                　　<data android:scheme="https" />
+        <activity android:name=".activity.WebActivity">
+            <intent-filter>
+                <action android:name="bethel.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
             </intent-filter>
         </activity>
         <activity android:name=".activity.DebugActivity" />
@@ -97,9 +88,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-           <!-- <meta-data
+            <!--
+                <meta-data
                 android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />-->
+                android:resource="@xml/shortcuts" />
+            -->
         </activity>
         <activity
             android:name=".activity.CustomCaptureActivity"
@@ -107,7 +100,40 @@
             android:screenOrientation="portrait"
             android:theme="@style/XQRCodeTheme"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".activity.SettingsActivity" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
+        <activity android:name=".activity.SettingsActivity" />
+
+        <meta-data
+            android:name="android.nfc.disable_beam_default"
+            android:value="true" /> <!-- android:theme="@style/My.Theme.ChildActivity" -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.file_attachment"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider" />
+        </provider>
+
+        <receiver android:name=".service.WalletBalanceWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/wallet_balance_widget_provider_info" />
+        </receiver>
+
+        <receiver android:name=".service.BootstrapReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".service.AcceptBluetoothService"
             android:enabled="true"
@@ -119,29 +145,17 @@
             android:name=".service.BlockChainService"
             android:enabled="true"
             android:exported="false" />
-
-        <receiver android:name=".service.BootstrapReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-            </intent-filter>
-        </receiver>
-
-        <meta-data
-            android:name="android.nfc.disable_beam_default"
-            android:value="true" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.file_attachment"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_provider" />
-        </provider>
-
     </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
 </manifest>

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 
+import com.bethel.mycoolwallet.data.ExchangeRateBean;
 import com.google.common.base.Strings;
 
 import org.bitcoinj.core.Coin;
+import org.bitcoinj.utils.Fiat;
 import org.bitcoinj.utils.MonetaryFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,10 @@ public enum  Configuration {
     public static final String PREFS_KEY_DATA_USAGE = "data_usage";
 
     public static final String PREFS_KEY_GUIDE_USER = "guide_user_main";
+
+    private static final String PREFS_KEY_CACHED_EXCHANGE_CURRENCY = "cached_exchange_currency";
+    private static final String PREFS_KEY_CACHED_EXCHANGE_RATE_COIN = "cached_exchange_rate_coin";
+    private static final String PREFS_KEY_CACHED_EXCHANGE_RATE_FIAT = "cached_exchange_rate_fiat";
 
     private static final int PREFS_DEFAULT_BTC_SHIFT = 3;
     private static final int PREFS_DEFAULT_BTC_PRECISION = 2;
@@ -244,6 +250,28 @@ public enum  Configuration {
 
     public void updateLastBlockchainResetTime() {
         mPreference.putLong(PREFS_KEY_LAST_BLOCKCHAIN_RESET, System.currentTimeMillis());
+    }
+
+
+    public ExchangeRateBean getCachedExchangeRate() {
+        final  SharedPreferences prefs = mPreference.mSharedPref;
+        if (prefs.contains(PREFS_KEY_CACHED_EXCHANGE_CURRENCY) && prefs.contains(PREFS_KEY_CACHED_EXCHANGE_RATE_COIN)
+                && prefs.contains(PREFS_KEY_CACHED_EXCHANGE_RATE_FIAT)) {
+            final String cachedExchangeCurrency = prefs.getString(PREFS_KEY_CACHED_EXCHANGE_CURRENCY, null);
+            final Coin cachedExchangeRateCoin = Coin.valueOf(prefs.getLong(PREFS_KEY_CACHED_EXCHANGE_RATE_COIN, 0));
+            final Fiat cachedExchangeRateFiat = Fiat.valueOf(cachedExchangeCurrency,
+                    prefs.getLong(PREFS_KEY_CACHED_EXCHANGE_RATE_FIAT, 0));
+            return new ExchangeRateBean(new org.bitcoinj.utils.ExchangeRate(cachedExchangeRateCoin, cachedExchangeRateFiat),
+                    null);
+        }
+
+        return null;
+    }
+
+    public void setCachedExchangeRate(final ExchangeRateBean cachedExchangeRate) {
+        mPreference.putString(PREFS_KEY_CACHED_EXCHANGE_CURRENCY, cachedExchangeRate.getCurrencyCode());
+        mPreference.putLong(PREFS_KEY_CACHED_EXCHANGE_RATE_COIN, cachedExchangeRate.rate.coin.value);
+        mPreference.putLong(PREFS_KEY_CACHED_EXCHANGE_RATE_FIAT, cachedExchangeRate.rate.fiat.value);
     }
 
     public void registerOnSharedPreferenceChangeListener(final SharedPreferences.OnSharedPreferenceChangeListener listener) {

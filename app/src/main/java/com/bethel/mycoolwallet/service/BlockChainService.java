@@ -117,13 +117,17 @@ public class BlockChainService extends LifecycleService {
         final WalletBalanceLiveData balanceLiveData = new WalletBalanceLiveData(app);
         final ExchangeRateSelectedLiveData rateSelectedLiveData = new ExchangeRateSelectedLiveData();
         balanceLiveData.observe(this, coin -> {
-            // todo updateWidgets
+            //  updateWidgets
             ExchangeRateBean rateBean = rateSelectedLiveData.getValue();
+            WalletBalanceWidgetProvider.updateWidgets(this, coin, rateBean);
         });
         if (Constants.ENABLE_EXCHANGE_RATES) {
-            rateSelectedLiveData.observe(this, bean -> {
-                // todo updateWidgets
-                Coin value = balanceLiveData.getValue();
+            rateSelectedLiveData.observe(this, rateBean -> {
+                //  updateWidgets
+                Coin coin = balanceLiveData.getValue();
+                if (null!=coin) {
+                    WalletBalanceWidgetProvider.updateWidgets(this, coin, rateBean);
+                }
             });
         }
 
