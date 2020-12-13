@@ -1,4 +1,7 @@
 # 麦酷钱包（MyCoolWallet）
+[ 测试网络·安装包 apk ](https://github.com/lingyajun/MyCoolWallet/releases/download/v1.0.2/app-test_net-debug-v1.0.1.apk)
+
+
 <div align="center">
     <img src="media/photo-0.jpg" width="360" height="700">
     <img src="media/photo-2.jpg" width="360" height="700" style="margin-left:5px">
