@@ -30,6 +30,6 @@ public class ExampleInstrumentedTest {
 
     @Test
     public void requestExchangeRate() {
-        HttpUtil.requestExchangeRate("CNY");
+        HttpUtil.requestExchangeRate("CNY", null);
     }
 }

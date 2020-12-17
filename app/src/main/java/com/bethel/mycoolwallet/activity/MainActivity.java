@@ -191,7 +191,7 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
         }
 
         boolean debug = res.getBoolean(R.bool.show_debug_option);
-        menu.findItem(R.id.wallet_options_debug).setEnabled(debug);
+        menu.findItem(R.id.wallet_options_debug).setVisible(debug);
         return true;
     }
 
@@ -257,7 +257,6 @@ public class MainActivity extends BaseActivity implements IQrScan, IRequestCoins
                 return super.onOptionsItemSelected(item);
         }
         return true;
-//        return super.onOptionsItemSelected(item);
     }
 
     private void handleRequestCoins() {

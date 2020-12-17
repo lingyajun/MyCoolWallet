@@ -42,6 +42,8 @@ public class SendCoinsQrActivity extends AppCompatActivity {
         //处理二维码扫描结果
         if (requestCode == REQUEST_QR_SCAN_CODE && resultCode == RESULT_OK) {
             handleScanResult(data);
+        } else {
+            finish();
         }
     }
 
@@ -59,12 +61,16 @@ public class SendCoinsQrActivity extends AppCompatActivity {
 
         if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_SUCCESS) {
             final String result = bundle.getString(XQRCode.RESULT_DATA);
-            if (TextUtils.isEmpty(result)) return;
+            if (TextUtils.isEmpty(result)) {
+                finish();
+                return;
+            }
             //  handle bitcoin pay
             final StringInputParser parser = new StringInputParser(result) {
                 @Override
                 protected void handleWebUrl(String link) {
                     WebActivity.start(SendCoinsQrActivity.this, link);
+                    SendCoinsQrActivity.this.finish();
                 }
 
                 @Override
@@ -100,7 +106,8 @@ public class SendCoinsQrActivity extends AppCompatActivity {
             parser.parse();
             log.info(" 解析结果: {} ", result);
         } else if (bundle.getInt(XQRCode.RESULT_TYPE) == XQRCode.RESULT_FAILED) {
-            XToast.error(this, R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+            XToast.error(getApplication(), R.string.parse_qr_code_failed, Toast.LENGTH_LONG).show();
+            SendCoinsQrActivity.this.finish();
         }
     }
 
