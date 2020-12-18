@@ -78,3 +78,7 @@
 -keepclasseswithmembernames,includedescriptorclasses class * {
     native <methods>;
 }
+
+-keepclassmembers class * extends android.preference.PreferenceActivity {
+    protected boolean isValidFragment(java.lang.String);
+}
