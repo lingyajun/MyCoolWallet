@@ -1,5 +1,5 @@
 # 麦酷钱包（MyCoolWallet）
-[ 测试网络·安装包 apk ](https://github.com/lingyajun/MyCoolWallet/releases/download/v1.0.2/test_net-release-1.0.3.apk)
+[ 测试网络·安装包 apk ](https://github.com/lingyajun/MyCoolWallet/releases/download/v1.0.2/test_net-release-1.0.4.apk)
 
 
 <div align="center">
